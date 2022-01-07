@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:live_audio_room_flutter/model/user_info.dart';
+import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 
 enum LoginState {
   loginStateLoggedOut,

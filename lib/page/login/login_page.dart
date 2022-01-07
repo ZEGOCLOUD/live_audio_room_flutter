@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:live_audio_room_flutter/model/user_info.dart';
-import 'package:live_audio_room_flutter/model/user_service.dart';
+import 'package:live_audio_room_flutter/model/zego_user_info.dart';
+import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/src/provider.dart';
 
 class LoginPage extends StatelessWidget {

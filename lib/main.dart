@@ -2,9 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:live_audio_room_flutter/model/room_service.dart';
-import 'package:live_audio_room_flutter/model/user_service.dart';
-import 'package:live_audio_room_flutter/model/user_service.dart';
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/page/login/login_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_entrance_page.dart';
 import 'package:live_audio_room_flutter/page/settings/settings_page.dart';
