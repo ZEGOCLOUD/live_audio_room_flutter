@@ -10,7 +10,8 @@ class RoomEntrancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(
+        body: SafeArea(
+            child: Center(
       child: FractionallySizedBox(
         widthFactor: 0.85,
         child: Column(
@@ -69,7 +70,7 @@ class RoomEntrancePage extends StatelessWidget {
           ],
         ),
       ),
-    ));
+    )));
     // return Scaffold(
     //   body: Center(
     //     child: Consumer<UserService>(
