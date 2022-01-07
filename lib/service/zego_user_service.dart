@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:live_audio_room_flutter/model/user_info.dart';
+import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 
 enum LoginState {
   loginStateLoggedOut,
@@ -12,11 +12,11 @@ enum LoginState {
 
 typedef LoginCallback = Function(int);
 
-class UserService extends ChangeNotifier {
+class ZegoUserService extends ChangeNotifier {
   // TODO@oliver update userList on SDK callback and notify changed
-  late List<UserInfo> userList;
-  late UserInfo localUserInfo;
-  late Map<String, UserInfo> userDic;
+  late List<ZegoUserInfo> userList;
+  late ZegoUserInfo localUserInfo;
+  late Map<String, ZegoUserInfo> userDic;
   late String token;
   int totalUsersNum = 0;
   LoginState loginState = LoginState.loginStateLoggedOut;
@@ -32,7 +32,7 @@ class UserService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void login(UserInfo info, String token, LoginCallback? callback) {
+  void login(ZegoUserInfo info, String token, LoginCallback? callback) {
     localUserInfo = info;
     loginState = LoginState.loginStateLoggingIn;
     notifyListeners();

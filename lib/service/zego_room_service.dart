@@ -11,7 +11,7 @@ class RoomInfo {
 }
 
 typedef RoomCallback = Function(int);
-class RoomService extends ChangeNotifier {
+class ZegoRoomService extends ChangeNotifier {
   late RoomInfo roomInfo;
 
   void createRoom(String roomId, String roomName, String token, RoomCallback? callback) {
