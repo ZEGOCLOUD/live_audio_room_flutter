@@ -3,6 +3,89 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+class CreateRoomDialog extends StatelessWidget {
+  CreateRoomDialog({Key? key}) : super(key: key);
+
+  final dialogRoomIDInputController = TextEditingController();
+  final dialogRoomNameInputController = TextEditingController();
+
+  void checkRoomInfoIsValid(BuildContext context) {
+    if (dialogRoomIDInputController.text.isEmpty) {
+      Fluttertoast.showToast(msg: "Please enter the roomid.");
+      return;
+    }
+    if (dialogRoomNameInputController.text.isEmpty) {
+      Fluttertoast.showToast(msg: "Please enter the room name.");
+      return;
+    }
+    // TODO@oliveryang@zego.im call sdk and wait for callback to show the taost below.
+    // The room has been created. Please join the room directly.
+    // Failed to create. Error code: xx.
+    // TODO@oliveryang@zego.im go to seats page while call sdk succeed.
+    Navigator.pushReplacementNamed(context, "/room_seats");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return CupertinoAlertDialog(
+      title: const Text("Create a new room"),
+      content: FractionallySizedBox(
+        widthFactor: 0.95,
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 30,
+            ),
+            SizedBox(
+              height: 50,
+              child: CupertinoTextField(
+                expands: true,
+                maxLines: null,
+                maxLength: 20,
+                placeholder: "Room ID",
+                controller: dialogRoomIDInputController,
+              ),
+            ),
+            const SizedBox(
+              height: 30,
+            ),
+            SizedBox(
+              height: 50,
+              child: CupertinoTextField(
+                expands: true,
+                maxLines: null,
+                maxLength: 16,
+                placeholder: "Room Name",
+                controller: dialogRoomNameInputController,
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            )
+          ],
+        ),
+      ),
+      actions: [
+        CupertinoDialogAction(
+          child: const Text('Cancel'),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+        CupertinoDialogAction(
+          child: const Text('Create'),
+          isDestructiveAction: true,
+          onPressed: () {
+            checkRoomInfoIsValid(context);
+          },
+        )
+      ],
+    );
+  }
+}
 
 class RoomEntrancePage extends StatelessWidget {
   const RoomEntrancePage({Key? key}) : super(key: key);
@@ -41,7 +124,10 @@ class RoomEntrancePage extends StatelessWidget {
               height: 30,
             ),
             CupertinoButton.filled(
-                child: const Text("Join Room"), onPressed: () {}),
+                child: const Text("Join Room"),
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, "/room_seats");
+                }),
             Padding(
               padding: const EdgeInsets.all(15),
               child: Row(
@@ -65,11 +151,16 @@ class RoomEntrancePage extends StatelessWidget {
                     )
                   ],
                 ),
-                onPressed: () {}),
+                onPressed: () {
+                  showCupertinoDialog<void>(
+                      context: context,
+                      builder: (BuildContext context) => CreateRoomDialog());
+                }),
           ],
         ),
       ),
     ));
+
     // return Scaffold(
     //   body: Center(
     //     child: Consumer<UserService>(
