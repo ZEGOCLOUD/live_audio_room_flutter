@@ -39,10 +39,10 @@ class LoginPage extends StatelessWidget {
               ElevatedButton(
                 child: const Text('Login'),
                 onPressed: () {
-                  UserInfo info = UserInfo();
+                  ZegoUserInfo info = ZegoUserInfo();
                   info.userId = userIdInputController.text;
                   info.userName = userNameInputController.text;
-                  var userModel = context.read<UserService>();
+                  var userModel = context.read<ZegoUserService>();
                   // TODO@oliver using correct token
                   userModel.login(
                       info,

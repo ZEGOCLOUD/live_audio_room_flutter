@@ -38,8 +38,8 @@ class ZegoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => UserService()),
-        ChangeNotifierProvider(create: (context) => RoomService()),
+        ChangeNotifierProvider(create: (context) => ZegoUserService()),
+        ChangeNotifierProvider(create: (context) => ZegoRoomService()),
       ],
       child: MaterialApp(
         title: "ZegoLiveAudio",
