@@ -9,6 +9,7 @@ import 'package:live_audio_room_flutter/page/login/login_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_entrance_page.dart';
 import 'package:live_audio_room_flutter/page/settings/settings_page.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 
 void main() {
   runApp(const ZegoApp());
@@ -37,6 +38,7 @@ class ZegoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => UserService()),
