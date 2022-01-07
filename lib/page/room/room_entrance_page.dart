@@ -5,13 +5,15 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+typedef RoomOperationCallback = Function();
+
 class CreateRoomDialog extends StatelessWidget {
   CreateRoomDialog({Key? key}) : super(key: key);
 
   final dialogRoomIDInputController = TextEditingController();
   final dialogRoomNameInputController = TextEditingController();
 
-  void checkRoomInfoIsValid(BuildContext context) {
+  void tryCreateRoom(RoomOperationCallback? callback) {
     if (dialogRoomIDInputController.text.isEmpty) {
       Fluttertoast.showToast(msg: "Please enter the roomid.");
       return;
@@ -24,7 +26,9 @@ class CreateRoomDialog extends StatelessWidget {
     // The room has been created. Please join the room directly.
     // Failed to create. Error code: xx.
     // TODO@oliveryang@zego.im go to seats page while call sdk succeed.
-    Navigator.pushReplacementNamed(context, "/room_seats");
+    if (callback != null) {
+      callback();
+    }
   }
 
   @override
@@ -79,7 +83,8 @@ class CreateRoomDialog extends StatelessWidget {
           child: const Text('Create'),
           isDestructiveAction: true,
           onPressed: () {
-            checkRoomInfoIsValid(context);
+            tryCreateRoom(
+                () => Navigator.pushReplacementNamed(context, "/room_seats"));
           },
         )
       ],
@@ -88,7 +93,22 @@ class CreateRoomDialog extends StatelessWidget {
 }
 
 class RoomEntrancePage extends StatelessWidget {
-  const RoomEntrancePage({Key? key}) : super(key: key);
+  RoomEntrancePage({Key? key}) : super(key: key);
+
+  final roomIDInputController = TextEditingController();
+
+  void tryJoinRoom(RoomOperationCallback? callback) {
+    if (roomIDInputController.text.isEmpty) {
+      Fluttertoast.showToast(msg: "Please enter the roomid.");
+      return;
+    }
+    // TODO@oliveryang@zego.im join room by calling sdk and call callback after finished.
+    // The room does not exist. Please create a new one.
+    // Failed to join. Error code: xx.
+    if (callback != null) {
+      callback();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,12 +132,14 @@ class RoomEntrancePage extends StatelessWidget {
             const SizedBox(
               height: 150,
             ),
-            const SizedBox(
+            SizedBox(
               height: 50,
               child: CupertinoTextField(
                 expands: true,
                 maxLines: null,
+                maxLength: 20,
                 placeholder: "Room ID",
+                controller: roomIDInputController,
               ),
             ),
             const SizedBox(
@@ -126,7 +148,8 @@ class RoomEntrancePage extends StatelessWidget {
             CupertinoButton.filled(
                 child: const Text("Join Room"),
                 onPressed: () {
-                  Navigator.pushReplacementNamed(context, "/room_seats");
+                  tryJoinRoom(() =>
+                      Navigator.pushReplacementNamed(context, "/room_seats"));
                 }),
             Padding(
               padding: const EdgeInsets.all(15),
