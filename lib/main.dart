@@ -8,6 +8,7 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/page/login/login_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_entrance_page.dart';
 import 'package:live_audio_room_flutter/page/settings/settings_page.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
@@ -40,20 +41,23 @@ class ZegoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => ZegoUserService()),
-        ChangeNotifierProvider(create: (context) => ZegoRoomService()),
-      ],
-      child: MaterialApp(
-        title: "ZegoLiveAudio",
-        initialRoute: "/login",
-        routes: {
-          "/login": (context) => LoginPage(),
-          "/settings": (context) => const SettingsPage(),
-          "/room_entrance": (context) => RoomEntrancePage(),
-          "/room_seats": (context) => const RoomSeatsPage()
-        },
-      ),
-    );
+        providers: [
+          ChangeNotifierProvider(create: (context) => ZegoUserService()),
+          ChangeNotifierProvider(create: (context) => ZegoRoomService()),
+        ],
+        child: ScreenUtilInit(
+          designSize: const Size(375, 645),
+          minTextAdapt: true,
+          builder: () => MaterialApp(
+            title: "ZegoLiveAudio",
+            initialRoute: "/login",
+            routes: {
+              "/login": (context) => LoginPage(),
+              "/settings": (context) => const SettingsPage(),
+              "/room_entrance": (context) => const RoomEntrancePage(),
+              "/room_seats": (context) => const RoomSeatsPage()
+            },
+          ),
+        ));
   }
 }
