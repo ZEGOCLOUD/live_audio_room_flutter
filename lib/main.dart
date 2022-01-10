@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:live_audio_room_flutter/page/room/room_seats_page.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/page/login/login_page.dart';
@@ -49,7 +50,8 @@ class ZegoApp extends StatelessWidget {
         routes: {
           "/login": (context) => LoginPage(),
           "/settings": (context) => const SettingsPage(),
-          "/room_entrance": (context) => const RoomEntrancePage()
+          "/room_entrance": (context) => RoomEntrancePage(),
+          "/room_seats": (context) => const RoomSeatsPage()
         },
       ),
     );
