@@ -54,7 +54,7 @@ class ZegoApp extends StatelessWidget {
             routes: {
               "/login": (context) => LoginPage(),
               "/settings": (context) => const SettingsPage(),
-              "/room_entrance": (context) => const RoomEntrancePage(),
+              "/room_entrance": (context) => RoomEntrancePage(),
               "/room_seats": (context) => const RoomSeatsPage()
             },
           ),

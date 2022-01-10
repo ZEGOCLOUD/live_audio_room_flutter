@@ -183,7 +183,7 @@ class RoomEntrancePage extends StatelessWidget {
           ],
         ),
       ),
-    ));
+    )));
 
 
     // return Scaffold(

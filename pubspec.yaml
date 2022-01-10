@@ -89,3 +89,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+  assets:
+    - images/navigator_back.png
+    - images/2.0x/navigator_back.png
+    - images/3.0x/navigator_back.png
