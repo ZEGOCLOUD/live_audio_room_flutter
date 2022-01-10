@@ -21,6 +21,9 @@ class ZegoUserService extends ChangeNotifier {
   int totalUsersNum = 0;
   LoginState loginState = LoginState.loginStateLoggedOut;
 
+  ZegoUserService() {
+    // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
+  }
   void fetchOnlineRoomUsersWithPage(int page) {
     // TODO@oliver fetch users info and update userList
     notifyListeners();

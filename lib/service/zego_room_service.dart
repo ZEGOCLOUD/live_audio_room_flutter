@@ -14,6 +14,10 @@ typedef RoomCallback = Function(int);
 class ZegoRoomService extends ChangeNotifier {
   late RoomInfo roomInfo;
 
+  ZegoRoomService() {
+    // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
+  }
+
   void createRoom(String roomId, String roomName, String token, RoomCallback? callback) {
     roomInfo.roomId = roomId;
     roomInfo.roomName = roomName;
