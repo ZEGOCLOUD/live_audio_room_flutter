@@ -47,19 +47,21 @@ class LoginPage extends StatelessWidget {
           child: Column(
             children: [
               TextFormField(
+                style: StyleConstant.loginTextInput,
                 decoration: const InputDecoration(
                     focusedBorder: textFormFieldBorder,
                     border: textFormFieldBorder,
-                    hintStyle: TextStyle(color: StyleColors.loginTextHintColor),
+                    hintStyle: StyleConstant.loginTextInputHintStyle,
                     hintText: 'User ID'),
                 controller: userIdInputController,
               ),
               const SizedBox(height: 26),
               TextFormField(
+                style: StyleConstant.loginTextInput,
                 decoration: const InputDecoration(
                     focusedBorder: textFormFieldBorder,
                     border: textFormFieldBorder,
-                    hintStyle: TextStyle(color: StyleColors.loginTextHintColor),
+                    hintStyle: StyleConstant.loginTextInputHintStyle,
                     hintText: 'User Name'),
                 controller: userNameInputController,
               ),

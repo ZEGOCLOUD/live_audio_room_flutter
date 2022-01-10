@@ -10,8 +10,8 @@ class StyleColors {
   static const Color settingsTitleBackgroundColor = Colors.white;
   static const Color settingsCellBackgroundColor = Colors.white;
 
-  static const Color loginTextHintColor = Color(0xff989BA8);
   static const Color loginTextInputColor = Color(0xff1B1B1B);
+  static const Color loginTextInputHintColor = Color(0xff989BA8);
   static const Color loginTextBorderColor = Color(0xffF0F0F0);
   static const Color loginButtonColor = Color(0xff0055FF);
 }
@@ -26,6 +26,7 @@ class StyleConstant {
   static const appBarTitleSize = 17.0;
   static const settingsFontSize = 14.0;
   static const loginTitleFontSize = 30.0;
+  static const longTextInputFontSize = 14.0;
 
   static const settingAppBar = TextStyle(
     color: Colors.black,
@@ -47,5 +48,13 @@ class StyleConstant {
   static const loginTitle = TextStyle(
     color: Colors.black,
     fontSize: loginTitleFontSize,
+  );
+  static const loginTextInput = TextStyle(
+    color: StyleColors.loginTextInputColor,
+    fontSize: longTextInputFontSize,
+  );
+  static const loginTextInputHintStyle = TextStyle(
+    color: StyleColors.loginTextInputHintColor,
+    fontSize: longTextInputFontSize,
   );
 }
