@@ -93,7 +93,7 @@ class SettingsPage extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
-              icon: Image.asset(StyleIconUrls.navigator_back),
+              icon: Image.asset(StyleIconUrls.navigatorBack),
               onPressed: () =>
                   Navigator.pushReplacementNamed(context, "/room_entrance")),
           title: const Text('Settings',

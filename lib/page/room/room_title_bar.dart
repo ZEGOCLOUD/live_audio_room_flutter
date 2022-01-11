@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:live_audio_room_flutter/common/style/styles.dart';
+
 class RoomTitleBar extends StatelessWidget {
   const RoomTitleBar({Key? key}) : super(key: key);
 
@@ -33,15 +35,11 @@ class RoomTitleBar extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(
-          width: 68,
-          height: 68,
-          child: Icon(
-            Icons.power_settings_new,
-            color: Colors.grey,
-            size: 32.0,
-          ),
-        ),
+        IconButton(
+          icon: Image.asset(StyleIconUrls.roomTopQuit),
+          iconSize: 68,
+          onPressed: () {},
+        )
       ],
     );
   }
