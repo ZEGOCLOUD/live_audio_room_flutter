@@ -22,7 +22,19 @@ class StyleColors {
 
 /// icons
 class StyleIconUrls {
-  static const String navigator_back = 'images/navigator_back.png';
+  static const String navigatorBack = 'images/navigator_back.png';
+  static const String roomBottomGift = 'images/room_bottom_gift.png';
+  static const String roomBottomIm = 'images/room_bottom_im.png';
+  static const String roomBottomMember = 'images/room_bottom_member.png';
+  static const String roomBottomMicrophone =
+      'images/room_bottom_microphone.png';
+  static const String roomBottomSettings = 'images/room_bottom_settings.png';
+  static const String roomGiftFingerHeart = 'images/room_gift_finger_heart.png';
+  static const String roomMemberDropDownArrow =
+      'images/room_member_drop_down_arrow.png';
+  static const String roomSeatDefault = 'images/room_seats.png';
+  static const String roomSeatsHost = 'images/room_seats_host.png';
+  static const String roomTopQuit = 'images/room_top_quit.png';
 }
 
 /// constant style

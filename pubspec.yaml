@@ -91,5 +91,40 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
   assets:
     - images/navigator_back.png
+    - images/navigator_back.png
+    - images/room_bottom_gift.png
+    - images/room_bottom_im.png
+    - images/room_bottom_member.png
+    - images/room_bottom_microphone.png
+    - images/room_bottom_settings.png
+    - images/room_gift_finger_heart.png
+    - images/room_member_drop_down_arrow.png
+    - images/room_seats_default.png
+    - images/room_seats_host.png
+    - images/room_top_quit.png
+
     - images/2.0x/navigator_back.png
+    - images/2.0x/navigator_back.png
+    - images/2.0x/room_bottom_gift.png
+    - images/2.0x/room_bottom_im.png
+    - images/2.0x/room_bottom_member.png
+    - images/2.0x/room_bottom_microphone.png
+    - images/2.0x/room_bottom_settings.png
+    - images/2.0x/room_gift_finger_heart.png
+    - images/2.0x/room_member_drop_down_arrow.png
+    - images/2.0x/room_seats_default.png
+    - images/2.0x/room_seats_host.png
+    - images/2.0x/room_top_quit.png
+
     - images/3.0x/navigator_back.png
+    - images/3.0x/navigator_back.png
+    - images/3.0x/room_bottom_gift.png
+    - images/3.0x/room_bottom_im.png
+    - images/3.0x/room_bottom_member.png
+    - images/3.0x/room_bottom_microphone.png
+    - images/3.0x/room_bottom_settings.png
+    - images/3.0x/room_gift_finger_heart.png
+    - images/3.0x/room_member_drop_down_arrow.png
+    - images/3.0x/room_seats_default.png
+    - images/3.0x/room_seats_host.png
+    - images/3.0x/room_top_quit.png

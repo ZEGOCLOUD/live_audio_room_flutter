@@ -18,17 +18,17 @@ class _RoomSettingPageState extends State<RoomSettingPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.only(left: 18, top: 10, right: 18, bottom: 0),
+      padding: EdgeInsets.only(left: 18.w, top: 10.h, right: 18.w, bottom: 0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-              height: 36.h,
+              height: 72.h,
               child: const Text('Settings',
                   style: StyleConstant.roomSettingTitle)),
-          const SizedBox(height: 10),
+          SizedBox(height: 20.h),
           SizedBox(
-              height: 54.h,
+              height: 108.h,
               child: Row(
                 children: [
                   const Text('Prohibit listeners being a speaker',
@@ -49,7 +49,7 @@ class _RoomSettingPageState extends State<RoomSettingPage> {
                 ],
               )),
           SizedBox(
-              height: 54.h,
+              height: 108.h,
               child: Row(
                 children: [
                   const Text('Prohibit others sending messages'),

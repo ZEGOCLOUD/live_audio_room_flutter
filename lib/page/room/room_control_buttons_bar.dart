@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/page/room/room_setting_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_member_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_gift_page.dart';
@@ -34,17 +36,17 @@ class RoomControlButtonsBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           ControllerButton(
-            icon: const Icon(Icons.chat),
+            icon: Image.asset(StyleIconUrls.roomBottomIm),
             onPressed: () {},
           ),
           Row(
             children: [
               ControllerButton(
-                icon: const Icon(Icons.mic),
+                icon: Image.asset(StyleIconUrls.roomBottomMicrophone),
                 onPressed: () {},
               ),
               ControllerButton(
-                icon: const Icon(Icons.people_alt),
+                icon: Image.asset(StyleIconUrls.roomBottomMember),
                 onPressed: () {
                   showModalBottomSheet(
                       context: context,
@@ -58,7 +60,7 @@ class RoomControlButtonsBar extends StatelessWidget {
                 },
               ),
               ControllerButton(
-                icon: const Icon(Icons.card_giftcard_outlined),
+                icon: Image.asset(StyleIconUrls.roomBottomGift),
                 onPressed: () {
                   showModalBottomSheet(
                       context: context,
@@ -72,7 +74,7 @@ class RoomControlButtonsBar extends StatelessWidget {
                 },
               ),
               ControllerButton(
-                icon: const Icon(Icons.settings),
+                icon: Image.asset(StyleIconUrls.roomBottomSettings),
                 onPressed: () {
                   showModalBottomSheet(
                       context: context,

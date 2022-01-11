@@ -46,7 +46,7 @@ class ZegoApp extends StatelessWidget {
           ChangeNotifierProvider(create: (context) => ZegoRoomService()),
         ],
         child: ScreenUtilInit(
-          designSize: const Size(375, 645),
+          designSize: const Size(750, 1334),
           minTextAdapt: true,
           builder: () => MaterialApp(
             title: "ZegoLiveAudio",
