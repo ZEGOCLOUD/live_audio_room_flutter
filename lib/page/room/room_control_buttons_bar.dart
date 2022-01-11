@@ -1,6 +1,10 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:live_audio_room_flutter/page/room/room_setting_page.dart';
+import 'package:live_audio_room_flutter/page/room/room_member_page.dart';
+import 'package:live_audio_room_flutter/page/room/room_gift_page.dart';
 
 class ControllerButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -13,14 +17,14 @@ class ControllerButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration:
-      const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+          const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
       child: IconButton(onPressed: onPressed, icon: icon),
     );
   }
 }
 
 class RoomControlButtonsBar extends StatelessWidget {
-  const RoomControlButtonsBar({Key? key}):super(key: key);
+  const RoomControlButtonsBar({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,15 +45,45 @@ class RoomControlButtonsBar extends StatelessWidget {
               ),
               ControllerButton(
                 icon: const Icon(Icons.people_alt),
-                onPressed: () {},
+                onPressed: () {
+                  showModalBottomSheet(
+                      context: context,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      elevation: 400.h,
+                      isDismissible: true,
+                      builder: (BuildContext context) {
+                        return RoomMemberPage();
+                      });
+                },
               ),
               ControllerButton(
                 icon: const Icon(Icons.card_giftcard_outlined),
-                onPressed: () {},
+                onPressed: () {
+                  showModalBottomSheet(
+                      context: context,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      elevation: 400.h,
+                      isDismissible: true,
+                      builder: (BuildContext context) {
+                        return RoomGiftPage();
+                      });
+                },
               ),
               ControllerButton(
                 icon: const Icon(Icons.settings),
-                onPressed: () {},
+                onPressed: () {
+                  showModalBottomSheet(
+                      context: context,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      elevation: 400.h,
+                      isDismissible: true,
+                      builder: (BuildContext context) {
+                        return RoomSettingPage();
+                      });
+                },
               ),
             ],
           )
