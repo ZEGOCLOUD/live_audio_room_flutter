@@ -25,6 +25,7 @@ class StyleIconUrls {
   static const String navigatorBack = 'images/navigator_back.png';
   static const String roomBottomGift = 'images/room_bottom_gift.png';
   static const String roomBottomIm = 'images/room_bottom_im.png';
+  static const String roomBottomImDisable = 'images/room_bottom_im_disable.png';
   static const String roomBottomMember = 'images/room_bottom_member.png';
   static const String roomBottomMicrophone =
       'images/room_bottom_microphone.png';
@@ -32,9 +33,14 @@ class StyleIconUrls {
   static const String roomGiftFingerHeart = 'images/room_gift_finger_heart.png';
   static const String roomMemberDropDownArrow =
       'images/room_member_drop_down_arrow.png';
-  static const String roomSeatDefault = 'images/room_seats.png';
+  static const String roomSeatDefault = 'images/room_seats_default.png';
   static const String roomSeatsHost = 'images/room_seats_host.png';
   static const String roomTopQuit = 'images/room_top_quit.png';
+  static const String roomSoundWave = 'images/room_sound_wave.png';
+  static const String roomNetworkStatusBad = 'images/room_network_status_bad.png';
+  static const String roomNetworkStatusGood = 'images/room_network_status_good.png';
+  static const String roomNetworkStatusNormal = 'images/room_network_status_normal.png';
+
 }
 
 /// constant style

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/page/room/room_center_content_frame.dart';
 import 'package:live_audio_room_flutter/page/room/room_control_buttons_bar.dart';
 import 'package:live_audio_room_flutter/page/room/room_title_bar.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RoomMainPage extends StatelessWidget {
   const RoomMainPage({Key? key}) : super(key: key);
@@ -19,22 +20,14 @@ class RoomMainPage extends StatelessWidget {
           // padding: const EdgeInsets.all(80.0),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
-            children: const [
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children:  [
               SizedBox(
-                height: 16,
+                height: 16.h,
               ),
-              RoomTitleBar(),
-              SizedBox(
-                height: 68 / 2,
-              ),
-              Expanded(child: RoomCenterContentFrame()),
-              SizedBox(
-                height: 22 / 2,
-              ),
-              RoomControlButtonsBar(),
-              SizedBox(
-                height: 22 / 2,
-              ),
+              const RoomTitleBar(),
+              const Expanded(child: RoomCenterContentFrame()),
+              const RoomControlButtonsBar(),
             ],
           ),
         ),

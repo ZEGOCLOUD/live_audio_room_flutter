@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -10,18 +11,26 @@ import 'package:live_audio_room_flutter/page/room/room_gift_page.dart';
 
 class ControllerButton extends StatelessWidget {
   final VoidCallback onPressed;
-  final Widget icon;
+  final String iconSrc;
 
-  const ControllerButton(
-      {Key? key, required this.onPressed, required this.icon});
+  ControllerButton({Key? key, required this.onPressed, required this.iconSrc}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration:
-          const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-      child: IconButton(onPressed: onPressed, icon: icon),
-    );
+        width: 68.w,
+        height: 68.w,
+        decoration:
+            const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+        child: Transform.scale(
+          scale: 1.5,
+          child: IconButton(
+            onPressed: onPressed,
+            icon: Image.asset(
+              iconSrc,
+            ),
+          ),
+        ));
   }
 }
 
@@ -31,22 +40,25 @@ class RoomControlButtonsBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(32, 0, 32, 0),
+      padding: EdgeInsets.fromLTRB(32.w, 22.h, 32.h, 22.h),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           ControllerButton(
-            icon: Image.asset(StyleIconUrls.roomBottomIm),
+            iconSrc: StyleIconUrls.roomBottomIm,
             onPressed: () {},
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               ControllerButton(
-                icon: Image.asset(StyleIconUrls.roomBottomMicrophone),
+                iconSrc: StyleIconUrls.roomBottomMicrophone,
                 onPressed: () {},
               ),
+              SizedBox(width: 36.w,),
               ControllerButton(
-                icon: Image.asset(StyleIconUrls.roomBottomMember),
+                iconSrc: StyleIconUrls.roomBottomMember,
                 onPressed: () {
                   showModalBottomSheet(
                       context: context,
@@ -59,8 +71,9 @@ class RoomControlButtonsBar extends StatelessWidget {
                       });
                 },
               ),
+              SizedBox(width: 36.w,),
               ControllerButton(
-                icon: Image.asset(StyleIconUrls.roomBottomGift),
+                iconSrc: StyleIconUrls.roomBottomGift,
                 onPressed: () {
                   showModalBottomSheet(
                       context: context,
@@ -73,8 +86,9 @@ class RoomControlButtonsBar extends StatelessWidget {
                       });
                 },
               ),
+              SizedBox(width: 36.w,),
               ControllerButton(
-                icon: Image.asset(StyleIconUrls.roomBottomSettings),
+                iconSrc: StyleIconUrls.roomBottomSettings,
                 onPressed: () {
                   showModalBottomSheet(
                       context: context,
