@@ -84,7 +84,7 @@ class CreateRoomDialog extends StatelessWidget {
           isDestructiveAction: true,
           onPressed: () {
             tryCreateRoom(
-                () => Navigator.pushReplacementNamed(context, "/room_seats"));
+                () => Navigator.pushReplacementNamed(context, "/room_main"));
           },
         )
       ],
@@ -150,7 +150,7 @@ class RoomEntrancePage extends StatelessWidget {
                 child: const Text("Join Room"),
                 onPressed: () {
                   tryJoinRoom(() =>
-                      Navigator.pushReplacementNamed(context, "/room_seats"));
+                      Navigator.pushReplacementNamed(context, "/room_main"));
                 }),
             Padding(
               padding: const EdgeInsets.all(15),
