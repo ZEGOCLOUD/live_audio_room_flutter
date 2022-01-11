@@ -14,9 +14,9 @@ class SettingSDKVersionWidget extends StatelessWidget {
         decoration: const BoxDecoration(
           color: StyleColors.settingsCellBackgroundColor,
         ),
-        padding: const EdgeInsets.only(left: 16, top: 0, right: 16, bottom: 0),
+        padding: EdgeInsets.only(left: 32.w, top: 0, right: 32.w, bottom: 0),
         child: SizedBox(
-            height: 49.h,
+            height: 98.h,
             child: Row(children: [
               Text(title,
                   style: StyleConstant.settingTitle,
@@ -40,10 +40,10 @@ class SettingsUploadLogWidget extends StatelessWidget {
         decoration: const BoxDecoration(
           color: StyleColors.settingsCellBackgroundColor,
         ),
-        padding: const EdgeInsets.only(left: 16, top: 0, right: 16, bottom: 0),
-        margin: const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 60),
+        padding: EdgeInsets.only(left: 32.w, top: 0, right: 32.w, bottom: 0),
+        margin: EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 120.h),
         child: SizedBox(
-            height: 49.h,
+            height: 98.h,
             child: InkWell(
               onTap: () {
                 //  TODO@yuuyj call user logout logic
@@ -68,7 +68,7 @@ class SettingsLogoutWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: 49.h,
+        height: 98.h,
         width: double.infinity,
         decoration: const BoxDecoration(
           color: StyleColors.settingsCellBackgroundColor,
@@ -109,8 +109,8 @@ class SettingsPage extends StatelessWidget {
               child: Column(children: [
                 // sdk version
                 Container(
-                    margin: const EdgeInsets.only(
-                        left: 0, top: 16, right: 0, bottom: 10),
+                    margin: EdgeInsets.only(
+                        left: 0, top: 32.h, right: 0, bottom: 20.h),
                     child: Column(
                       children: const [
                         //  TODO@yuyj get sdk version
@@ -121,8 +121,7 @@ class SettingsPage extends StatelessWidget {
                       ]
                           .map((e) => Padding(
                                 child: e,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 1),
+                                padding: EdgeInsets.symmetric(vertical: 2.h),
                               ))
                           .toList(),
                     )),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
@@ -12,7 +13,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const textFormFieldBorder = OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(12.0)),
+        borderRadius: BorderRadius.all(Radius.circular(24.0)),
         borderSide: BorderSide(
           color: StyleColors.loginTextBorderColor,
         ));
@@ -21,8 +22,8 @@ class LoginPage extends StatelessWidget {
         body: Column(
       children: [
         Container(
-            margin:
-                const EdgeInsets.only(left: 37, top: 50, right: /*94*/0, bottom: 35),
+            margin: EdgeInsets.only(
+                left: 74.w, top: 100.h, right: /*94*/ 0, bottom: 70.h),
             child: Column(children: [
               Row(
                 children: const [
@@ -43,7 +44,7 @@ class LoginPage extends StatelessWidget {
             ])),
         Container(
           margin:
-              const EdgeInsets.only(left: 30, top: 0, right: 30, bottom: 268),
+              EdgeInsets.only(left: 60.w, top: 0, right: 60.w, bottom: 536.h),
           child: Column(
             children: [
               TextFormField(
@@ -55,7 +56,7 @@ class LoginPage extends StatelessWidget {
                     hintText: 'User ID'),
                 controller: userIdInputController,
               ),
-              const SizedBox(height: 26),
+              SizedBox(height: 49.h),
               TextFormField(
                 style: StyleConstant.loginTextInput,
                 decoration: const InputDecoration(
@@ -65,8 +66,8 @@ class LoginPage extends StatelessWidget {
                     hintText: 'User Name'),
                 controller: userNameInputController,
               ),
-              const SizedBox(
-                height: 35,
+              SizedBox(
+                height: 70.h,
               ),
               ElevatedButton(
                 child: const Text('Login'),
@@ -74,8 +75,8 @@ class LoginPage extends StatelessWidget {
                   primary: StyleColors.loginButtonColor,
                   elevation: 3,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.0)),
-                  minimumSize: const Size(315, 49),
+                      borderRadius: BorderRadius.circular(24.0)),
+                  minimumSize: Size(630.w, 98.h),
                 ),
                 onPressed: () {
                   ZegoUserInfo info = ZegoUserInfo();
