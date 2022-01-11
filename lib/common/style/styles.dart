@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 /// colors
 class StyleColors {
+  static const Color switchActiveColor = Colors.white;
+  static const Color switchActiveTrackColor = Color(0xff0055FF);
+  static const Color switchInactiveTrackColor = Color(0xff787880);
+
   static const Color dark = Color(0xff1B1B1B);
   static const Color red = Color(0xffEE1515);
 
@@ -25,6 +29,8 @@ class StyleIconUrls {
 class StyleConstant {
   static const appBarTitleSize = 17.0;
   static const settingsFontSize = 14.0;
+  static const roomSettingsTitleSize = 17.0;
+  static const roomSettingsSwitchFontSize = 14.0;
   static const loginTitleFontSize = 30.0;
   static const longTextInputFontSize = 14.0;
 
@@ -56,5 +62,14 @@ class StyleConstant {
   static const loginTextInputHintStyle = TextStyle(
     color: StyleColors.loginTextInputHintColor,
     fontSize: longTextInputFontSize,
+  );
+
+  static const roomSettingTitle = TextStyle(
+    color: StyleColors.dark,
+    fontSize: roomSettingsTitleSize,
+  );
+  static const roomSettingSwitchText = TextStyle(
+    color: StyleColors.dark,
+    fontSize: roomSettingsSwitchFontSize,
   );
 }

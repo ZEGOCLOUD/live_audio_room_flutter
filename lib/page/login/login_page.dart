@@ -22,7 +22,7 @@ class LoginPage extends StatelessWidget {
       children: [
         Container(
             margin:
-                const EdgeInsets.only(left: 37, top: 50, right: 94, bottom: 35),
+                const EdgeInsets.only(left: 37, top: 50, right: /*94*/0, bottom: 35),
             child: Column(children: [
               Row(
                 children: const [

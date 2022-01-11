@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SettingSDKVersionWidget extends StatelessWidget {
   final String title;
@@ -15,7 +16,7 @@ class SettingSDKVersionWidget extends StatelessWidget {
         ),
         padding: const EdgeInsets.only(left: 16, top: 0, right: 16, bottom: 0),
         child: SizedBox(
-            height: 49,
+            height: 49.h,
             child: Row(children: [
               Text(title,
                   style: StyleConstant.settingTitle,
@@ -42,7 +43,7 @@ class SettingsUploadLogWidget extends StatelessWidget {
         padding: const EdgeInsets.only(left: 16, top: 0, right: 16, bottom: 0),
         margin: const EdgeInsets.only(left: 0, top: 0, right: 0, bottom: 60),
         child: SizedBox(
-            height: 49,
+            height: 49.h,
             child: InkWell(
               onTap: () {
                 //  TODO@yuuyj call user logout logic
@@ -67,7 +68,7 @@ class SettingsLogoutWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        height: 49,
+        height: 49.h,
         width: double.infinity,
         decoration: const BoxDecoration(
           color: StyleColors.settingsCellBackgroundColor,
