@@ -73,7 +73,7 @@ class LoginPage extends StatelessWidget {
               ElevatedButton(
                 child: const Text('Login'),
                 style: ElevatedButton.styleFrom(
-                  primary: StyleColors.loginButtonColor,
+                  primary: StyleColors.blueButtonEnabledColor,
                   elevation: 3,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(24.0)),
