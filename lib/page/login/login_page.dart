@@ -19,7 +19,8 @@ class LoginPage extends StatelessWidget {
         ));
 
     return Scaffold(
-        body: Column(
+        body: SafeArea(
+            child: Column(
       children: [
         Container(
             margin: EdgeInsets.only(
@@ -95,6 +96,6 @@ class LoginPage extends StatelessWidget {
           ),
         ),
       ],
-    ));
+    )));
   }
 }

@@ -12,7 +12,8 @@ class RoomMainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+        body: SafeArea(
+      child: Center(
         child: Container(
           color: const Color(0xFFF4F4F6),
           // padding: const EdgeInsets.all(80.0),
@@ -38,6 +39,6 @@ class RoomMainPage extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 }
