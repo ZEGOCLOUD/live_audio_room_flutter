@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
@@ -113,6 +114,10 @@ class RoomEntrancePage extends HookWidget {
     // Failed to join. Error code: xx.
     var room = context.read<ZegoRoomService>();
     room.joinRoom(roomID, "token", callback);
+    var users = context.read<ZegoUserService>();
+    if (room.roomInfo.hostId == users.localUserInfo.userId) {
+      users.localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleHost;
+    }
     // TODO@oliveryang below code for UI test only
     var seats = context.read<ZegoSpeakerSeatService>();
     seats.generateFakeDataForUITest();
