@@ -4,14 +4,16 @@ import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/src/provider.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({Key? key}) : super(key: key);
-  final userIdInputController = TextEditingController();
-  final userNameInputController = TextEditingController();
+class LoginPage extends HookWidget {
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final userIdInputController = useTextEditingController();
+    final userNameInputController = useTextEditingController();
+
     const textFormFieldBorder = OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(24.0)),
         borderSide: BorderSide(

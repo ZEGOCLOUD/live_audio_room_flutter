@@ -1,24 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
-typedef RoomOperationCallback = Function();
+typedef RoomOperationCallback = Function(int);
 
-class CreateRoomDialog extends StatelessWidget {
+class CreateRoomDialog extends HookWidget {
   CreateRoomDialog({Key? key}) : super(key: key);
 
-  final dialogRoomIDInputController = TextEditingController();
-  final dialogRoomNameInputController = TextEditingController();
-
-  void tryCreateRoom(RoomOperationCallback? callback) {
-    if (dialogRoomIDInputController.text.isEmpty) {
-      Fluttertoast.showToast(msg: "Please enter the roomid.");
+  void tryCreateRoom(BuildContext context, String roomID, String roomName,
+      RoomOperationCallback? callback) {
+    if (roomID.isEmpty) {
+      Fluttertoast.showToast(msg: "Please enter the roomID.");
       return;
     }
-    if (dialogRoomNameInputController.text.isEmpty) {
+    if (roomName.isEmpty) {
       Fluttertoast.showToast(msg: "Please enter the room name.");
       return;
     }
@@ -26,13 +28,15 @@ class CreateRoomDialog extends StatelessWidget {
     // The room has been created. Please join the room directly.
     // Failed to create. Error code: xx.
     // TODO@oliveryang@zego.im go to seats page while call sdk succeed.
-    if (callback != null) {
-      callback();
-    }
+    var room = context.read<ZegoRoomService>();
+    room.createRoom(roomID, roomName, "token", callback);
   }
 
   @override
   Widget build(BuildContext context) {
+    final dialogRoomIDInputController = useTextEditingController();
+    final dialogRoomNameInputController = useTextEditingController();
+
     // TODO: implement build
     return CupertinoAlertDialog(
       title: const Text("Create a new room"),
@@ -84,7 +88,11 @@ class CreateRoomDialog extends StatelessWidget {
           isDestructiveAction: true,
           onPressed: () {
             tryCreateRoom(
-                () => Navigator.pushReplacementNamed(context, "/room_main"));
+                context,
+                dialogRoomIDInputController.text,
+                dialogRoomNameInputController.text,
+                (code) =>
+                    Navigator.pushReplacementNamed(context, "/room_main"));
           },
         )
       ],
@@ -92,26 +100,33 @@ class CreateRoomDialog extends StatelessWidget {
   }
 }
 
-class RoomEntrancePage extends StatelessWidget {
-  RoomEntrancePage({Key? key}) : super(key: key);
+class RoomEntrancePage extends HookWidget {
+  const RoomEntrancePage({Key? key}) : super(key: key);
 
-  final roomIDInputController = TextEditingController();
-
-  void tryJoinRoom(RoomOperationCallback? callback) {
-    if (roomIDInputController.text.isEmpty) {
-      Fluttertoast.showToast(msg: "Please enter the roomid.");
+  void tryJoinRoom(
+      BuildContext context, String roomID, RoomOperationCallback? callback) {
+    if (roomID.isEmpty) {
+      Fluttertoast.showToast(msg: "Please enter the roomID.");
       return;
     }
     // TODO@oliveryang@zego.im join room by calling sdk and call callback after finished.
     // The room does not exist. Please create a new one.
     // Failed to join. Error code: xx.
-    if (callback != null) {
-      callback();
+    var room = context.read<ZegoRoomService>();
+    room.joinRoom(roomID, "token", callback);
+    var users = context.read<ZegoUserService>();
+    if (room.roomInfo.hostId == users.localUserInfo.userId) {
+      users.localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleHost;
     }
+    // TODO@oliveryang below code for UI test only
+    var seats = context.read<ZegoSpeakerSeatService>();
+    seats.generateFakeDataForUITest();
   }
 
   @override
   Widget build(BuildContext context) {
+    final roomIDInputController = useTextEditingController();
+
     return Scaffold(
         body: SafeArea(
             child: Center(
@@ -149,8 +164,11 @@ class RoomEntrancePage extends StatelessWidget {
             CupertinoButton.filled(
                 child: const Text("Join Room"),
                 onPressed: () {
-                  tryJoinRoom(() =>
-                      Navigator.pushReplacementNamed(context, "/room_main"));
+                  tryJoinRoom(
+                      context,
+                      roomIDInputController.text,
+                      (code) => Navigator.pushReplacementNamed(
+                          context, "/room_main"));
                 }),
             Padding(
               padding: const EdgeInsets.all(15),
@@ -184,14 +202,5 @@ class RoomEntrancePage extends StatelessWidget {
         ),
       ),
     )));
-
-
-    // return Scaffold(
-    //   body: Center(
-    //     child: Consumer<UserService>(
-    //         builder: (context, user, child) =>
-    //             Text('Welcome ${user.localUserInfo.userName}', style: Theme.of(context).textTheme.bodyText1)),
-    //   ),
-    // );
   }
 }
