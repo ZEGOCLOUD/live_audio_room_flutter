@@ -18,7 +18,10 @@ class _RoomSettingPageState extends State<RoomSettingPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 36.w, top: 20.h, right: 36.w, bottom: 20.h),
+      decoration:
+          const BoxDecoration(color: StyleColors.roomPopUpPageBackgroundColor),
+      padding:
+          EdgeInsets.only(left: 36.w, top: 20.h, right: 36.w, bottom: 20.h),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

@@ -24,6 +24,7 @@ class StyleColors {
   static const Color blueButtonEnabledColor = Color(0xff0055FF);
   static Color blueButtonDisableColor = const Color(0xff0055FF).withOpacity(0.3);
 
+  static const Color roomPopUpPageBackgroundColor = Colors.white;
   static const Color giftMemberListBackgroundColor = Color(0xffF7F7F8);
 }
 
@@ -101,6 +102,10 @@ class StyleConstant {
 
   static const roomGiftSendButtonText = TextStyle(
     color: Colors.white,
+    fontSize: 13.0,
+  );
+  static const roomGiftInputText = TextStyle(
+    color: StyleColors.dark,
     fontSize: 13.0,
   );
 
