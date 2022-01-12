@@ -102,6 +102,11 @@ flutter:
     - images/room_seats_default.png
     - images/room_seats_host.png
     - images/room_top_quit.png
+    - images/room_sound_wave.png
+    - images/room_bottom_im_disable.png
+    - images/room_network_status_bad.png
+    - images/room_network_status_good.png
+    - images/room_network_status_normal.png
 
     - images/2.0x/navigator_back.png
     - images/2.0x/navigator_back.png
@@ -115,6 +120,11 @@ flutter:
     - images/2.0x/room_seats_default.png
     - images/2.0x/room_seats_host.png
     - images/2.0x/room_top_quit.png
+    - images/2.0x/room_sound_wave.png
+    - images/2.0x/room_bottom_im_disable.png
+    - images/2.0x/room_network_status_bad.png
+    - images/2.0x/room_network_status_good.png
+    - images/2.0x/room_network_status_normal.png
 
     - images/3.0x/navigator_back.png
     - images/3.0x/navigator_back.png
@@ -128,3 +138,8 @@ flutter:
     - images/3.0x/room_seats_default.png
     - images/3.0x/room_seats_host.png
     - images/3.0x/room_top_quit.png
+    - images/3.0x/room_sound_wave.png
+    - images/3.0x/room_bottom_im_disable.png
+    - images/3.0x/room_network_status_bad.png
+    - images/3.0x/room_network_status_good.png
+    - images/3.0x/room_network_status_normal.png

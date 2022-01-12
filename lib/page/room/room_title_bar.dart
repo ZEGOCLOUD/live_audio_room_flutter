@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 
@@ -13,23 +14,23 @@ class RoomTitleBar extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Container(
-          padding: const EdgeInsets.fromLTRB(36, 0, 0, 0),
+          padding:  EdgeInsets.fromLTRB(36.w, 0, 0, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children:  [
               Text(
                 "Room Name",
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  color: Color(0xFF1B1B1B),
-                  fontSize: 32,
+                  color: const Color(0xFF1B1B1B),
+                  fontSize: 32.sp,
                 ),
               ),
               Text(
                 "ID:123456",
                 style: TextStyle(
-                  color: Color(0xFF606060),
-                  fontSize: 20,
+                  color: const Color(0xFF606060),
+                  fontSize: 20.sp,
                 ),
               )
             ],
@@ -37,7 +38,7 @@ class RoomTitleBar extends StatelessWidget {
         ),
         IconButton(
           icon: Image.asset(StyleIconUrls.roomTopQuit),
-          iconSize: 68,
+          iconSize: 68.w,
           onPressed: () {},
         )
       ],

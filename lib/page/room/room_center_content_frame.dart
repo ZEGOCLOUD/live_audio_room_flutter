@@ -1,38 +1,54 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:live_audio_room_flutter/common/style/styles.dart';
 
 class SeatItem extends StatelessWidget {
   const SeatItem({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 108 + 13 + 28,
-      width: 108,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+    return Container(
+      height: 152.h + 30.h,
+      width: 152.w,
+      child: Stack(
         children: [
-          const CircleAvatar(
-            backgroundImage: NetworkImage(
-                "https://avatarfiles.alphacoders.com/182/182854.jpg"),
+          // bottom layout
+          Positioned.fill(
+            child: Align(
+                alignment: Alignment.topCenter,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // sound wave background
+                    Image.asset(StyleIconUrls.roomSoundWave),
+                    SizedBox(
+                      width: 100.w,
+                      height: 100.h,
+                      child: const CircleAvatar(
+                        backgroundColor: Color(0xFFE6E6E6),
+                        backgroundImage:
+                            AssetImage(StyleIconUrls.roomSeatDefault),
+                      ),
+                    )
+                  ],
+                )),
           ),
-          Container(
-            width: 94 / 2,
-            height: 24 / 2,
-            color: const Color(0xFF0000FF),
-            child: const Text(
-              "Owner",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 10
-              ),
-            ),
-          ),
-          const Text(
-            "User Name",
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 20 / 2
+          Positioned.fill(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image.asset(StyleIconUrls.roomSeatsHost),
+                SizedBox(
+                  height: 9.h,
+                ),
+                Text(
+                  "User Name",
+                  style: TextStyle(fontSize: 20.sp),
+                )
+              ],
             ),
           )
         ],
@@ -41,23 +57,24 @@ class SeatItem extends StatelessWidget {
   }
 }
 
-
 class RoomCenterContentFrame extends StatelessWidget {
-  const RoomCenterContentFrame({Key? key}): super(key: key);
+  const RoomCenterContentFrame({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: EdgeInsets.fromLTRB(38.w, 46.h, 38.w, 0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(
-            height: 149 * 2,
-            width: 108 * 3,
+            height: 212.h * 2,
+            width: 622.w, //(152.w + 22.w) * 3,
             child: GridView.count(
+              childAspectRatio: (152 / 165),
               primary: false,
-              padding: const EdgeInsets.fromLTRB(0, 34, 0, 0),
-              crossAxisSpacing: 20,
+              crossAxisSpacing: 22.w,
               mainAxisSpacing: 0,
               crossAxisCount: 4,
               children: const <Widget>[
