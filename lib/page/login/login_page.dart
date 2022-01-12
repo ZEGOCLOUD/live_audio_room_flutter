@@ -80,7 +80,7 @@ class LoginPage extends StatelessWidget {
                   minimumSize: Size(630.w, 98.h),
                 ),
                 onPressed: () {
-                  ZegoUserInfo info = ZegoUserInfo();
+                  ZegoUserInfo info = ZegoUserInfo.empty();
                   info.userId = userIdInputController.text;
                   info.userName = userNameInputController.text;
                   var userModel = context.read<ZegoUserService>();

@@ -9,4 +9,12 @@ class ZegoUserInfo {
   String userName = "";
   /// User role
   ZegoRoomUserRole userRole = ZegoRoomUserRole.roomUserRoleListener;
+
+  ZegoUserInfo.empty();
+  ZegoUserInfo(this.userId, this.userName, this.userRole);
+
+  @override
+  String toString() {
+    return "UserInfo [userId=$userId,userName=$userName,userRole=$userRole]";
+  }
 }
