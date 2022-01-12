@@ -5,21 +5,20 @@ import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 
 typedef RoomOperationCallback = Function(int);
 
-class CreateRoomDialog extends StatelessWidget {
+class CreateRoomDialog extends HookWidget {
   CreateRoomDialog({Key? key}) : super(key: key);
 
-  final dialogRoomIDInputController = TextEditingController();
-  final dialogRoomNameInputController = TextEditingController();
-
-  void tryCreateRoom(BuildContext context, RoomOperationCallback? callback) {
-    if (dialogRoomIDInputController.text.isEmpty) {
-      Fluttertoast.showToast(msg: "Please enter the roomid.");
+  void tryCreateRoom(BuildContext context, String roomID, String roomName,
+      RoomOperationCallback? callback) {
+    if (roomID.isEmpty) {
+      Fluttertoast.showToast(msg: "Please enter the roomID.");
       return;
     }
-    if (dialogRoomNameInputController.text.isEmpty) {
+    if (roomName.isEmpty) {
       Fluttertoast.showToast(msg: "Please enter the room name.");
       return;
     }
@@ -28,11 +27,14 @@ class CreateRoomDialog extends StatelessWidget {
     // Failed to create. Error code: xx.
     // TODO@oliveryang@zego.im go to seats page while call sdk succeed.
     var room = context.read<ZegoRoomService>();
-    room.createRoom(dialogRoomIDInputController.text, dialogRoomNameInputController.text, "token", callback);
+    room.createRoom(roomID, roomName, "token", callback);
   }
 
   @override
   Widget build(BuildContext context) {
+    final dialogRoomIDInputController = useTextEditingController();
+    final dialogRoomNameInputController = useTextEditingController();
+
     // TODO: implement build
     return CupertinoAlertDialog(
       title: const Text("Create a new room"),
@@ -85,6 +87,8 @@ class CreateRoomDialog extends StatelessWidget {
           onPressed: () {
             tryCreateRoom(
                 context,
+                dialogRoomIDInputController.text,
+                dialogRoomNameInputController.text,
                 (code) =>
                     Navigator.pushReplacementNamed(context, "/room_main"));
           },
@@ -94,25 +98,26 @@ class CreateRoomDialog extends StatelessWidget {
   }
 }
 
-class RoomEntrancePage extends StatelessWidget {
-  RoomEntrancePage({Key? key}) : super(key: key);
+class RoomEntrancePage extends HookWidget {
+  const RoomEntrancePage({Key? key}) : super(key: key);
 
-  final roomIDInputController = TextEditingController();
-
-  void tryJoinRoom(BuildContext context, RoomOperationCallback? callback) {
-    if (roomIDInputController.text.isEmpty) {
-      Fluttertoast.showToast(msg: "Please enter the roomid.");
+  void tryJoinRoom(
+      BuildContext context, String roomID, RoomOperationCallback? callback) {
+    if (roomID.isEmpty) {
+      Fluttertoast.showToast(msg: "Please enter the roomID.");
       return;
     }
     // TODO@oliveryang@zego.im join room by calling sdk and call callback after finished.
     // The room does not exist. Please create a new one.
     // Failed to join. Error code: xx.
     var room = context.read<ZegoRoomService>();
-    room.joinRoom(roomIDInputController.text, "token", callback);
+    room.joinRoom(roomID, "token", callback);
   }
 
   @override
   Widget build(BuildContext context) {
+    final roomIDInputController = useTextEditingController();
+
     return Scaffold(
         body: SafeArea(
             child: Center(
@@ -152,6 +157,7 @@ class RoomEntrancePage extends StatelessWidget {
                 onPressed: () {
                   tryJoinRoom(
                       context,
+                      roomIDInputController.text,
                       (code) => Navigator.pushReplacementNamed(
                           context, "/room_main"));
                 }),
@@ -187,13 +193,5 @@ class RoomEntrancePage extends StatelessWidget {
         ),
       ),
     )));
-
-    // return Scaffold(
-    //   body: Center(
-    //     child: Consumer<UserService>(
-    //         builder: (context, user, child) =>
-    //             Text('Welcome ${user.localUserInfo.userName}', style: Theme.of(context).textTheme.bodyText1)),
-    //   ),
-    // );
   }
 }
