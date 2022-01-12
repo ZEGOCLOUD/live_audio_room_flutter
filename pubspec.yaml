@@ -107,6 +107,7 @@ flutter:
     - images/room_network_status_bad.png
     - images/room_network_status_good.png
     - images/room_network_status_normal.png
+    - images/room_member_more.png
 
     - images/2.0x/navigator_back.png
     - images/2.0x/navigator_back.png
@@ -125,6 +126,7 @@ flutter:
     - images/2.0x/room_network_status_bad.png
     - images/2.0x/room_network_status_good.png
     - images/2.0x/room_network_status_normal.png
+    - images/2.0x/room_member_more.png
 
     - images/3.0x/navigator_back.png
     - images/3.0x/navigator_back.png
@@ -143,3 +145,4 @@ flutter:
     - images/3.0x/room_network_status_bad.png
     - images/3.0x/room_network_status_good.png
     - images/3.0x/room_network_status_normal.png
+    - images/3.0x/room_member_more.png

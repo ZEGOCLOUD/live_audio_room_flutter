@@ -18,12 +18,13 @@ class _RoomSettingPageState extends State<RoomSettingPage> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(left: 18.w, top: 10.h, right: 18.w, bottom: 0),
+      padding: EdgeInsets.only(left: 36.w, top: 20.h, right: 36.w, bottom: 20.h),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
               height: 72.h,
+              width: double.infinity,
               child: const Center(
                   child: Text('Settings',
                       style: StyleConstant.roomBottomPopUpTitle))),

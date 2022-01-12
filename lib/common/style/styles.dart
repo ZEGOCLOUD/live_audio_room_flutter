@@ -10,14 +10,15 @@ class StyleColors {
 
   static const Color dark = Color(0xff1B1B1B);
   static const Color red = Color(0xffEE1515);
+  static const Color gray = Color(0xff989BA8);
 
-  static const Color settingsVersion = Color(0xff989BA8);
+  static const Color settingsVersion = gray;
   static const Color settingsBackgroundColor = Color(0xffF4F5F6);
   static const Color settingsTitleBackgroundColor = Colors.white;
   static const Color settingsCellBackgroundColor = Colors.white;
 
-  static const Color loginTextInputColor = Color(0xff1B1B1B);
-  static const Color loginTextInputHintColor = Color(0xff989BA8);
+  static const Color loginTextInputColor = dark;
+  static const Color loginTextInputHintColor = gray;
   static const Color loginTextBorderColor = Color(0xffF0F0F0);
 
   static const Color blueButtonEnabledColor = Color(0xff0055FF);
@@ -46,6 +47,7 @@ class StyleIconUrls {
   static const String roomNetworkStatusBad = 'images/room_network_status_bad.png';
   static const String roomNetworkStatusGood = 'images/room_network_status_good.png';
   static const String roomNetworkStatusNormal = 'images/room_network_status_normal.png';
+  static const String roomMemberMore = 'images/room_member_more.png';
 
 }
 
@@ -53,7 +55,7 @@ class StyleIconUrls {
 class StyleConstant {
   static const appBarTitleSize = 17.0;
   static const settingsFontSize = 14.0;
-  static const roomSettingsTitleSize = 17.0;
+  static const roomBottomPopupTitleSize = 17.0;
   static const roomSettingsSwitchFontSize = 14.0;
   static const loginTitleFontSize = 30.0;
   static const longTextInputFontSize = 14.0;
@@ -90,7 +92,7 @@ class StyleConstant {
 
   static const roomBottomPopUpTitle = TextStyle(
     color: StyleColors.dark,
-    fontSize: roomSettingsTitleSize,
+    fontSize: roomBottomPopupTitleSize,
   );
   static const roomSettingSwitchText = TextStyle(
     color: StyleColors.dark,
@@ -100,5 +102,14 @@ class StyleConstant {
   static const roomGiftSendButtonText = TextStyle(
     color: Colors.white,
     fontSize: 13.0,
+  );
+
+  static const roomMemberListNameText = TextStyle(
+    color: StyleColors.dark,
+    fontSize: 14.0,
+  );
+  static const roomMemberListRoleText = TextStyle(
+    color: StyleColors.gray,
+    fontSize: 12.0,
   );
 }
