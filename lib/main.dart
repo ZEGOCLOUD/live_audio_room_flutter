@@ -49,7 +49,14 @@ class ZegoApp extends StatelessWidget {
           ChangeNotifierProvider(create: (context) => ZegoRoomService()),
           ChangeNotifierProvider(create: (context) => ZegoGiftService()),
           ChangeNotifierProvider(create: (context) => ZegoMessageService()),
-          ChangeNotifierProvider(create: (context) => ZegoSpeakerSeatService()),
+          ChangeNotifierProxyProvider<ZegoRoomService, ZegoSpeakerSeatService>(
+            create: (_) => ZegoSpeakerSeatService(),
+            update: (_, room, seats) {
+              if (seats == null) throw ArgumentError.notNull('seats');
+              seats.updateHostID(room.roomInfo.hostId);
+              return seats;
+            },
+          )
         ],
         child: ScreenUtilInit(
           designSize: const Size(750, 1334),
