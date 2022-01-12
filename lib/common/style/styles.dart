@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
 /// colors
 class StyleColors {
   static const Color switchActiveColor = Colors.white;
@@ -17,7 +19,11 @@ class StyleColors {
   static const Color loginTextInputColor = Color(0xff1B1B1B);
   static const Color loginTextInputHintColor = Color(0xff989BA8);
   static const Color loginTextBorderColor = Color(0xffF0F0F0);
-  static const Color loginButtonColor = Color(0xff0055FF);
+
+  static const Color blueButtonEnabledColor = Color(0xff0055FF);
+  static Color blueButtonDisableColor = const Color(0xff0055FF).withOpacity(0.3);
+
+  static const Color giftMemberListBackgroundColor = Color(0xffF7F7F8);
 }
 
 /// icons
@@ -76,12 +82,17 @@ class StyleConstant {
     fontSize: longTextInputFontSize,
   );
 
-  static const roomSettingTitle = TextStyle(
+  static const roomBottomPopUpTitle = TextStyle(
     color: StyleColors.dark,
     fontSize: roomSettingsTitleSize,
   );
   static const roomSettingSwitchText = TextStyle(
     color: StyleColors.dark,
     fontSize: roomSettingsSwitchFontSize,
+  );
+
+  static const roomGiftSendButtonText = TextStyle(
+    color: Colors.white,
+    fontSize: 13.0,
   );
 }

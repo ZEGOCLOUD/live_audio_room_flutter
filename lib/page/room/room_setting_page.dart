@@ -24,8 +24,9 @@ class _RoomSettingPageState extends State<RoomSettingPage> {
         children: [
           SizedBox(
               height: 72.h,
-              child: const Text('Settings',
-                  style: StyleConstant.roomSettingTitle)),
+              child: const Center(
+                  child: Text('Settings',
+                      style: StyleConstant.roomBottomPopUpTitle))),
           SizedBox(height: 20.h),
           SizedBox(
               height: 108.h,

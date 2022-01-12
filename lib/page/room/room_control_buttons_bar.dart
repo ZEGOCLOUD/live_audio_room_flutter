@@ -52,7 +52,7 @@ class RoomControlButtonsBar extends StatelessWidget {
                       context: context,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
-                      elevation: 400.h,
+                      elevation: 800.h,
                       isDismissible: true,
                       builder: (BuildContext context) {
                         return RoomMemberPage();
@@ -66,7 +66,7 @@ class RoomControlButtonsBar extends StatelessWidget {
                       context: context,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
-                      elevation: 400.h,
+                      elevation: 800.h,
                       isDismissible: true,
                       builder: (BuildContext context) {
                         return RoomGiftPage();
@@ -80,7 +80,7 @@ class RoomControlButtonsBar extends StatelessWidget {
                       context: context,
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
-                      elevation: 400.h,
+                      elevation: 800.h,
                       isDismissible: true,
                       builder: (BuildContext context) {
                         return RoomSettingPage();
