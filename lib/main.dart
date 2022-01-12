@@ -3,7 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:live_audio_room_flutter/page/room/room_main_page.dart';
+import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
+import 'package:live_audio_room_flutter/service/zego_message_service.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/page/login/login_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_entrance_page.dart';
@@ -44,6 +47,9 @@ class ZegoApp extends StatelessWidget {
         providers: [
           ChangeNotifierProvider(create: (context) => ZegoUserService()),
           ChangeNotifierProvider(create: (context) => ZegoRoomService()),
+          ChangeNotifierProvider(create: (context) => ZegoGiftService()),
+          ChangeNotifierProvider(create: (context) => ZegoMessageService()),
+          ChangeNotifierProvider(create: (context) => ZegoSpeakerSeatService()),
         ],
         child: ScreenUtilInit(
           designSize: const Size(750, 1334),

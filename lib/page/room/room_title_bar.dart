@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+import 'package:provider/provider.dart';
 
 class RoomTitleBar extends StatelessWidget {
   const RoomTitleBar({Key? key}) : super(key: key);
@@ -14,25 +16,30 @@ class RoomTitleBar extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Container(
-          padding:  EdgeInsets.fromLTRB(36.w, 0, 0, 0),
+          padding: EdgeInsets.fromLTRB(36.w, 0, 0, 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children:  [
-              Text(
-                "Room Name",
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  color: const Color(0xFF1B1B1B),
-                  fontSize: 32.sp,
+            children: [
+              Consumer<ZegoRoomService>(
+                builder: (context, room, child) => Text(
+                  room.roomInfo.roomName,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    color: const Color(0xFF1B1B1B),
+                    fontSize: 32.sp,
+                  ),
                 ),
               ),
-              Text(
-                "ID:123456",
-                style: TextStyle(
-                  color: const Color(0xFF606060),
-                  fontSize: 20.sp,
+
+              Consumer<ZegoRoomService>(
+                builder: (context, room, child) => Text(
+                  room.roomInfo.roomId,
+                  style: TextStyle(
+                    color: const Color(0xFF606060),
+                    fontSize: 20.sp,
+                  ),
                 ),
-              )
+              ),
             ],
           ),
         ),

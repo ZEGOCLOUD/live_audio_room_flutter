@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 class RoomInfo {
   String roomId = "";
@@ -12,7 +13,7 @@ class RoomInfo {
 
 typedef RoomCallback = Function(int);
 class ZegoRoomService extends ChangeNotifier {
-  late RoomInfo roomInfo;
+  RoomInfo roomInfo = RoomInfo();
 
   ZegoRoomService() {
     // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
@@ -22,11 +23,9 @@ class ZegoRoomService extends ChangeNotifier {
     roomInfo.roomId = roomId;
     roomInfo.roomName = roomName;
     if (callback != null) {
-
       callback(0);
-
-      notifyListeners();
     }
+    notifyListeners();
   }
 
   void joinRoom(String roomId, String token, RoomCallback? callback) {
@@ -36,7 +35,12 @@ class ZegoRoomService extends ChangeNotifier {
     roomInfo.seatNum = 0;
     roomInfo.isTextMessageDisable = false;
     roomInfo.isSeatClosed = false;
+    roomInfo.roomId = roomId;
+    roomInfo.roomName = "Test Room Name";
 
+    if (callback != null) {
+      callback(0); // Please set the actual code
+    }
     notifyListeners();
   }
 

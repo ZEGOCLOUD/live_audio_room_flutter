@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-typedef RoomOperationCallback = Function();
+typedef RoomOperationCallback = Function(int);
 
 class CreateRoomDialog extends StatelessWidget {
   CreateRoomDialog({Key? key}) : super(key: key);
@@ -13,7 +14,7 @@ class CreateRoomDialog extends StatelessWidget {
   final dialogRoomIDInputController = TextEditingController();
   final dialogRoomNameInputController = TextEditingController();
 
-  void tryCreateRoom(RoomOperationCallback? callback) {
+  void tryCreateRoom(BuildContext context, RoomOperationCallback? callback) {
     if (dialogRoomIDInputController.text.isEmpty) {
       Fluttertoast.showToast(msg: "Please enter the roomid.");
       return;
@@ -26,9 +27,8 @@ class CreateRoomDialog extends StatelessWidget {
     // The room has been created. Please join the room directly.
     // Failed to create. Error code: xx.
     // TODO@oliveryang@zego.im go to seats page while call sdk succeed.
-    if (callback != null) {
-      callback();
-    }
+    var room = context.read<ZegoRoomService>();
+    room.createRoom(dialogRoomIDInputController.text, dialogRoomNameInputController.text, "token", callback);
   }
 
   @override
@@ -84,7 +84,9 @@ class CreateRoomDialog extends StatelessWidget {
           isDestructiveAction: true,
           onPressed: () {
             tryCreateRoom(
-                () => Navigator.pushReplacementNamed(context, "/room_main"));
+                context,
+                (code) =>
+                    Navigator.pushReplacementNamed(context, "/room_main"));
           },
         )
       ],
@@ -97,7 +99,7 @@ class RoomEntrancePage extends StatelessWidget {
 
   final roomIDInputController = TextEditingController();
 
-  void tryJoinRoom(RoomOperationCallback? callback) {
+  void tryJoinRoom(BuildContext context, RoomOperationCallback? callback) {
     if (roomIDInputController.text.isEmpty) {
       Fluttertoast.showToast(msg: "Please enter the roomid.");
       return;
@@ -105,9 +107,8 @@ class RoomEntrancePage extends StatelessWidget {
     // TODO@oliveryang@zego.im join room by calling sdk and call callback after finished.
     // The room does not exist. Please create a new one.
     // Failed to join. Error code: xx.
-    if (callback != null) {
-      callback();
-    }
+    var room = context.read<ZegoRoomService>();
+    room.joinRoom(roomIDInputController.text, "token", callback);
   }
 
   @override
@@ -149,8 +150,10 @@ class RoomEntrancePage extends StatelessWidget {
             CupertinoButton.filled(
                 child: const Text("Join Room"),
                 onPressed: () {
-                  tryJoinRoom(() =>
-                      Navigator.pushReplacementNamed(context, "/room_main"));
+                  tryJoinRoom(
+                      context,
+                      (code) => Navigator.pushReplacementNamed(
+                          context, "/room_main"));
                 }),
             Padding(
               padding: const EdgeInsets.all(15),
@@ -184,7 +187,6 @@ class RoomEntrancePage extends StatelessWidget {
         ),
       ),
     )));
-
 
     // return Scaffold(
     //   body: Center(
