@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
+import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
@@ -110,18 +111,19 @@ class SeatItem extends StatelessWidget {
 class RoomCenterContentFrame extends StatelessWidget {
   const RoomCenterContentFrame({Key? key}) : super(key: key);
 
-  createSeats(List<ZegoSpeakerSeat> seatList, SeatItemClickCallback callback) {
-    for (var i = seatList.length - 1; i < 8; i++) {
-      seatList.add(ZegoSpeakerSeat());
+  _createSeats(List<ZegoSpeakerSeat> seatList, List<ZegoUserInfo> userInfoList,
+      SeatItemClickCallback callback) {
+    var userIDNameMap = <String, String>{};
+    for (var userInfo in userInfoList) {
+      userIDNameMap[userInfo.userId] = userInfo.userName;
     }
-
     var itemList = <SeatItem>[];
     for (var i = 0; i < 8; i++) {
       var seat = seatList[i];
       var item = SeatItem(
         index: i,
         userID: seat.userID,
-        userName: seat.userName,
+        userName: userIDNameMap[seat.userID],
         mic: seat.mic,
         soundLevel: seat.soundLevel,
         avatar: "images/seat_$i.png",
@@ -181,7 +183,7 @@ class RoomCenterContentFrame extends StatelessWidget {
                 crossAxisSpacing: 22.w,
                 mainAxisSpacing: 0,
                 crossAxisCount: 4,
-                children: createSeats(seats.speakerSeatList,
+                children: _createSeats(seats.speakerSeatList, users.userList,
                     seatClickCallback(users.localUserInfo.userRole)),
               ),
             ),
