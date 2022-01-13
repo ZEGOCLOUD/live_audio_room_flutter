@@ -230,5 +230,13 @@ class MainActivity: FlutterActivity() {
         })
     }
 
+//    val handler = ZIMEventHandler() {
+//
+//    }
+//
+//    private fun setZIMHandler(){
+//        zim?.setEventHandler(handler)
+//    }
+
 
 }

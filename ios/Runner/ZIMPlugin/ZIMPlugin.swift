@@ -8,16 +8,23 @@
 import UIKit
 import ZIM
 import Flutter
+import fluttertoast
 
 class ZIMPlugin: NSObject {
     
     static let shared = ZIMPlugin()
     private override init() {}
     
+    var events: FlutterEventSink?
+    
     var zim: ZIM?
     
      func registerChannel() {
+         
          guard let flutterViewController = UIApplication.shared.windows.first?.rootViewController as? FlutterViewController else { return }
+         
+         FlutterEventChannel(name: "ZIMPluginEventChannel", binaryMessenger: flutterViewController.binaryMessenger).setStreamHandler(self)
+         
          let channel = FlutterMethodChannel(name: "ZIMPlugin", binaryMessenger: flutterViewController.binaryMessenger)
          channel.setMethodCallHandler { (call, result) in
              // 根据函数名做不同的处理
@@ -181,7 +188,8 @@ class ZIMPlugin: NSObject {
                  if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
          let textMessage = params!["text"] as? String ?? ""
-         zim?.sendRoomMessage(textMessage, toRoomID: roomID, callback: { message, error in
+         let message = ZIMTextMessage(message: textMessage)
+         zim?.sendRoomMessage(message, toRoomID: roomID, callback: { message, error in
              result(error.code)
          })
      }
@@ -192,11 +200,11 @@ class ZIMPlugin: NSObject {
          let roomID = params!["roomID"] as? String ?? ""
          let attributes = params!["attributes"] as? String ?? ""
          let isDeleteAfterOwnerLeft = params!["delete"] as? Bool ?? false
-
+         let dic = convertJSONStringToDictionary(json:attributes) ?? Dictionary<String, String>()
          let config = ZIMRoomAttributesSetConfig()
          config.isForce = true
          config.isDeleteAfterOwnerLeft = isDeleteAfterOwnerLeft
-         zim?.setRoomAttributes(attributes, roomID: roomID, config: config, callback: { error in
+         zim?.setRoomAttributes(dic, roomID: roomID, config: config, callback: { error in
              result(error.code)
          })
      }
@@ -212,6 +220,82 @@ class ZIMPlugin: NSObject {
        return data
    }
     
+    func convertJSONStringToDictionary(json: String?)->Dictionary<String, String>? {
+        guard let data = json?.data(using: .utf8) else { return nil }
+        
+        do {
+            let dic = try JSONSerialization.jsonObject(with: data, options:.allowFragments)
+            return dic as? Dictionary<String, String> ?? nil
+        } catch {
+            return nil
+        }
+    }
 }
 
+extension ZIMPlugin: ZIMEventHandler {
+    func zim(_ zim: ZIM, connectionStateChanged state: ZIMConnectionState, event: ZIMConnectionEvent, extendedData: [AnyHashable : Any]) {
+        guard let events = self.events else { return }
+        events(["connectionStateChanged", state, event])
+    }
+    
+    // MARK: - Main
+    func zim(_ zim: ZIM, errorInfo: ZIMError) {
+        guard let events = self.events else { return }
+        events(["zim", errorInfo.code])
+    }
+    
+    func zim(_ zim: ZIM, tokenWillExpire second: UInt32) {
+        guard let events = self.events else { return }
+        events(["tokenWillExpire", second])
+        
+    }
+    
+    // MARK: - Message
+    func zim(_ zim: ZIM, receivePeerMessage messageList: [ZIMMessage], fromUserID: String) {
+        guard let events = self.events else { return }
+        events(["receivePeerMessage", messageList, fromUserID])
+    }
+    
+    func zim(_ zim: ZIM, receiveRoomMessage messageList: [ZIMMessage], fromRoomID: String) {
+        guard let events = self.events else { return }
+        events(["receiveRoomMessage", messageList, fromRoomID])
+    }
+    
+    // MARK: - Room
+    func zim(_ zim: ZIM, roomMemberJoined memberList: [ZIMUserInfo], roomID: String) {
+        guard let events = self.events else { return }
+        events(["roomMemberJoined", memberList, roomID])
+    }
+    
+    func zim(_ zim: ZIM, roomMemberLeft memberList: [ZIMUserInfo], roomID: String) {
+        guard let events = self.events else { return }
+        events(["roomMemberLeft", memberList, roomID])
+        
+    }
+    
+    func zim(_ zim: ZIM, roomStateChanged state: ZIMRoomState, event: ZIMRoomEvent, extendedData: [AnyHashable : Any], roomID: String) {
+        guard let events = self.events else { return }
+        events(["roomStateChanged", state, event])
+    }
+    
+    func zim(_ zim: ZIM, roomAttributesUpdated updateInfo: ZIMRoomAttributesUpdateInfo, roomID: String) {
+        guard let events = self.events else { return }
+        events(["roomAttributesUpdated", updateInfo, roomID])
+        
+    }
+}
 
+extension ZIMPlugin : FlutterStreamHandler {
+    
+    func onListen(withArguments arguments: Any?, eventSink events: @escaping FlutterEventSink) -> FlutterError? {
+        self.events = events
+        
+        return nil
+    }
+    
+    func onCancel(withArguments arguments: Any?) -> FlutterError? {
+        events = nil
+        return nil
+    }
+    
+}
