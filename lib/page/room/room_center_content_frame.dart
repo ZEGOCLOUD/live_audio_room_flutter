@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:live_audio_room_flutter/page/room/room_chat_page.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
@@ -270,7 +271,8 @@ class RoomCenterContentFrame extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           SizedBox(
-            height: 212.h * 2,
+            //height: 212.h * 2,
+            height: 300.h,
             width: 622.w, //(152.w + 22.w) * 3,
 
             child: Consumer2<ZegoSpeakerSeatService, ZegoUserService>(
@@ -285,7 +287,8 @@ class RoomCenterContentFrame extends StatelessWidget {
               ),
             ),
           ),
-          const Expanded(child: Text("Message"))
+          const Expanded(child: Text('')),
+          SizedBox(width: 632.w, height: 630.h, child: ChatMessagePage())
         ],
       ),
     );

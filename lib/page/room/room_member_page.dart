@@ -29,12 +29,20 @@ class RoomMemberListItem extends StatelessWidget {
         const SizedBox(width: 24),
         Text(userInfo.userName, style: StyleConstant.roomMemberListNameText),
         const Expanded(child: Text('')),
-        getUserRoleDispaly()
+        getRightWidgetByUserRole()
       ],
     );
   }
 
-  Widget getUserRoleDispaly() {
+  void onMoreMenuSelected(RoomMemberListMenuAction action) {
+    //  todo@yuyj call service api
+    switch (action) {
+      case RoomMemberListMenuAction.inviteToBeASpeaker:
+        break;
+    }
+  }
+
+  Widget getRightWidgetByUserRole() {
     switch (userInfo.userRole) {
       case ZegoRoomUserRole.roomUserRoleHost:
         return const Text('Host',
@@ -57,13 +65,7 @@ class RoomMemberListItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(24),
                 ),
                 color: Colors.white,
-                onSelected: (value) {
-                  //  todo@yuyj call service api
-                  switch (value) {
-                    case RoomMemberListMenuAction.inviteToBeASpeaker:
-                      break;
-                  }
-                },
+                onSelected: (value) => onMoreMenuSelected,
                 itemBuilder: (context) {
                   return <PopupMenuEntry<RoomMemberListMenuAction>>[
                     PopupMenuItem<RoomMemberListMenuAction>(
@@ -90,6 +92,7 @@ class RoomMemberPage extends StatefulWidget {
 }
 
 class _RoomMemberPageState extends State<RoomMemberPage> {
+  //  todo@yuyuj this is some test data
   final List<ZegoUserInfo> _users = [
     ZegoUserInfo('0001', 'Liam', ZegoRoomUserRole.roomUserRoleHost),
     ZegoUserInfo('0002', 'Noah', ZegoRoomUserRole.roomUserRoleSpeaker),
@@ -105,10 +108,11 @@ class _RoomMemberPageState extends State<RoomMemberPage> {
   ];
 
   @override
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
         body: Container(
+      decoration:
+          const BoxDecoration(color: StyleColors.roomPopUpPageBackgroundColor),
       padding: EdgeInsets.only(left: 0, top: 20.h, right: 0, bottom: 0),
       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
         SizedBox(
@@ -117,7 +121,7 @@ class _RoomMemberPageState extends State<RoomMemberPage> {
             child: const Center(
                 child: Text('Members',
                     style: StyleConstant.roomBottomPopUpTitle))),
-        Container(
+        SizedBox(
           width: double.infinity,
           height: 658.h,
           child: ListView.builder(
