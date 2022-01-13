@@ -22,7 +22,8 @@ class StyleColors {
   static const Color loginTextBorderColor = Color(0xffF0F0F0);
 
   static const Color blueButtonEnabledColor = Color(0xff0055FF);
-  static Color blueButtonDisableColor = const Color(0xff0055FF).withOpacity(0.3);
+  static Color blueButtonDisableColor =
+      const Color(0xff0055FF).withOpacity(0.3);
 
   static const Color roomPopUpPageBackgroundColor = Colors.white;
   static const Color giftMemberListBackgroundColor = Color(0xffF7F7F8);
@@ -45,11 +46,13 @@ class StyleIconUrls {
   static const String roomSeatsHost = 'images/room_seats_host.png';
   static const String roomTopQuit = 'images/room_top_quit.png';
   static const String roomSoundWave = 'images/room_sound_wave.png';
-  static const String roomNetworkStatusBad = 'images/room_network_status_bad.png';
-  static const String roomNetworkStatusGood = 'images/room_network_status_good.png';
-  static const String roomNetworkStatusNormal = 'images/room_network_status_normal.png';
+  static const String roomNetworkStatusBad =
+      'images/room_network_status_bad.png';
+  static const String roomNetworkStatusGood =
+      'images/room_network_status_good.png';
+  static const String roomNetworkStatusNormal =
+      'images/room_network_status_normal.png';
   static const String roomMemberMore = 'images/room_member_more.png';
-
 }
 
 /// constant style
@@ -108,6 +111,8 @@ class StyleConstant {
     color: StyleColors.dark,
     fontSize: 13.0,
   );
+  static const roomGiftMemberListText = TextStyle(
+      color: StyleColors.dark, fontSize: 13.0, decoration: TextDecoration.none);
 
   static const roomMemberListNameText = TextStyle(
     color: StyleColors.dark,
