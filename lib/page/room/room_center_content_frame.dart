@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
@@ -138,9 +139,42 @@ class RoomCenterContentFrame extends StatelessWidget {
     return itemList;
   }
 
+  _showBottomModalButton(
+      BuildContext context, String buttonText, VoidCallback callback) {
+    showModalBottomSheet(
+        context: context,
+        isDismissible: true,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext context) {
+          return SizedBox(
+              height: 60.h + 98.h,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: 98.h,
+                    width: 630.w,
+                    child: CupertinoButton(
+                        color: Colors.white,
+                        onPressed: () {
+                          Navigator.pop(context);
+                          callback();
+                        },
+                        child: Text(
+                          buttonText,
+                          style: TextStyle(
+                              color: const Color(0xFF1B1B1B), fontSize: 28.sp),
+                        )),
+                  ),
+                ],
+              ));
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-    seatClickCallback(ZegoRoomUserRole userRole) {
+    seatClickCallback(ZegoRoomUserRole userRole, {String? userName}) {
       if (ZegoRoomUserRole.roomUserRoleHost == userRole) {
         // Process host click
         return (int index, String userID, ZegoSpeakerSeatStatus status) {
@@ -151,12 +185,41 @@ class RoomCenterContentFrame extends StatelessWidget {
             // Close or Unclose Seat
             var setToClose =
                 ZegoSpeakerSeatStatus.zegoSpeakerSeatStatusClosed != status;
-            var seats = context.read<ZegoSpeakerSeatService>();
-            seats.closeSeat(setToClose, index, (p0) => null);
+            _showBottomModalButton(
+                context,
+                setToClose
+                    ? "Close a speaker seat"
+                    : "Open a closed speaker seat ", () {
+              var seats = context.read<ZegoSpeakerSeatService>();
+              seats.closeSeat(setToClose, index, (p0) => null);
+            });
           } else {
             // Remove user from seat
-            var seats = context.read<ZegoSpeakerSeatService>();
-            seats.removeUserFromSeat(index, (p0) => null);
+            _showBottomModalButton(context, "Remove from speaker seat", () {
+              showDialog<String>(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  title: const Text('Leave the seat'),
+                  content:
+                      Text('Are you sure to let $userName leave the seat?'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'Cancel'),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context, 'Confirm');
+                        // DO REMOVE JOB
+                        var seats = context.read<ZegoSpeakerSeatService>();
+                        seats.removeUserFromSeat(index, (p0) => null);
+                      },
+                      child: const Text('Confirm'),
+                    ),
+                  ],
+                ),
+              );
+            });
           }
         };
       } else if (ZegoRoomUserRole.roomUserRoleSpeaker == userRole) {
@@ -167,11 +230,15 @@ class RoomCenterContentFrame extends StatelessWidget {
           var seats = context.read<ZegoSpeakerSeatService>();
 
           if (userID.isEmpty) {
-            seats.switchSeat(index, (p0) => null);
+            _showBottomModalButton(context, "Take a speaker seat", () {
+              seats.switchSeat(index, (p0) => null);
+            });
           } else if (users.localUserInfo.userId == userID) {
-            seats.leaveSeat((p0) => null);
-            users.setUserRoleForUITest(ZegoRoomUserRole
-                .roomUserRoleListener); // TODO@oliver FOR UI TEST ONLY
+            _showBottomModalButton(context, "Leave speaker seat ", () {
+              seats.leaveSeat((p0) => null);
+              users.setUserRoleForUITest(ZegoRoomUserRole
+                  .roomUserRoleListener); // TODO@oliver FOR UI TEST ONLY
+            });
           }
         };
       } else {
@@ -182,10 +249,16 @@ class RoomCenterContentFrame extends StatelessWidget {
           if (userID.isNotEmpty) {
             return;
           }
-          users.setUserRoleForUITest(ZegoRoomUserRole
-              .roomUserRoleSpeaker); // TODO@oliver FOR UI TEST ONLY
-          var seats = context.read<ZegoSpeakerSeatService>();
-          seats.takeSeat(index, (p0) => null);
+          if (ZegoSpeakerSeatStatus.zegoSpeakerSeatStatusClosed == status) {
+            Fluttertoast.showToast(msg: "The seat is closed");
+            return;
+          }
+          _showBottomModalButton(context, "Take a speaker seat", () {
+            users.setUserRoleForUITest(ZegoRoomUserRole
+                .roomUserRoleSpeaker); // TODO@oliver FOR UI TEST ONLY
+            var seats = context.read<ZegoSpeakerSeatService>();
+            seats.takeSeat(index, (p0) => null);
+          });
         };
       }
     }
