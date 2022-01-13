@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 
 enum LoginState {
@@ -8,13 +9,14 @@ enum LoginState {
   loginStateLoginFailed,
 }
 
-
-
 typedef LoginCallback = Function(int);
 
 class ZegoUserService extends ChangeNotifier {
   // TODO@oliver update userList on SDK callback and notify changed
-  late List<ZegoUserInfo> userList;
+  late List<ZegoUserInfo> userList = [
+    ZegoUserInfo("111", "Host Name", ZegoRoomUserRole.roomUserRoleHost),
+    ZegoUserInfo("222", "Speaker Name", ZegoRoomUserRole.roomUserRoleHost),
+  ]; // Init list for UI test
   late ZegoUserInfo localUserInfo;
   late Map<String, ZegoUserInfo> userDic;
   late String token;
@@ -24,6 +26,7 @@ class ZegoUserService extends ChangeNotifier {
   ZegoUserService() {
     // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
   }
+
   void fetchOnlineRoomUsersWithPage(int page) {
     // TODO@oliver fetch users info and update userList
     notifyListeners();
@@ -37,6 +40,9 @@ class ZegoUserService extends ChangeNotifier {
 
   void login(ZegoUserInfo info, String token, LoginCallback? callback) {
     localUserInfo = info;
+    if (info.userName.isEmpty) {
+      localUserInfo.userName = info.userId;
+    }
     loginState = LoginState.loginStateLoggingIn;
     notifyListeners();
     if (callback != null) {
@@ -44,12 +50,20 @@ class ZegoUserService extends ChangeNotifier {
       loginState = LoginState.loginStateLoggedIn;
       callback(0);
     }
+    // TODO@oliver FOR UI TEST ONLY
+    userList.add(localUserInfo);
     // TODO@oliver notify in SDK callback
     notifyListeners();
   }
 
   void logout() {
     loginState = LoginState.loginStateLoggedOut;
+    notifyListeners();
+  }
+
+  // TODO@oliveryang
+  void setUserRoleForUITest(ZegoRoomUserRole role) {
+    localUserInfo.userRole = role;
     notifyListeners();
   }
 }

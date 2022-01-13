@@ -49,11 +49,12 @@ class ZegoApp extends StatelessWidget {
           ChangeNotifierProvider(create: (context) => ZegoRoomService()),
           ChangeNotifierProvider(create: (context) => ZegoGiftService()),
           ChangeNotifierProvider(create: (context) => ZegoMessageService()),
-          ChangeNotifierProxyProvider<ZegoRoomService, ZegoSpeakerSeatService>(
+          ChangeNotifierProxyProvider2<ZegoRoomService, ZegoUserService, ZegoSpeakerSeatService>(
             create: (_) => ZegoSpeakerSeatService(),
-            update: (_, room, seats) {
+            update: (_, room,users, seats) {
               if (seats == null) throw ArgumentError.notNull('seats');
               seats.updateHostID(room.roomInfo.hostId);
+              seats.updateLocalUserID(users.localUserInfo.userId);
               return seats;
             },
           )
