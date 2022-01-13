@@ -11,14 +11,15 @@ import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
 
-typedef SeatItemClickCallback = Function(int index, String userId);
+typedef SeatItemClickCallback = Function(
+    int index, String userId, ZegoSpeakerSeatStatus status);
 
 class SeatItem extends StatelessWidget {
   final int index;
   final String userID;
   final String? userName;
   final bool? mic;
-  final ZegoSpeakerSeatStatus? status;
+  final ZegoSpeakerSeatStatus status;
   final double? soundLevel;
   final double? network;
   final String? avatar;
@@ -29,7 +30,7 @@ class SeatItem extends StatelessWidget {
       required this.userID,
       this.userName,
       this.mic,
-      this.status,
+      required this.status,
       this.soundLevel,
       this.network,
       this.avatar,
@@ -61,9 +62,12 @@ class SeatItem extends StatelessWidget {
                       width: 100.w,
                       height: 100.h,
                       child: CircleAvatar(
-                        backgroundColor: Color(0xFFE6E6E6),
-                        backgroundImage:
-                            AssetImage(StyleIconUrls.roomSeatDefault),
+                        backgroundColor: const Color(0xFFE6E6E6),
+                        backgroundImage: (ZegoSpeakerSeatStatus
+                                    .zegoSpeakerSeatStatusClosed ==
+                                status)
+                            ? const AssetImage(StyleIconUrls.roomSeatLock)
+                            : const AssetImage(StyleIconUrls.roomSeatDefault),
                         foregroundImage:
                             (avatar ?? "").isEmpty || (userName ?? "").isEmpty
                                 ? null
@@ -96,8 +100,7 @@ class SeatItem extends StatelessWidget {
           Positioned.fill(
             child: TextButton(
               onPressed: () {
-                print("Button click...");
-                callback(index, userID);
+                callback(index, userID, status);
               },
               child: const Text(""),
             ),
@@ -125,6 +128,7 @@ class RoomCenterContentFrame extends StatelessWidget {
         userID: seat.userID,
         userName: userIDNameMap[seat.userID],
         mic: seat.mic,
+        status: seat.status,
         soundLevel: seat.soundLevel,
         avatar: "images/seat_$i.png",
         callback: callback,
@@ -138,11 +142,25 @@ class RoomCenterContentFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     seatClickCallback(ZegoRoomUserRole userRole) {
       if (ZegoRoomUserRole.roomUserRoleHost == userRole) {
-        return (int index, String userID) {
+        return (int index, String userID, ZegoSpeakerSeatStatus status) {
           // Process host click
+          if (index == 0) {
+            return;
+          }
+          if (userID.isEmpty) {
+            // Close or Unclose Seat
+            var setToClose =
+                ZegoSpeakerSeatStatus.zegoSpeakerSeatStatusClosed != status;
+            var seats = context.read<ZegoSpeakerSeatService>();
+            seats.closeSeat(setToClose, index, (p0) => null);
+          } else {
+            // Remove user from seat
+            var seats = context.read<ZegoSpeakerSeatService>();
+            seats.removeUserFromSeat(index, (p0) => null);
+          }
         };
       } else if (ZegoRoomUserRole.roomUserRoleSpeaker == userRole) {
-        return (int index, String userID) {
+        return (int index, String userID, ZegoSpeakerSeatStatus status) {
           // Process speaker click
           var users = context.read<ZegoUserService>();
           if (users.localUserInfo.userId == userID) {
@@ -152,7 +170,7 @@ class RoomCenterContentFrame extends StatelessWidget {
           seats.switchSeat(index, (p0) => null);
         };
       } else {
-        return (int index, String userID) {
+        return (int index, String userID, ZegoSpeakerSeatStatus status) {
           // Process listener click
           print("Listener($userID) click the item with index($index).");
           var users = context.read<ZegoUserService>();

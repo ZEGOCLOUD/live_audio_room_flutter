@@ -101,6 +101,7 @@ flutter:
     - images/room_gift_finger_heart.png
     - images/room_member_drop_down_arrow.png
     - images/room_seats_default.png
+    - images/room_seats_lock.png
     - images/room_seats_host.png
     - images/room_top_quit.png
     - images/room_sound_wave.png
@@ -128,6 +129,7 @@ flutter:
     - images/2.0x/room_gift_finger_heart.png
     - images/2.0x/room_member_drop_down_arrow.png
     - images/2.0x/room_seats_default.png
+    - images/2.0x/room_seats_lock.png
     - images/2.0x/room_seats_host.png
     - images/2.0x/room_top_quit.png
     - images/2.0x/room_sound_wave.png
@@ -155,6 +157,7 @@ flutter:
     - images/3.0x/room_gift_finger_heart.png
     - images/3.0x/room_member_drop_down_arrow.png
     - images/3.0x/room_seats_default.png
+    - images/3.0x/room_seats_lock.png
     - images/3.0x/room_seats_host.png
     - images/3.0x/room_top_quit.png
     - images/3.0x/room_sound_wave.png
