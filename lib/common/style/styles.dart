@@ -4,13 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 /// colors
 class StyleColors {
-  static const Color switchActiveColor = Colors.white;
-  static const Color switchActiveTrackColor = Color(0xff0055FF);
-  static const Color switchInactiveTrackColor = Color(0xff787880);
-
   static const Color dark = Color(0xff1B1B1B);
   static const Color red = Color(0xffEE1515);
   static const Color gray = Color(0xff989BA8);
+  static const Color blue = Color(0xff0055FF);
+
+  static const Color switchActiveColor = Colors.white;
+  static const Color switchActiveTrackColor = blue;
+  static const Color switchInactiveTrackColor = Color(0xff787880);
 
   static const Color settingsVersion = gray;
   static const Color settingsBackgroundColor = Color(0xffF4F5F6);
@@ -21,12 +22,16 @@ class StyleColors {
   static const Color loginTextInputHintColor = gray;
   static const Color loginTextBorderColor = Color(0xffF0F0F0);
 
-  static const Color blueButtonEnabledColor = Color(0xff0055FF);
-  static Color blueButtonDisableColor =
-      const Color(0xff0055FF).withOpacity(0.3);
+  static const Color blueButtonEnabledColor = blue;
+  static Color blueButtonDisableColor = blue.withOpacity(0.3);
 
   static const Color roomPopUpPageBackgroundColor = Colors.white;
   static const Color giftMemberListBackgroundColor = Color(0xffF7F7F8);
+
+  static const Color roomChatBackgroundColor = Color(0xffe6eaed);
+  static const Color roomChatHostRoleBackgroundColor = Color(0xffF7F7F8);
+  static const Color roomChatUserNameColor = blue;
+  static const Color roomChatMessageColor = dark;
 }
 
 /// icons
@@ -120,6 +125,21 @@ class StyleConstant {
   );
   static const roomMemberListRoleText = TextStyle(
     color: StyleColors.gray,
+    fontSize: 12.0,
+  );
+
+  static const roomChatHostRoleText = TextStyle(
+    color: Colors.white,
+    backgroundColor: StyleColors.roomChatHostRoleBackgroundColor,
+    fontSize: 11.0,
+  );
+  static const roomChatUserNameText = TextStyle(
+    color: StyleColors.roomChatUserNameColor,
+    fontWeight: FontWeight.bold,
+    fontSize: 12.0,
+  );
+  static const roomChatMessageText = TextStyle(
+    color: StyleColors.roomChatMessageColor,
     fontSize: 12.0,
   );
 }

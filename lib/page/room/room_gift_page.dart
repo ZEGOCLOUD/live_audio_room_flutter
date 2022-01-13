@@ -44,18 +44,22 @@ class _RoomGiftMemberListState extends State<RoomGiftMemberList> {
         itemCount: _users.length,
         itemBuilder: (_, index) {
           ZegoUserInfo user = _users[index];
-          return Center(
-            child: Row(
-              children: [
-                Text(
-                  user.userName,
-                  textAlign: TextAlign.left,
-                  style: StyleConstant.roomGiftMemberListText,
+          return GestureDetector(
+              child: Center(
+                child: Row(
+                  children: [
+                    Text(
+                      user.userName,
+                      textAlign: TextAlign.left,
+                      style: StyleConstant.roomGiftMemberListText,
+                    ),
+                    const Expanded(child: Text(''))
+                  ],
                 ),
-                const Expanded(child: Text(''))
-              ],
-            ),
-          );
+              ),
+              onTap: () {
+                //  todo@yuyj change input text, userNameInputController
+              });
         },
       ),
     );
