@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   provider: ^6.0.2
   fluttertoast: ^8.0.8
+  flutter_hooks: ^0.18.2
 
 dev_dependencies:
   flutter_test:
@@ -108,6 +109,14 @@ flutter:
     - images/room_network_status_good.png
     - images/room_network_status_normal.png
     - images/room_member_more.png
+    - images/seat_0.png
+    - images/seat_1.png
+    - images/seat_2.png
+    - images/seat_3.png
+    - images/seat_4.png
+    - images/seat_5.png
+    - images/seat_6.png
+    - images/seat_7.png
 
     - images/2.0x/navigator_back.png
     - images/2.0x/navigator_back.png
@@ -127,6 +136,14 @@ flutter:
     - images/2.0x/room_network_status_good.png
     - images/2.0x/room_network_status_normal.png
     - images/2.0x/room_member_more.png
+    - images/2.0x/seat_0.png
+    - images/2.0x/seat_1.png
+    - images/2.0x/seat_2.png
+    - images/2.0x/seat_3.png
+    - images/2.0x/seat_4.png
+    - images/2.0x/seat_5.png
+    - images/2.0x/seat_6.png
+    - images/2.0x/seat_7.png
 
     - images/3.0x/navigator_back.png
     - images/3.0x/navigator_back.png
@@ -146,3 +163,11 @@ flutter:
     - images/3.0x/room_network_status_good.png
     - images/3.0x/room_network_status_normal.png
     - images/3.0x/room_member_more.png
+    - images/3.0x/seat_0.png
+    - images/3.0x/seat_1.png
+    - images/3.0x/seat_2.png
+    - images/3.0x/seat_3.png
+    - images/3.0x/seat_4.png
+    - images/3.0x/seat_5.png
+    - images/3.0x/seat_6.png
+    - images/3.0x/seat_7.png
