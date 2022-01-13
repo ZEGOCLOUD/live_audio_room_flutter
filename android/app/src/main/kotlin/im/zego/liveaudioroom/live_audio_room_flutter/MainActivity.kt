@@ -1,194 +1,233 @@
 package im.zego.liveaudioroom.live_audio_room_flutter
 
-import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
-import android.os.Bundle
 import im.zego.zim.ZIM
-import im.zego.zim.entity.ZIMRoomInfo
-import im.zego.zim.entity.ZIMRoomAdvancedConfig
-
+import im.zego.zim.callback.*
+import im.zego.zim.entity.*
+import im.zego.zim.enums.ZIMErrorCode
+import io.flutter.plugin.common.MethodCall
+import org.json.JSONObject
 
 class MainActivity: FlutterActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-//        GeneratedPluginRegistrant.registerWith(this)
-        print("=======configureFlutterEngine")
-//        MethodChannel(flutterView, CHANNEL).setMethodCallHandler {
-//                call, result ->
-//            // Note: this method is invoked on the main thread.
-//            // TODO
-//            print("=======configureFlutterEngine")
-//        }
-    }
-
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
 
-        print("=======configureFlutterEngine")
         val messenger = flutterEngine.dartExecutor.binaryMessenger
-
-        // 新建一个 Channel 对象
         val channel = MethodChannel(messenger, "ZIMPlugin")
-
-        // 为 channel 设置回调
-        channel.setMethodCallHandler { call, res ->
-            // 根据方法名，分发不同的处理
+        channel.setMethodCallHandler { call, result ->
             when(call.method) {
-
-                "createZIM" -> {
-                    // 获取传入的参数
-                    val pid = call.argument<String>("pid")
-//                    Log.i("ZHP", "正在执行原生方法，传入的参数是：「$pid」")
-                    // 通知执行成功
-                    print("正在执行原生方法")
-                    res.success("这是执行的结果")
-//                    ZIM.create(pid ?? "")
-                } else -> {
-                    // 如果有未识别的方法名，通知执行失败
-//                    res.error("error_code", "error_message", null)
-                }
+                "createZIM" -> { createZIM(call, result) }
+                "destoryZIM" -> { destoryZIM(call, result) }
+                "login" -> { login(call, result) }
+                "logout" -> { logout(call, result) }
+                "createRoom" -> { createRoom(call, result) }
+                "joinRoom" -> { joinRoom(call, result) }
+                "leaveRoom" -> { leaveRoom(call, result) }
+                "uploadLog" -> { uploadLog(call, result) }
+                "queryRoomAllAttributes" -> { queryRoomAllAttributes(call, result) }
+                "queryRoomOnlineMemberCount" -> { queryRoomOnlineMemberCount(call, result) }
+                "sendPeerMessage" -> { sendPeerMessage(call, result) }
+                "sendRoomMessage" -> { sendRoomMessage(call, result) }
+                "setRoomAttributes" -> { setRoomAttributes(call, result) }
+                else -> { result.error("error_code", "error_message", null) }
             }
         }
     }
 
-    private val zim: ZIM?
-    fun createZIM(call: MethodCall, result: Result) {
-        let params = call.arguments as? NSDictionary
-        var pid = ""
-        if (params != nil) {
-            pid = params!["pid"] as? String ?? ""
-        }
-        zim = ZIM.create(pid)
-        print("createZIM：" + pid)
-        result(nil)
+    private var zim: ZIM? = null
+    private fun createZIM(call: MethodCall, result: MethodChannel.Result) {
+        val appID: Int? = call.argument<Int>("appID")
+        zim = ZIM.create(appID?.toLong()!!, application)
+        result.success(null)
     }
 
-    fun destoryZIM(call: MethodCall, result: Result) {
-        zim.destroy()
-        zim = nil
-        print("destoryZIM")
-        result(nil)
+    private fun destoryZIM(call: MethodCall, result: MethodChannel.Result) {
+        zim?.destroy()
+        zim = null
+        result.success(null)
     }
 
-    fun login(call: MethodCall, result: Result) {
-        let params = call.arguments as? NSDictionary
-        if (params == nil) { return }
-        var userID = params!["userID"] as? String ?? ""
-        var userName = params!["userName"] as? String ?? ""
-        var token = params!["token"] as? String ?? ""
-        let user = ZIMUserInfo()
+    private fun login(call: MethodCall, result: MethodChannel.Result) {
+        val userID: String? = call.argument<String>("userID")
+        val userName: String? = call.argument<String>("userName")
+        val token: String? = call.argument<String>("token")
+
+        var user = ZIMUserInfo()
         user.userID = userID
         user.userName = userName
-        zim.login(user, token, errorInfo -> {
-            result(nil)
+        zim?.login(user, token, ZIMLoggedInCallback {
+            if (it.code.value() == ZIMErrorCode.SUCCESS.value()) {
+                result.success(null)
+            } else {
+                result.error(it.code.toString(), it.message, null)
+            }
         })
     }
 
-    fun logout(call: MethodCall, result: Result) {
-        zim.logout()
+    private fun logout(call: MethodCall, result: MethodChannel.Result) {
+        zim?.logout()
     }
 
-    fun createRoom(call: MethodCall, result: Result) {
-        let params = call.arguments as? NSDictionary
+    private fun createRoom(call: MethodCall, result: MethodChannel.Result) {
+        val roomID: String? = call.argument<String>("roomID")
+        val roomName: String? = call.argument<String>("roomName")
 
-        if (params == nil) {
-            return
+        val roomInfo = ZIMRoomInfo()
+        roomInfo.roomID = roomID
+        roomInfo.roomName = roomName
+        val config = ZIMRoomAdvancedConfig()
+
+        val json = JSONObject()
+        json.put("room_id", roomID)
+        json.put("room_name", roomName)
+        val jsonString = json.toString()
+
+
+        config.roomAttributes = hashMapOf("room_info" to jsonString)
+        zim?.createRoom(roomInfo, config) { roomInfo, errorInfo ->
+            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
+                result.success(null)
+            } else {
+                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
+            }
         }
-        var roomID = params!["roomID"] as? String ?? ""
-        var roomName = params!["roomName"] as? String ?? ""
-
-        let roomInfo = ZIMRoomInfo(roomID, roomName)
-        let config = ZIMRoomAdvancedConfig()
-        config.roomAttributes = {"room_Info": {"room_id": roomID, "room_name": roomName}}
-        zim.createRoom(zimRoomInfo, config, (roomInfo, errorInfo) -> {
-            result(roomInfo)
-        });
     }
 
-    fun joinRoom(call: MethodCall, result: Result) {
-        let params = call.arguments as? NSDictionary
-        if (params == nil) {
-            return
+    private fun joinRoom(call: MethodCall, result: MethodChannel.Result) {
+        val roomID: String? = call.argument<String>("roomID")
+        zim?.joinRoom(roomID) { roomInfo, errorInfo ->
+            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
+                result.success(null)
+            } else {
+                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
+            }
         }
-        var roomID = params!["roomID"] as? String ?? ""
-        zim.joinRoom(roomID, (roomInfo, errorInfo) -> {
-            result(roomInfo)
-        });
     }
 
-    fun leaveRoom(call: MethodCall, result: Result) {
-        let params = call.arguments as? NSDictionary
-                if (params == nil) {
-                    return
-                }
-        var roomID = params!["roomID"] as? String ?? ""
-        zim.leaveRoom(roomID, (roomInfo, errorInfo) -> {
-            result(roomInfo)
-        });
+    private fun leaveRoom(call: MethodCall, result: MethodChannel.Result) {
+        val roomID: String? = call.argument<String>("roomID")
+        zim?.leaveRoom(roomID) { errorInfo ->
+            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
+                result.success(null)
+            } else {
+                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
+            }
+        }
+
     }
 
-    fun uploadLog(call: MethodCall, result: Result) {
-        zim.uploadLog(errorInfo -> callback.roomCallback(errorInfo.code.value()))
+    private fun uploadLog(call: MethodCall, result: MethodChannel.Result) {
+        zim?.uploadLog(ZIMLogUploadedCallback {
+            if (it.code.value() == ZIMErrorCode.SUCCESS.value()) {
+                result.success(null)
+            } else {
+                result.error(it.code.toString(), it.message, null)
+            }
+        })
     }
 
-    fun queryRoomAllAttributes(call: MethodCall, result: Result) {
-        let params = call.arguments as? NSDictionary
-        if (params == nil) { return }
-        var roomID = params!["roomID"] as? String ?? ""
-        zim.queryRoomAllAttributes(roomID, (roomInfo, errorInfo) -> {
-            result(roomInfo)
-        });
+    private fun queryRoomAllAttributes(call: MethodCall, result: MethodChannel.Result) {
+        val roomID: String? = call.argument<String>("roomID")
+        zim?.queryRoomAllAttributes(roomID
+        ) { roomAttributes, errorInfo ->
+            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
+                result.success(null)
+            } else {
+                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
+            }
+        }
     }
 
-    fun queryRoomOnlineMemberCount(call: MethodCall, result: Result) {
-        let params = call.arguments as? NSDictionary
-                if (params == nil) { return }
-        var roomID = params!["roomID"] as? String ?? ""
-        zim.queryRoomOnlineMemberCount(roomID, (count, errorInfo) -> {
-            result(count)
-        });
+    private fun queryRoomOnlineMemberCount(call: MethodCall, result: MethodChannel.Result) {
+        val roomID: String? = call.argument<String>("roomID")
+        zim?.queryRoomOnlineMemberCount(roomID
+        ) { count, errorInfo ->
+            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
+                result.success(null)
+            } else {
+                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
+            }
+        }
     }
 
-    fun sendPeerMessage(call: MethodCall, result: Result) {
-        let params = call.arguments as? NSDictionary
-                if (params == nil) { return }
-        var userID = params!["userID"] as? String ?? ""
-        var json = params!["json"] as? Dictionary ?? ""
-        var actionType = params!["actionType"] as? Int ?? 0
-        let command = ZegoCustomCommand()
-        command.actionType = actionType
-        command.userID = userID
-        commmand.content = json.getBytes(StandardCharsets.UTF_8)
-        zim.sendPeerMessage(command, userID, (message, errorInfo) -> {
-            result(errorInfo)
-        });
+    private fun sendPeerMessage(call: MethodCall, result: MethodChannel.Result) {
+        val userID: String? = call.argument<String>("userID")
+        val content: String? = call.argument<String>("content")
+        val actionType: Int? = call.argument<Int>("actionType")
+
+        val json = JSONObject()
+        json.put("user_id", userID)
+        json.put("content", content)
+        json.put("action_type", actionType)
+
+        val jsonString = json.toString()
+
+        val customMessage = ZIMCustomMessage()
+        customMessage.message = jsonString.encodeToByteArray()
+        zim?.sendPeerMessage(customMessage, userID
+        ) { message, errorInfo ->
+            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
+                result.success(null)
+            } else {
+                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
+            }
+        }
     }
 
-    fun sendRoomMessage(call: MethodCall, result: Result) {
-        let params = call.arguments as? NSDictionary
-                if (params == nil) { return }
-        var roomID = params!["roomID"] as? String ?? ""
-        var textMessage = params!["text"] as? String ?? ""
-        zim.sendRoomMessage(textMessage, roomID, (message, errorInfo) -> {
-        });
+    private fun sendRoomMessage(call: MethodCall, result: MethodChannel.Result) {
+        val roomID: String? = call.argument<String>("roomID")
+        val textMessage: String? = call.argument<String>("textMessage")
+
+        val message = ZIMTextMessage()
+        message.message = textMessage
+        zim?.sendRoomMessage(message, roomID
+        ) { message, errorInfo ->
+            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
+                result.success(null)
+            } else {
+                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
+            }
+        }
     }
 
-    fun setRoomAttributes(call: MethodCall, result: Result) {
-        let params = call.arguments as? NSDictionary
-                if (params == nil) { return }
-        var roomID = params!["roomID"] as? String ?? ""
-        var attributes = params!["attributes"] as? String ?? ""
-        var isDeleteAfterOwnerLeft = params!["delete"] as? BOOL ?? false
+    private fun setRoomAttributes(call: MethodCall, result: MethodChannel.Result) {
+        val roomID: String? = call.argument<String>("roomID")
+        val attributes: String? = call.argument<String>("attributes")
+        val isDeleteAfterOwnerLeft: Boolean? = call.argument<Boolean>("isDeleteAfterOwnerLeft")
 
-        let config = ZIMRoomAttributesSetConfig()
+        val json = JSONObject(attributes)
+        val map = HashMap<String, String>()
+
+        json.keys().forEach {
+            map[it] = json.getString(it)
+        }
+
+        val config = ZIMRoomAttributesSetConfig()
         config.isForce = true
-        config.isDeleteAfterOwnerLeft = isDeleteAfterOwnerLeft
-        zim.setRoomAttributes(attributes, roomID, config, errorInfo -> {
-            result(errorInfo)
-        }
+        config.isDeleteAfterOwnerLeft = isDeleteAfterOwnerLeft!!
+
+        zim?.setRoomAttributes(map, roomID, config, object :ZIMRoomAttributesBatchOperatedCallback,
+            ZIMRoomAttributesOperatedCallback {
+            override fun onRoomAttributesBatchOperated(errorInfo: ZIMError?) {
+                if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
+                    result.success(null)
+                } else {
+                    result.error(errorInfo?.code.toString(), errorInfo?.message, null)
+                }
+            }
+
+            override fun onRoomAttributesOperated(errorInfo: ZIMError?) {
+                if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
+                    result.success(null)
+                } else {
+                    result.error(errorInfo?.code.toString(), errorInfo?.message, null)
+                }
+            }
+
+        })
     }
 
 

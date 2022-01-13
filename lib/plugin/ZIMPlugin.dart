@@ -10,5 +10,4 @@ class ZIMPlugin {
     print('The pid is $appID .');
     channel.invokeMethod("createZIM", {"appID": appID});
   }
-
 }
