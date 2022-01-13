@@ -40,6 +40,9 @@ class ZegoUserService extends ChangeNotifier {
 
   void login(ZegoUserInfo info, String token, LoginCallback? callback) {
     localUserInfo = info;
+    if (info.userName.isEmpty) {
+      localUserInfo.userName = info.userId;
+    }
     loginState = LoginState.loginStateLoggingIn;
     notifyListeners();
     if (callback != null) {
@@ -47,12 +50,20 @@ class ZegoUserService extends ChangeNotifier {
       loginState = LoginState.loginStateLoggedIn;
       callback(0);
     }
+    // TODO@oliver FOR UI TEST ONLY
+    userList.add(localUserInfo);
     // TODO@oliver notify in SDK callback
     notifyListeners();
   }
 
   void logout() {
     loginState = LoginState.loginStateLoggedOut;
+    notifyListeners();
+  }
+
+  // TODO@oliveryang
+  void setUserRoleForUITest(ZegoRoomUserRole role) {
+    localUserInfo.userRole = role;
     notifyListeners();
   }
 }

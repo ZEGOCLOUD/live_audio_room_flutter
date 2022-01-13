@@ -142,8 +142,8 @@ class RoomCenterContentFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     seatClickCallback(ZegoRoomUserRole userRole) {
       if (ZegoRoomUserRole.roomUserRoleHost == userRole) {
+        // Process host click
         return (int index, String userID, ZegoSpeakerSeatStatus status) {
-          // Process host click
           if (index == 0) {
             return;
           }
@@ -160,26 +160,32 @@ class RoomCenterContentFrame extends StatelessWidget {
           }
         };
       } else if (ZegoRoomUserRole.roomUserRoleSpeaker == userRole) {
+        // Process speaker click
         return (int index, String userID, ZegoSpeakerSeatStatus status) {
-          // Process speaker click
+          print("Speaker click...$index, $userID");
           var users = context.read<ZegoUserService>();
-          if (users.localUserInfo.userId == userID) {
-            return;
-          }
           var seats = context.read<ZegoSpeakerSeatService>();
-          seats.switchSeat(index, (p0) => null);
+
+          if (userID.isEmpty) {
+            seats.switchSeat(index, (p0) => null);
+          } else if (users.localUserInfo.userId == userID) {
+            seats.leaveSeat((p0) => null);
+            users.setUserRoleForUITest(ZegoRoomUserRole
+                .roomUserRoleListener); // TODO@oliver FOR UI TEST ONLY
+          }
         };
       } else {
+        // Process listener click
         return (int index, String userID, ZegoSpeakerSeatStatus status) {
-          // Process listener click
-          print("Listener($userID) click the item with index($index).");
+          print("Listener click...$index, $userID");
           var users = context.read<ZegoUserService>();
-          if (users.localUserInfo.userId == userID) {
+          if (userID.isNotEmpty) {
             return;
           }
+          users.setUserRoleForUITest(ZegoRoomUserRole
+              .roomUserRoleSpeaker); // TODO@oliver FOR UI TEST ONLY
           var seats = context.read<ZegoSpeakerSeatService>();
           seats.takeSeat(index, (p0) => null);
-          // users.localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleSpeaker;
         };
       }
     }
