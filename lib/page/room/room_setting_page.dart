@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class RoomSettingPage extends StatefulWidget {
   @override
@@ -28,15 +29,15 @@ class _RoomSettingPageState extends State<RoomSettingPage> {
           SizedBox(
               height: 72.h,
               width: double.infinity,
-              child: const Center(
-                  child: Text('Settings',
+              child: Center(
+                  child: Text(AppLocalizations.of(context)!.roomPageSettings,
                       style: StyleConstant.roomBottomPopUpTitle))),
           SizedBox(height: 20.h),
           SizedBox(
               height: 108.h,
               child: Row(
                 children: [
-                  const Text('Prohibit listeners being a speaker',
+                  Text(AppLocalizations.of(context)!.roomPageSetTakeSeat,
                       style: StyleConstant.roomSettingSwitchText),
                   const Expanded(child: Text('')),
                   Switch(
@@ -57,7 +58,7 @@ class _RoomSettingPageState extends State<RoomSettingPage> {
               height: 108.h,
               child: Row(
                 children: [
-                  const Text('Prohibit others sending messages'),
+                  Text(AppLocalizations.of(context)!.roomPageSetSilence),
                   const Expanded(child: Text('')),
                   Switch(
                     activeColor: StyleColors.switchActiveColor,

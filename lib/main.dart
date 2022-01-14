@@ -14,6 +14,8 @@ import 'package:live_audio_room_flutter/page/settings/settings_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 void main() {
   runApp(const ZegoApp());
@@ -64,6 +66,16 @@ class ZegoApp extends StatelessWidget {
           minTextAdapt: true,
           builder: () => MaterialApp(
             title: "ZegoLiveAudio",
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en', ''), // English, no country code
+              Locale('zh', ''),
+            ],
             initialRoute: "/login",
             routes: {
               "/login": (context) => LoginPage(),
