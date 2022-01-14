@@ -65,4 +65,7 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    api 'com.github.zegolibrary:zim:1.3.2'
 }
+
