@@ -32,6 +32,11 @@ class StyleColors {
   static const Color roomChatHostRoleBackgroundColor = Color(0xffF7F7F8);
   static const Color roomChatUserNameColor = blue;
   static const Color roomChatMessageColor = dark;
+
+  static const Color roomMessageSendButtonBgColor = blue;
+  static  Color roomMessageSendButtonDisableBgColor = roomMessageSendButtonBgColor.withOpacity(0.3);
+  static const Color roomMessageInputBgColor = Color(0xffF7F7F8);
+
 }
 
 /// icons
@@ -142,5 +147,15 @@ class StyleConstant {
   static const roomChatMessageText = TextStyle(
     color: StyleColors.roomChatMessageColor,
     fontSize: 12.0,
+  );
+
+
+  static const roomMessageInputText = TextStyle(
+    color: StyleColors.dark,
+    fontSize: 13.0,
+  );
+  static const roomMessageSendButtonText = TextStyle(
+    color: Colors.white,
+    fontSize: 13.0,
   );
 }

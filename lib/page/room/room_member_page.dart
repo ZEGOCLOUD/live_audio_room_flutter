@@ -118,8 +118,8 @@ class _RoomMemberPageState extends State<RoomMemberPage> {
         SizedBox(
             height: 72.h,
             width: double.infinity,
-            child: const Center(
-                child: Text('Members',
+            child: Center(
+                child: Text('Members (' + _users.length.toString() + ")",
                     style: StyleConstant.roomBottomPopUpTitle))),
         SizedBox(
           width: double.infinity,
