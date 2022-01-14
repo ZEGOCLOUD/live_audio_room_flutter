@@ -88,9 +88,9 @@ class LoginPage extends HookWidget {
                   info.userId = userIdInputController.text;
                   info.userName = userNameInputController.text;
                   var userModel = context.read<ZegoUserService>();
-                  TODO@oliver using correct token
+                  // TODO@oliver using correct token
                   userModel.login(
-                      info,
+                      info, 
                       "token",
                       (errorCode) => Navigator.pushReplacementNamed(
                           context, '/room_entrance'));
