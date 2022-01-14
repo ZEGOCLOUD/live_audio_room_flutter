@@ -287,8 +287,15 @@ class RoomCenterContentFrame extends StatelessWidget {
               ),
             ),
           ),
-          const Expanded(child: Text('')),
-          SizedBox(width: 632.w, height: 630.h, child: ChatMessagePage())
+          const Expanded(child: Text('sss')),
+          ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: 632.w,
+                maxWidth: 632.w,
+                minHeight: 1.h,
+                maxHeight: 630.h,
+              ),
+              child: ChatMessagePage())
         ],
       ),
     );

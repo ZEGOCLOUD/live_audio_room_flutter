@@ -24,7 +24,7 @@ class ChatMessageItem extends StatelessWidget {
         flex: 10,
         child: Container(
           padding:
-          EdgeInsets.only(left: 21.w, top: 21.h, right: 21.w, bottom: 21.h),
+              EdgeInsets.only(left: 21.w, top: 21.h, right: 21.w, bottom: 21.h),
           margin: EdgeInsets.only(bottom: 20.h),
           decoration: BoxDecoration(
             color: StyleColors.roomChatBackgroundColor,
@@ -111,14 +111,14 @@ And the emptiness you felt will disappear"""),
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(right: (118 - 32).w),
-      child: ListView.builder(
-        itemCount: _messages.length,
-        itemBuilder: (_, index) {
-          ChatMessageModel message = _messages[index];
-          return ChatMessageItem(message: message);
-        },
-      ),
-    );
+        margin: EdgeInsets.only(right: (118 - 32).w),
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: _messages.length,
+          itemBuilder: (_, index) {
+            ChatMessageModel message = _messages[index];
+            return ChatMessageItem(message: message);
+          },
+        ));
   }
 }
