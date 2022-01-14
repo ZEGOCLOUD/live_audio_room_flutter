@@ -4,8 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/page/room/room_setting_page.dart';
@@ -13,6 +11,7 @@ import 'package:live_audio_room_flutter/page/room/room_member_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_gift_page.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
+import 'package:live_audio_room_flutter/common/input/input_dialog.dart';
 
 class ControllerButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -104,7 +103,16 @@ class RoomControlButtonsBar extends StatelessWidget {
         children: [
           ControllerButton(
             iconSrc: StyleIconUrls.roomBottomIm,
-            onPressed: () {},
+            onPressed: () {
+              InputDialog.show(context).then((value) {
+                //  todo@yuuyj send message
+                print(value);
+                // setState(() {
+                //  String _inputString = "";
+                //   _inputString = value;
+                // });
+              });
+            },
           ),
           Consumer<ZegoUserService>(
               builder: (_, users, child) => Row(
