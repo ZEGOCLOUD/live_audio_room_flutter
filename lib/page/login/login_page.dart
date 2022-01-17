@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+
+import 'package:provider/src/provider.dart';
+
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:live_audio_room_flutter/common/device_info.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
-import 'package:provider/src/provider.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
@@ -15,6 +19,15 @@ class LoginPage extends HookWidget {
   Widget build(BuildContext context) {
     final userIdInputController = useTextEditingController();
     final userNameInputController = useTextEditingController();
+
+    //  user id binding device name
+    final deviceName = useState('');
+    userIdInputController.text = deviceName.value;
+    DeviceInfo().readDeviceInfo().then((value) {
+      if (value.containsKey('id')) {
+        deviceName.value = value['id'];
+      }
+    });
 
     const textFormFieldBorder = OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(24.0)),
