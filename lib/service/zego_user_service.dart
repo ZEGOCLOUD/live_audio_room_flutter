@@ -44,13 +44,14 @@ class ZegoUserService extends ChangeNotifier {
     if (info.userName.isEmpty) {
       localUserInfo.userName = info.userID;
     }
-    int result = ZIMPlugin.login(info.userID, info.userName, "");
+    Map result = ZIMPlugin.login(info.userID, info.userName, "");
     loginState = LoginState.loginStateLoggingIn;
     notifyListeners();
     if (callback != null) {
       // TODO@oliver call in SDK real callback
       loginState = LoginState.loginStateLoggedIn;
-      callback(result);
+      int code = result['errorCode'];
+      callback(code);
     }
     // TODO@oliver FOR UI TEST ONLY
     userList.add(localUserInfo);
