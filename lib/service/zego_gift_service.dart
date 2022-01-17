@@ -11,17 +11,17 @@ class ZegoGiftService extends ChangeNotifier {
   String giftName = "";
   List<String> giftReceivers = [];
 
-  void sendGift(String giftID, List<String> toUserList, ZegoRoomCallback? callback) {
+  Future<int> sendGift(String giftID, List<String> toUserList, ZegoRoomCallback? callback) async {
     Map message = {'actionType': 2, 'target': toUserList, 'content': {'giftID': giftID}};
     String json = jsonEncode(message);
-    int result = ZIMPlugin.sendRoomMessage(ZegoRoomManager.shared.roomService.roomInfo.roomID, json, true);
-    if (callback != null) {
-      callback(result);
+    var result = await ZIMPlugin.sendRoomMessage(ZegoRoomManager.shared.roomService.roomInfo.roomID, json, true);
+    int code = result['errorCode'];
+    if (code == 0) {
       giftName = giftID;
       giftReceivers = toUserList;
       giftSender = "Some One";
     }
-
     notifyListeners();
+    return code;
   }
 }

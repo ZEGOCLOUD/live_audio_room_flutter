@@ -139,7 +139,7 @@ class ZIMPlugin: NSObject {
          let roomID = params!["roomID"] as? String ?? ""
          zim?.joinRoom(roomID, callback: { roomInfo, error in
              let dic = ["id": roomInfo.baseInfo.roomID, "name": roomInfo.baseInfo.roomName]
-             result(dic)
+             result(["errorCode": NSNumber(value: error.code.rawValue), "roomInfo": dic])
          })
      }
 

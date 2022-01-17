@@ -33,42 +33,42 @@ class ZegoUserService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void fetchOnlineRoomUsersNum(String roomID) {
-    int result = ZIMPlugin.queryRoomOnlineMemberCount(roomID);
-    totalUsersNum = 0;
+  Future<int> fetchOnlineRoomUsersNum(String roomID) async {
+    var result = await ZIMPlugin.queryRoomOnlineMemberCount(roomID);
+    int code = result['errorCode'];
+    if (code == 0) {
+      totalUsersNum = result['count'];
+    }
     notifyListeners();
+    return code;
   }
 
-  void login(ZegoUserInfo info, String token, LoginCallback? callback) {
+  Future<int> login(ZegoUserInfo info, String token) async {
     localUserInfo = info;
     if (info.userName.isEmpty) {
       localUserInfo.userName = info.userID;
     }
-    Map result = ZIMPlugin.login(info.userID, info.userName, "");
-    loginState = LoginState.loginStateLoggingIn;
-    notifyListeners();
-    if (callback != null) {
-      // TODO@oliver call in SDK real callback
-      loginState = LoginState.loginStateLoggedIn;
-      int code = result['errorCode'];
-      callback(code);
+
+    var result = await ZIMPlugin.login(info.userID, info.userName, "");
+    int code = result['errorCode'];
+    if (code == 0) {
+      loginState = LoginState.loginStateLoggingIn;
     }
-    // TODO@oliver FOR UI TEST ONLY
-    userList.add(localUserInfo);
-    // TODO@oliver notify in SDK callback
     notifyListeners();
+    return code;
   }
 
-  void logout() {
-    ZIMPlugin.logout();
-    loginState = LoginState.loginStateLoggedOut;
+  Future<int> logout() async {
+    var result = await ZIMPlugin.logout();
     notifyListeners();
+    return result['errorCode'];
   }
 
-  void sendInvitation(String userID) {
-    ZIMPlugin.sendPeerMessage(userID, "", 1);
+  Future<int> sendInvitation(String userID) async {
+    var result = await ZIMPlugin.sendPeerMessage(userID, "", 1);
+    notifyListeners();
+    return result['errorCode'];
   }
-
 
   // TODO@oliveryang
   void setUserRoleForUITest(ZegoRoomUserRole role) {

@@ -112,13 +112,8 @@ class LoginPage extends HookWidget {
                   info.userName = userNameInputController.text;
                   var userModel = context.read<ZegoUserService>();
                   // TODO@oliver using correct token
-                  ZegoRoomManager.shared
-                      .initWithAPPID(123, "appSign", (p0) => null);
-                  userModel.login(
-                      info,
-                      "token",
-                      (errorCode) => Navigator.pushReplacementNamed(
-                          context, '/room_entrance'));
+                  ZegoRoomManager.shared.initWithAPPID(123, "appSign", (p0) => null);
+                  userModel.login( info, "token");
                 },
               )
             ],
