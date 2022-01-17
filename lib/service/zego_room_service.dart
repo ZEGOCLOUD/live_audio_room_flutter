@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
+import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 
 class RoomInfo {
   String roomID = "";
@@ -41,8 +42,10 @@ class ZegoRoomService extends ChangeNotifier {
   }
 
   void createRoom(String roomId, String roomName, String token, RoomCallback? callback) {
-    Map<String, Object>  result = ZIMPlugin.createRoom(roomId, roomName);
-
+    int  code = ZIMPlugin.createRoom(roomId, roomName);
+    if (code == 0) {
+      roomInfo = RoomInfo(roomId, roomName, ZegoRoomManager.shared.userService.localUserInfo.userID);
+    }
     if (callback != null) {
       callback(0);
     }
@@ -60,14 +63,21 @@ class ZegoRoomService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void leaveRoom(RoomCallback callback) {
+  void leaveRoom(RoomCallback? callback) {
     int result = ZIMPlugin.leaveRoom(roomInfo.roomID);
-    callback(result);
+    if (callback != null) {
+      callback(result);
+    }
   }
 
   void disableTextMessage(bool disable, RoomCallback? callback) {
-
-    // Map<String, Object>  result = ZIMPlugin.setRoomAttributes(roomId, roomName);
-    // TODO@oliver call SDK method and update state on callback.
+    roomInfo.isTextMessageDisable = disable;
+    var json = jsonEncode(roomInfo);
+    var map = { 'room_info': json };
+    var mapJson = jsonEncode(map);
+    int result = ZIMPlugin.setRoomAttributes(roomInfo.roomID, mapJson, true);
+    if (callback != null) {
+      callback(result);
+    }
   }
 }

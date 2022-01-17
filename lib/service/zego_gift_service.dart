@@ -1,6 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
-import 'dart:async';
-import 'package:async/async.dart';
+import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
+import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 
 typedef ZegoRoomCallback = Function(int);
 
@@ -8,26 +10,18 @@ class ZegoGiftService extends ChangeNotifier {
   String giftSender = "";
   String giftName = "";
   List<String> giftReceivers = [];
-  late RestartableTimer _timer;
 
-  ZegoGiftService() {
-    _timer = RestartableTimer(const Duration(seconds: 10), () {
-      giftSender = "";
-      giftName = "";
-      giftReceivers = [];
-      notifyListeners();
-    });
-    // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
-  }
+  void sendGift(String giftID, List<String> toUserList, ZegoRoomCallback? callback) {
+    Map message = {'actionType': 2, 'target': toUserList, 'content': {'giftID': giftID}};
+    String json = jsonEncode(message);
+    int result = ZIMPlugin.sendRoomMessage(ZegoRoomManager.shared.roomService.roomInfo.roomID, json, true);
+    if (callback != null) {
+      callback(result);
+      giftName = giftID;
+      giftReceivers = toUserList;
+      giftSender = "Some One";
+    }
 
-  void sendGift(
-      String giftID, List<String> toUserList, ZegoRoomCallback? callback) {
-    // TODO@larry call SDK and update data in delegate while callback with succeed code.
-    // Below code just for UI test, Please map gitID to gift name and map userID to user name.
-    giftName = giftID;
-    giftReceivers = toUserList;
-    giftSender = "Some One";
     notifyListeners();
-    _timer.reset();
   }
 }

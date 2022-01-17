@@ -52,8 +52,8 @@ class ZIMPlugin {
     channel.invokeMethod("sendPeerMessage", {"userID": userID, "content": content, "actionType": actionType});
   }
 
-  static sendRoomMessage(String roomID, String text) {
-    channel.invokeMethod("sendRoomMessage", {"roomID": roomID, "text": text});
+  static sendRoomMessage(String roomID, String content, bool isCustomMessage) {
+    channel.invokeMethod("sendRoomMessage", {"roomID": roomID, "content": content, 'isCustomMessage': isCustomMessage});
   }
 
   static setRoomAttributes(String roomID, String attributes, bool delete) {
