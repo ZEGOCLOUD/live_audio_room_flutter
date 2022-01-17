@@ -22,8 +22,8 @@ class ZegoMessageService extends ChangeNotifier {
       var msg = ZegoTextMessage();
       msg.message = message;
       messageList.add(msg);
+      notifyListeners();
     }
-    notifyListeners();
     return code;
   }
 }
