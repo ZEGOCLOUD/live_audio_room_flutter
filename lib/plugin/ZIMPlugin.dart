@@ -56,7 +56,7 @@ class ZIMPlugin {
     channel.invokeMethod("sendRoomMessage", {"roomID": roomID, "text": text});
   }
 
-  static setRoomAttributes(String roomID, String attributes, Bool delete) {
+  static setRoomAttributes(String roomID, String attributes, bool delete) {
     channel.invokeMethod("setRoomAttributes", {"roomID": roomID, "attributes": attributes, "delete": delete});
   }
 

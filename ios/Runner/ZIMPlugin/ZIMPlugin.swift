@@ -97,7 +97,12 @@ class ZIMPlugin: NSObject {
          if (params == nil) { return }
          let userID = params!["userID"] as? String ?? ""
          let userName = params!["userName"] as? String ?? ""
-         let token = params!["token"] as? String ?? ""
+         var token = params!["token"] as? String ?? ""
+         serverSecret = params!["serverSecret"] as? String ?? ""
+         if token.count == 0 {
+             token = AppToken.getZIMToken(withUserID: userID, appID: appID, secret: serverSecret) ?? ""
+         }
+         
          let user = ZIMUserInfo()
          user.userID = userID
          user.userName = userName

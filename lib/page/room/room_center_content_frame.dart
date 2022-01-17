@@ -68,7 +68,7 @@ class SeatItem extends StatelessWidget {
                       child: CircleAvatar(
                         backgroundColor: const Color(0xFFE6E6E6),
                         backgroundImage: (ZegoSpeakerSeatStatus
-                                    .zegoSpeakerSeatStatusClosed ==
+                                    .Closed ==
                                 status)
                             ? const AssetImage(StyleIconUrls.roomSeatLock)
                             : const AssetImage(StyleIconUrls.roomSeatDefault),
@@ -122,7 +122,7 @@ class RoomCenterContentFrame extends StatelessWidget {
       SeatItemClickCallback callback) {
     var userIDNameMap = <String, String>{};
     for (var userInfo in userInfoList) {
-      userIDNameMap[userInfo.userId] = userInfo.userName;
+      userIDNameMap[userInfo.userID] = userInfo.userName;
     }
     var itemList = <SeatItem>[];
     for (var i = 0; i < 8; i++) {
@@ -187,7 +187,7 @@ class RoomCenterContentFrame extends StatelessWidget {
           if (userID.isEmpty) {
             // Close or Unclose Seat
             var setToClose =
-                ZegoSpeakerSeatStatus.zegoSpeakerSeatStatusClosed != status;
+                ZegoSpeakerSeatStatus.Closed != status;
             _showBottomModalButton(
                 context,
                 setToClose
@@ -240,7 +240,7 @@ class RoomCenterContentFrame extends StatelessWidget {
             _showBottomModalButton(context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
               seats.switchSeat(index, (p0) => null);
             });
-          } else if (users.localUserInfo.userId == userID) {
+          } else if (users.localUserInfo.userID == userID) {
             _showBottomModalButton(context, AppLocalizations.of(context)!.roomPageLeaveSeat, () {
               seats.leaveSeat((p0) => null);
               users.setUserRoleForUITest(ZegoRoomUserRole
@@ -256,7 +256,7 @@ class RoomCenterContentFrame extends StatelessWidget {
           if (userID.isNotEmpty) {
             return;
           }
-          if (ZegoSpeakerSeatStatus.zegoSpeakerSeatStatusClosed == status) {
+          if (ZegoSpeakerSeatStatus.Closed == status) {
             Fluttertoast.showToast(msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed);
             return;
           }

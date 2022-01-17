@@ -42,15 +42,15 @@ class ZegoUserService extends ChangeNotifier {
   void login(ZegoUserInfo info, String token, LoginCallback? callback) {
     localUserInfo = info;
     if (info.userName.isEmpty) {
-      localUserInfo.userName = info.userId;
+      localUserInfo.userName = info.userID;
     }
-    Map<String, Object>  result = ZIMPlugin.login(info.userId, info.userName, "");
+    int result = ZIMPlugin.login(info.userID, info.userName, "");
     loginState = LoginState.loginStateLoggingIn;
     notifyListeners();
     if (callback != null) {
       // TODO@oliver call in SDK real callback
       loginState = LoginState.loginStateLoggedIn;
-      callback(0);
+      callback(result);
     }
     // TODO@oliver FOR UI TEST ONLY
     userList.add(localUserInfo);
@@ -74,4 +74,5 @@ class ZegoUserService extends ChangeNotifier {
     localUserInfo.userRole = role;
     notifyListeners();
   }
+
 }

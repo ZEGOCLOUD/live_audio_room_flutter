@@ -51,15 +51,18 @@ class ZegoRoomService extends ChangeNotifier {
 
   void joinRoom(String roomId, String token, RoomCallback? callback) {
     String result = ZIMPlugin.joinRoom(roomId);
-    // roomInfo = new RoomInfo.formJson(JSON.decode(result));
+    roomInfo = new RoomInfo.formJson(jsonDecode(result));
     if (callback != null) {
-      callback(0); // Please set the actual code
+      var code = 0;
+      if (roomInfo.roomID.length == 0) { code = -1; }
+      callback(code);
     }
     notifyListeners();
   }
 
   void leaveRoom(RoomCallback callback) {
-    Map<String, Object>  result = ZIMPlugin.leaveRoom(roomInfo.roomID);
+    int result = ZIMPlugin.leaveRoom(roomInfo.roomID);
+    callback(result);
   }
 
   void disableTextMessage(bool disable, RoomCallback? callback) {

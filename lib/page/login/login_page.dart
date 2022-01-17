@@ -72,7 +72,7 @@ class LoginPage extends HookWidget {
                 ),
                 onPressed: () {
                   ZegoUserInfo info = ZegoUserInfo.empty();
-                  info.userId = userIdInputController.text;
+                  info.userID = userIdInputController.text;
                   info.userName = userNameInputController.text;
                   var userModel = context.read<ZegoUserService>();
                   // TODO@oliver using correct token
