@@ -48,13 +48,18 @@ class ZegoUserService extends ChangeNotifier {
     if (info.userName.isEmpty) {
       localUserInfo.userName = info.userID;
     }
+    loginState = LoginState.loginStateLoggingIn;
+    notifyListeners();
 
+    // Note: token is generate in native code
     var result = await ZIMPlugin.login(info.userID, info.userName, "");
     int code = result['errorCode'];
-    if (code == 0) {
-      loginState = LoginState.loginStateLoggingIn;
-    }
+
+    loginState = code != 0
+        ? LoginState.loginStateLoginFailed
+        : LoginState.loginStateLoggedIn;
     notifyListeners();
+
     return code;
   }
 
@@ -75,5 +80,4 @@ class ZegoUserService extends ChangeNotifier {
     localUserInfo.userRole = role;
     notifyListeners();
   }
-
 }
