@@ -38,8 +38,8 @@ class ZegoUserService extends ChangeNotifier {
     int code = result['errorCode'];
     if (code == 0) {
       totalUsersNum = result['count'];
+      notifyListeners();
     }
-    notifyListeners();
     return code;
   }
 
@@ -65,19 +65,11 @@ class ZegoUserService extends ChangeNotifier {
 
   Future<int> logout() async {
     var result = await ZIMPlugin.logout();
-    notifyListeners();
     return result['errorCode'];
   }
 
   Future<int> sendInvitation(String userID) async {
     var result = await ZIMPlugin.sendPeerMessage(userID, "", 1);
-    notifyListeners();
     return result['errorCode'];
-  }
-
-  // TODO@oliveryang
-  void setUserRoleForUITest(ZegoRoomUserRole role) {
-    localUserInfo.userRole = role;
-    notifyListeners();
   }
 }
