@@ -107,7 +107,7 @@ class ZIMPlugin: NSObject {
          user.userID = userID
          user.userName = userName
          zim?.login(user, token: token, callback: { error in
-             result(error.code)
+             result(["errorCode": NSNumber(value: error.code.rawValue)])
          })
      }
 
@@ -129,7 +129,7 @@ class ZIMPlugin: NSObject {
          let config = ZIMRoomAdvancedConfig()
          config.roomAttributes = ["room_Info": jsonString]
          zim?.createRoom(roomInfo, config: config, callback: { roomInfo, error in
-             result(error.code)
+             result(["errorCode": NSNumber(value: error.code.rawValue)])
          })
      }
 
@@ -148,13 +148,13 @@ class ZIMPlugin: NSObject {
          if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
          zim?.leaveRoom(roomID, callback: { error in
-             result(error.code)
+             result(["errorCode": NSNumber(value: error.code.rawValue)])
          })
      }
 
      func uploadLog(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
          zim?.uploadLog({ error in
-             result(error.code)
+             result(["errorCode": NSNumber(value: error.code.rawValue)])
          })
      }
 
@@ -172,7 +172,7 @@ class ZIMPlugin: NSObject {
                  if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
          zim?.queryRoomOnlineMemberCount(roomID, callback: { count, error in
-             result(count)
+             result(["errorCode": NSNumber(value: error.code.rawValue), "count": count])
          })
      }
 
@@ -187,7 +187,7 @@ class ZIMPlugin: NSObject {
          let data = convertDictionaryToData(dict: messageDic as NSDictionary)
          let customMessage = ZIMCustomMessage(message: data)
          zim?.sendPeerMessage(customMessage, toUserID: userID, callback: { message, error in
-             result(error.code)
+             result(["errorCode": NSNumber(value: error.code.rawValue)])
          })
      }
 
@@ -209,7 +209,7 @@ class ZIMPlugin: NSObject {
          }
 
          zim?.sendRoomMessage(message, toRoomID: roomID, callback: { message, error in
-             result(error.code)
+             result(["errorCode": NSNumber(value: error.code.rawValue)])
          })
      }
 
@@ -224,7 +224,7 @@ class ZIMPlugin: NSObject {
          config.isForce = true
          config.isDeleteAfterOwnerLeft = isDeleteAfterOwnerLeft
          zim?.setRoomAttributes(dic, roomID: roomID, config: config, callback: { error in
-             result(error.code)
+             result(["errorCode": NSNumber(value: error.code.rawValue)])
          })
      }
     
