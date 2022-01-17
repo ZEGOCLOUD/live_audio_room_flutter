@@ -14,18 +14,16 @@ class ZegoMessageService extends ChangeNotifier {
   ZegoMessageService() {
     // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
   }
-  void sendTextMessage(String message, ZegoRoomCallback? callback) {
+  Future<int> sendTextMessage(String message, ZegoRoomCallback? callback) async {
     var roomID = ZegoRoomManager.shared.roomService.roomInfo.roomID;
-    int code = ZIMPlugin.sendRoomMessage(roomID, message, false);
-    // Below code just for UI test
+    var result = await ZIMPlugin.sendRoomMessage(roomID, message, false);
+    int code = result['errorCode'];
     if (code == 0) {
       var msg = ZegoTextMessage();
       msg.message = message;
       messageList.add(msg);
     }
-    if (callback != null) {
-      callback(code);
-    }
     notifyListeners();
+    return code;
   }
 }
