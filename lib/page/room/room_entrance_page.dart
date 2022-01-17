@@ -13,7 +13,7 @@ import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 typedef RoomOperationCallback = Function(int);
 
 class CreateRoomDialog extends HookWidget {
-  CreateRoomDialog({Key? key}) : super(key: key);
+  const CreateRoomDialog({Key? key}) : super(key: key);
 
   void tryCreateRoom(BuildContext context, String roomID, String roomName,
       RoomOperationCallback? callback) {
@@ -32,7 +32,7 @@ class CreateRoomDialog extends HookWidget {
     // Failed to create. Error code: xx.
     // TODO@oliveryang@zego.im go to seats page while call sdk succeed.
     var room = context.read<ZegoRoomService>();
-    room.createRoom(roomID, roomName, "token", callback);
+    room.createRoom(roomID, roomName, callback);
   }
 
   @override
@@ -117,7 +117,7 @@ class RoomEntrancePage extends HookWidget {
     // The room does not exist. Please create a new one.
     // Failed to join. Error code: xx.
     var room = context.read<ZegoRoomService>();
-    room.joinRoom(roomID, "token", callback);
+    room.joinRoom(roomID, callback);
     var users = context.read<ZegoUserService>();
     if (room.roomInfo.hostID == users.localUserInfo.userID) {
       users.localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleHost;

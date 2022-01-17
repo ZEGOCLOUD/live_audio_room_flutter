@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
-import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 
 class RoomInfo {
   String roomID = "";
@@ -16,14 +15,14 @@ class RoomInfo {
   RoomInfo(this.roomID, this.roomName, this.hostID);
 
   RoomInfo.formJson(Map<String, dynamic> json)
-          : roomID = json['id'],
-            roomName = json['name'],
-            hostID = json['host_id'],
-            seatNum = json['num'],
-            isTextMessageDisable = json['disable'],
-            isSeatClosed = json['close'];
-  Map<String, dynamic> toJson() =>
-      {
+      : roomID = json['id'],
+        roomName = json['name'],
+        hostID = json['host_id'],
+        seatNum = json['num'],
+        isTextMessageDisable = json['disable'],
+        isSeatClosed = json['close'];
+
+  Map<String, dynamic> toJson() => {
         'id': roomID,
         'name': roomName,
         'host_id': hostID,
@@ -34,17 +33,19 @@ class RoomInfo {
 }
 
 typedef RoomCallback = Function(int);
+
 class ZegoRoomService extends ChangeNotifier {
   RoomInfo roomInfo = RoomInfo('', '', '');
+  String localHostID = ""; // Update while user service data is updated.
 
   ZegoRoomService() {
     // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
   }
 
-  void createRoom(String roomId, String roomName, String token, RoomCallback? callback) {
-    int  code = ZIMPlugin.createRoom(roomId, roomName);
+  void createRoom(String roomId, String roomName, RoomCallback? callback) {
+    int code = ZIMPlugin.createRoom(roomId, roomName);
     if (code == 0) {
-      roomInfo = RoomInfo(roomId, roomName, ZegoRoomManager.shared.userService.localUserInfo.userID);
+      roomInfo = RoomInfo(roomId, roomName, localHostID);
     }
     if (callback != null) {
       callback(0);
@@ -52,13 +53,12 @@ class ZegoRoomService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void joinRoom(String roomId, String token, RoomCallback? callback) {
+  void joinRoom(String roomId, RoomCallback? callback) {
     String result = ZIMPlugin.joinRoom(roomId);
-    roomInfo = new RoomInfo.formJson(jsonDecode(result));
+    // TODO@oliver call in SDK async callback
+    roomInfo = RoomInfo.formJson(jsonDecode(result));
     if (callback != null) {
-      var code = 0;
-      if (roomInfo.roomID.length == 0) { code = -1; }
-      callback(code);
+      callback(roomInfo.roomID.isEmpty ? -1 : 0);
     }
     notifyListeners();
   }
@@ -71,13 +71,18 @@ class ZegoRoomService extends ChangeNotifier {
   }
 
   void disableTextMessage(bool disable, RoomCallback? callback) {
-    roomInfo.isTextMessageDisable = disable;
     var json = jsonEncode(roomInfo);
-    var map = { 'room_info': json };
+    var map = {'room_info': json};
     var mapJson = jsonEncode(map);
     int result = ZIMPlugin.setRoomAttributes(roomInfo.roomID, mapJson, true);
+    // TODO@oliver call in SDK async callback
     if (callback != null) {
       callback(result);
+    }
+
+    if (result == 0) {
+      roomInfo.isTextMessageDisable = disable;
+      notifyListeners();
     }
   }
 }
