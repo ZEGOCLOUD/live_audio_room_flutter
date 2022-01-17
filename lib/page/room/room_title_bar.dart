@@ -33,7 +33,7 @@ class RoomTitleBar extends StatelessWidget {
 
               Consumer<ZegoRoomService>(
                 builder: (context, room, child) => Text(
-                  room.roomInfo.roomId,
+                  room.roomInfo.roomID,
                   style: TextStyle(
                     color: const Color(0xFF606060),
                     fontSize: 20.sp,

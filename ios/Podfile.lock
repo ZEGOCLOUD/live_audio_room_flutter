@@ -4,16 +4,24 @@ PODS:
     - Flutter
     - Toast
   - Toast (4.0.0)
+  - zego_express_engine (2.2.1):
+    - Flutter
+    - ZegoExpressEngine (= 2.15.0)
+  - ZegoExpressEngine (2.15.0):
+    - ZegoExpressEngine/Video (= 2.15.0)
+  - ZegoExpressEngine/Video (2.15.0)
   - ZIM (1.3.2)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
+  - zego_express_engine (from `.symlinks/plugins/zego_express_engine/ios`)
   - ZIM
 
 SPEC REPOS:
   trunk:
     - Toast
+    - ZegoExpressEngine
     - ZIM
 
 EXTERNAL SOURCES:
@@ -21,11 +29,15 @@ EXTERNAL SOURCES:
     :path: Flutter
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
+  zego_express_engine:
+    :path: ".symlinks/plugins/zego_express_engine/ios"
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
   fluttertoast: 8420a0a802306a31b7cb6446bd6ef2f041d045fc
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
+  zego_express_engine: 5f024113f1cf27a27287427d49e0fcc5a87346a3
+  ZegoExpressEngine: b3f8f173c5af47ee53caf29c6d62660118b63b97
   ZIM: b9d7a56e13c0bd88c777ba701e13db7759a8b3f8
 
 PODFILE CHECKSUM: 0d7bc85004b312eeee16f479b40951a279d919c5
