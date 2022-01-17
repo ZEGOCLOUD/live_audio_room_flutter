@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
+import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
 
 enum LoginState {
   loginStateLoggedOut,
@@ -32,8 +33,8 @@ class ZegoUserService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void fetchOnlineRoomUsersNum() {
-    // TODO@oliver fetch users info and count the num
+  void fetchOnlineRoomUsersNum(String roomID) {
+    int result = ZIMPlugin.queryRoomOnlineMemberCount(roomID);
     totalUsersNum = 0;
     notifyListeners();
   }
@@ -41,14 +42,15 @@ class ZegoUserService extends ChangeNotifier {
   void login(ZegoUserInfo info, String token, LoginCallback? callback) {
     localUserInfo = info;
     if (info.userName.isEmpty) {
-      localUserInfo.userName = info.userId;
+      localUserInfo.userName = info.userID;
     }
+    int result = ZIMPlugin.login(info.userID, info.userName, "");
     loginState = LoginState.loginStateLoggingIn;
     notifyListeners();
     if (callback != null) {
       // TODO@oliver call in SDK real callback
       loginState = LoginState.loginStateLoggedIn;
-      callback(0);
+      callback(result);
     }
     // TODO@oliver FOR UI TEST ONLY
     userList.add(localUserInfo);
@@ -57,13 +59,20 @@ class ZegoUserService extends ChangeNotifier {
   }
 
   void logout() {
+    ZIMPlugin.logout();
     loginState = LoginState.loginStateLoggedOut;
     notifyListeners();
   }
+
+  void sendInvitation(String userID) {
+    ZIMPlugin.sendPeerMessage(userID, "", 1);
+  }
+
 
   // TODO@oliveryang
   void setUserRoleForUITest(ZegoRoomUserRole role) {
     localUserInfo.userRole = role;
     notifyListeners();
   }
+
 }

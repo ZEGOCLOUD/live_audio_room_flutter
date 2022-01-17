@@ -16,11 +16,13 @@ class ZIMPlugin: NSObject {
     private override init() {}
     
     var events: FlutterEventSink?
+    var appID: UInt32 = 0
+    var appSign: String = ""
+    var serverSecret: String = ""
     
     var zim: ZIM?
     
-     func registerChannel() {
-         
+    func registerChannel() {
          guard let flutterViewController = UIApplication.shared.windows.first?.rootViewController as? FlutterViewController else { return }
          
          FlutterEventChannel(name: "ZIMPluginEventChannel", binaryMessenger: flutterViewController.binaryMessenger).setStreamHandler(self)
@@ -95,7 +97,12 @@ class ZIMPlugin: NSObject {
          if (params == nil) { return }
          let userID = params!["userID"] as? String ?? ""
          let userName = params!["userName"] as? String ?? ""
-         let token = params!["token"] as? String ?? ""
+         var token = params!["token"] as? String ?? ""
+         serverSecret = params!["serverSecret"] as? String ?? ""
+         if token.count == 0 {
+             token = AppToken.getZIMToken(withUserID: userID, appID: appID, secret: serverSecret) ?? ""
+         }
+         
          let user = ZIMUserInfo()
          user.userID = userID
          user.userName = userName
@@ -131,7 +138,8 @@ class ZIMPlugin: NSObject {
          if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
          zim?.joinRoom(roomID, callback: { roomInfo, error in
-             result(error.code)
+             let dic = ["id": roomInfo.baseInfo.roomID, "name": roomInfo.baseInfo.roomName]
+             result(dic)
          })
      }
 
@@ -278,11 +286,10 @@ extension ZIMPlugin: ZIMEventHandler {
         events(["roomStateChanged", state, event])
     }
     
-    func zim(_ zim: ZIM, roomAttributesUpdated updateInfo: ZIMRoomAttributesUpdateInfo, roomID: String) {
-        guard let events = self.events else { return }
-        events(["roomAttributesUpdated", updateInfo, roomID])
-        
-    }
+//    func zim(_ zim: ZIM, roomAttributesUpdated updateInfo: ZIMRoomAttributesUpdateInfo, roomID: String) {
+//        guard let events = self.events else { return }
+//        events(["roomAttributesUpdated", updateInfo, roomID])
+//    }
 }
 
 extension ZIMPlugin : FlutterStreamHandler {

@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
+import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 
 class ZegoTextMessage {
   // TODO@larry Add the member here.
@@ -13,11 +15,13 @@ class ZegoMessageService extends ChangeNotifier {
     // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
   }
   void sendTextMessage(String message, ZegoRoomCallback? callback) {
-    // TODO@larry call SDK.
+    var roomID = ZegoRoomManager.shared.roomService.roomInfo.roomID;
+    int code = ZIMPlugin.sendRoomMessage(roomID, message);
     // Below code just for UI test
     var msg = ZegoTextMessage();
     msg.message = message;
     messageList.add(msg);
     notifyListeners();
+
   }
 }

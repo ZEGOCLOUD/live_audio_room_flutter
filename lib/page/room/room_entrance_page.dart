@@ -119,7 +119,7 @@ class RoomEntrancePage extends HookWidget {
     var room = context.read<ZegoRoomService>();
     room.joinRoom(roomID, "token", callback);
     var users = context.read<ZegoUserService>();
-    if (room.roomInfo.hostId == users.localUserInfo.userId) {
+    if (room.roomInfo.hostID == users.localUserInfo.userID) {
       users.localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleHost;
     }
     // TODO@oliveryang below code for UI test only
