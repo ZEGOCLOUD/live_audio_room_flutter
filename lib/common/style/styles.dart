@@ -29,14 +29,19 @@ class StyleColors {
   static const Color giftMemberListBackgroundColor = Color(0xffF7F7F8);
 
   static const Color roomChatBackgroundColor = Color(0xffe6eaed);
-  static const Color roomChatHostRoleBackgroundColor = Color(0xffF7F7F8);
+  static const Color roomChatHostRoleBackgroundColor = Color(0xffF7d046);
   static const Color roomChatUserNameColor = blue;
   static const Color roomChatMessageColor = dark;
 
   static const Color roomMessageSendButtonBgColor = blue;
-  static  Color roomMessageSendButtonDisableBgColor = roomMessageSendButtonBgColor.withOpacity(0.3);
+  static Color roomMessageSendButtonDisableBgColor =
+      roomMessageSendButtonBgColor.withOpacity(0.3);
   static const Color roomMessageInputBgColor = Color(0xffF7F7F8);
 
+  static const Color giftMessageTypeTextColor = Color(0xffFFCE00);
+  static const Color giftMessageContentColor = Colors.white;
+  static Color giftMessageBackgroundStartColor = const Color(0xffA500FF).withOpacity(0.8);
+  static Color giftMessageBackgroundEndColor = const Color(0xff6C00FF).withOpacity(0.8);
 }
 
 /// icons
@@ -149,7 +154,6 @@ class StyleConstant {
     fontSize: 12.0,
   );
 
-
   static const roomMessageInputText = TextStyle(
     color: StyleColors.dark,
     fontSize: 13.0,
@@ -157,5 +161,14 @@ class StyleConstant {
   static const roomMessageSendButtonText = TextStyle(
     color: Colors.white,
     fontSize: 13.0,
+  );
+
+  static const giftMessageContentText = TextStyle(
+    color: StyleColors.giftMessageContentColor,
+    fontSize: 12.0,
+  );
+  static const giftMessageTypeText = TextStyle(
+    color: StyleColors.giftMessageTypeTextColor,
+    fontSize: 12.0,
   );
 }

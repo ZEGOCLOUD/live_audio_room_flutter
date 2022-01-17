@@ -25,7 +25,7 @@ class ChatMessageItem extends StatelessWidget {
         flex: 10,
         child: Container(
           padding:
-          EdgeInsets.only(left: 21.w, top: 21.h, right: 21.w, bottom: 21.h),
+              EdgeInsets.only(left: 21.w, top: 21.h, right: 21.w, bottom: 21.h),
           margin: EdgeInsets.only(bottom: 20.h),
           decoration: BoxDecoration(
             color: StyleColors.roomChatBackgroundColor,
@@ -34,6 +34,8 @@ class ChatMessageItem extends StatelessWidget {
           child: RichText(
               textAlign: TextAlign.start,
               text: TextSpan(children: <TextSpan>[
+                getRoleWidget(message.userInfo),
+                getSpacerWidgetByRole(message.userInfo),
                 TextSpan(
                     text: message.userInfo.userName + ": ",
                     style: StyleConstant.roomChatUserNameText),
@@ -46,9 +48,26 @@ class ChatMessageItem extends StatelessWidget {
       const Expanded(flex: 1, child: Text('')),
     ]);
   }
+
+  TextSpan getRoleWidget(ZegoUserInfo sender) {
+    if (ZegoRoomUserRole.roomUserRoleHost == sender.userRole) {
+      return const TextSpan(
+          text: "Host", style: StyleConstant.roomChatHostRoleText);
+    }
+    return const TextSpan(text: '');
+  }
+
+  TextSpan getSpacerWidgetByRole(ZegoUserInfo sender) {
+    if (ZegoRoomUserRole.roomUserRoleHost == sender.userRole) {
+      return const TextSpan(text: " ");
+    }
+    return const TextSpan(text: '');
+  }
 }
 
 class ChatMessagePage extends StatefulWidget {
+  const ChatMessagePage({Key? key}) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _ChatMessagePageState();
@@ -112,14 +131,14 @@ And the emptiness you felt will disappear"""),
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(right: (118 - 32).w),
-      child: ListView.builder(
-        itemCount: _messages.length,
-        itemBuilder: (_, index) {
-          ChatMessageModel message = _messages[index];
-          return ChatMessageItem(message: message);
-        },
-      ),
-    );
+        margin: EdgeInsets.only(right: (118 - 32).w),
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: _messages.length,
+          itemBuilder: (_, index) {
+            ChatMessageModel message = _messages[index];
+            return ChatMessageItem(message: message);
+          },
+        ));
   }
 }

@@ -11,6 +11,7 @@ import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+import 'package:live_audio_room_flutter/page/room/room_gift_tips.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
@@ -293,7 +294,23 @@ class RoomCenterContentFrame extends StatelessWidget {
             ),
           ),
           const Expanded(child: Text('')),
-          SizedBox(width: 632.w, height: 630.h, child: ChatMessagePage())
+          //  todo@yuyj this is a test data
+          GiftMessageItem(
+              gift: GiftMessageModel(
+                  ZegoUserInfo(
+                      "001", "Liam", ZegoRoomUserRole.roomUserRoleHost),
+                  ZegoUserInfo(
+                      "002", "Noah", ZegoRoomUserRole.roomUserRoleSpeaker),
+                  "Rocket")),
+          SizedBox(height: 18.h),
+          ConstrainedBox(
+              constraints: BoxConstraints(
+                minWidth: 632.w,
+                maxWidth: 632.w,
+                minHeight: 1.h,
+                maxHeight: 630.h,
+              ),
+              child: ChatMessagePage())
         ],
       ),
     );
