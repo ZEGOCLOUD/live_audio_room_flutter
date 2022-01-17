@@ -8,6 +8,29 @@ import 'package:device_info_plus/device_info_plus.dart';
 class DeviceInfo {
   static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
 
+  Future<String> readDeviceName() async {
+    var deviceInfo = await readDeviceInfo();
+    if(deviceInfo.containsKey('Error')) {
+      return '';
+    }
+
+    if (kIsWeb) {
+      return deviceInfo['browserName'];
+    }
+    if (Platform.isAndroid) {
+      return deviceInfo['id'];
+    } else if (Platform.isIOS) {
+      return deviceInfo['name'];
+    } else if (Platform.isLinux) {
+      return deviceInfo['name'];
+    } else if (Platform.isMacOS) {
+      return deviceInfo['hostName'];
+    } else if (Platform.isWindows) {
+      return deviceInfo['computerName'];
+    }
+    return '';
+  }
+
   Future<Map<String, dynamic>> readDeviceInfo() async {
     Map<String, dynamic> deviceData = <String, dynamic>{};
     try {
