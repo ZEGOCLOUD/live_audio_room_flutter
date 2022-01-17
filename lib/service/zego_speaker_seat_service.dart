@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html';
 
 import 'package:flutter/foundation.dart';
 import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
@@ -26,18 +27,23 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
   }
 
-  Future<int> removeUserFromSeat(int seatIndex, ZegoRoomCallback? callback) async {
-    if (seatIndex < 1 || seatIndex >= 8) {
-      return -1;
-    }
+  Future<int> removeUserFromSeat(int seatIndex) async {
     var speakerSeat = speakerSeatList[seatIndex];
+    var preUserID = speakerSeat.userID;
+    var preStatus = speakerSeat.status;
     speakerSeat.userID = "";
     speakerSeat.status = ZegoSpeakerSeatStatus.Untaken;
     String speakerSeatJson = jsonEncode(speakerSeat);
     Map speakerSeatMap = {speakerSeat.seatIndex : speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(ZegoRoomManager.shared.roomService.roomInfo.roomID, attributes, false);
-    return result['errorCode'];
+    int code = result['errorCode'];
+    if (code != 0) {
+      speakerSeat.userID = preUserID;
+      speakerSeat.status = preStatus;
+    }
+    notifyListeners();
+    return code;
   }
 
   Future<int> closeAllSeat(bool isClose, ZegoRoomCallback? callback) async {
@@ -54,19 +60,21 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return result['errorCode'];
   }
 
-  Future<int> closeSeat(bool isClose, int seatIndex, ZegoRoomCallback? callback) async {
-    if (seatIndex < 1 || seatIndex >= 8) {
-      return -1;
-    }
+  Future<int> closeSeat(bool isClose, int seatIndex) async {
     var speakerSeat = speakerSeatList[seatIndex];
+    var preStatus = speakerSeat.status;
     speakerSeat.status = isClose ? ZegoSpeakerSeatStatus.Closed : ZegoSpeakerSeatStatus.Untaken;
 
     String speakerSeatJson = jsonEncode(speakerSeat);
-    Map speakerSeatMap = {speakerSeat.seatIndex : json};
+    Map speakerSeatMap = {speakerSeat.seatIndex : speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(ZegoRoomManager.shared.roomService.roomInfo.roomID, attributes, false);
+    int code = result['errorCode'];
+    if (code != 0) {
+      speakerSeat.status = preStatus;
+    }
     notifyListeners();
-    return result['errorCode'];
+    return code;
   }
 
   Future<int> muteMic(bool isMute, ZegoRoomCallback? callback) async {
@@ -81,38 +89,46 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return result['errorCode'];
   }
 
-  Future<int> takeSeat(int seatIndex, ZegoRoomCallback? callback) async {
-    if (seatIndex < 1 || seatIndex >= 8) {
-      return -1;
-    }
-
+  Future<int> takeSeat(int seatIndex) async {
     var speakerSeat = speakerSeatList[seatIndex];
+    var preUserID = speakerSeat.userID;
+    var preStatus = speakerSeat.status;
     speakerSeat.userID = ZegoRoomManager.shared.userService.localUserInfo.userID;
     speakerSeat.status = ZegoSpeakerSeatStatus.Occupied;
     String speakerSeatJson = jsonEncode(speakerSeat);
-    Map speakerSeatMap = {speakerSeat.seatIndex : json};
+    Map speakerSeatMap = {speakerSeat.seatIndex : speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(ZegoRoomManager.shared.roomService.roomInfo.roomID, attributes, false);
+    int code = result['errorCode'];
+    if (code != 0) {
+      speakerSeat.userID = preUserID;
+      speakerSeat.status = preStatus;
+    }
     notifyListeners();
-    return result['errorCode'];
+    return code;
   }
 
-  Future<int> leaveSeat(ZegoRoomCallback? callback) async {
+  Future<int> leaveSeat() async {
     var speakerSeat = localSpeakerSeat();
     if (speakerSeat == null) { return -1; }
+    var preUserID = speakerSeat.userID;
+    var preStatus = speakerSeat.status;
     speakerSeat.userID = '';
     speakerSeat.status = ZegoRoomManager.shared.roomService.roomInfo.isSeatClosed ? ZegoSpeakerSeatStatus.Closed : ZegoSpeakerSeatStatus.Untaken;
     String speakerSeatJson = jsonEncode(speakerSeat);
-    Map speakerSeatMap = {speakerSeat.seatIndex : json};
+    Map speakerSeatMap = {speakerSeat.seatIndex : speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(ZegoRoomManager.shared.roomService.roomInfo.roomID, attributes, false);
-    return result['errorCode'];
+    int code = result['errorCode'];
+    if (code != 0) {
+      speakerSeat.userID = preUserID;
+      speakerSeat.status = preStatus;
+    }
+    notifyListeners();
+    return code;
   }
 
-  Future<int> switchSeat(int toSeatIndex, ZegoRoomCallback? callback) async {
-    if (toSeatIndex < 1 || toSeatIndex >= 8) {
-      return -1;
-    }
+  Future<int> switchSeat(int toSeatIndex) async {
     var fromSeat = localSpeakerSeat();
     if (fromSeat == null) { return -1; }
     var toSeat = speakerSeatList[toSeatIndex];
@@ -127,6 +143,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     Map speakerSeatMap = {fromSeat.seatIndex : fromSeatJson, toSeat.seatIndex: toSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(ZegoRoomManager.shared.roomService.roomInfo.roomID, attributes, false);
+    notifyListeners();
     return result['errorCode'];
   }
 
