@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class RoomTitleBar extends StatelessWidget {
   const RoomTitleBar({Key? key}) : super(key: key);
@@ -46,7 +48,32 @@ class RoomTitleBar extends StatelessWidget {
         IconButton(
           icon: Image.asset(StyleIconUrls.roomTopQuit),
           iconSize: 68.w,
-          onPressed: () {},
+          onPressed: () {
+            showDialog<bool>(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text(AppLocalizations.of(context)!.roomPageDestroyRoom),
+                  content: Text(AppLocalizations.of(context)!.dialogSureToDestroyRoom),
+                  actions: <Widget>[
+                    TextButton(
+                      child: Text(AppLocalizations.of(context)!.dialogCancel),
+                      onPressed: () =>
+                          Navigator.of(context).pop(),
+                    ),
+                    TextButton(
+                      child: Text(AppLocalizations.of(context)!.dialogConfirm),
+                      onPressed: () {
+                        //  todo@yuyj quit room logic
+                        Navigator.of(context).pop(true);
+                        Navigator.pushReplacementNamed(context, "/room_entrance");
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          },
         )
       ],
     );

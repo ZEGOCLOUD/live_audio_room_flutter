@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class RoomSettingPage extends StatefulWidget {
@@ -49,6 +51,13 @@ class _RoomSettingPageState extends State<RoomSettingPage> {
                       setState(() {
                         _isProhibitBeASpeaker = value;
                         //  todo@yuyj to prohibit listeners being a speaker
+
+                        if (!value) {
+                          Fluttertoast.showToast(
+                              msg: AppLocalizations.of(context)!
+                                  .roomPageSetTakeSeat,
+                              backgroundColor: Colors.grey);
+                        }
                       });
                     },
                   )
@@ -69,6 +78,13 @@ class _RoomSettingPageState extends State<RoomSettingPage> {
                       setState(() {
                         _isProhibitSendMessages = value;
                         //  todo@yuyj to prohibit others sending messages
+
+                        if (!value) {
+                          Fluttertoast.showToast(
+                              msg: AppLocalizations.of(context)!
+                                  .roomPageSetSilence,
+                              backgroundColor: Colors.grey);
+                        }
                       });
                     },
                   )
