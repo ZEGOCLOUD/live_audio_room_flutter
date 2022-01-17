@@ -13,10 +13,9 @@ import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 typedef RoomOperationCallback = Function(int);
 
 class CreateRoomDialog extends HookWidget {
-  CreateRoomDialog({Key? key}) : super(key: key);
+  const CreateRoomDialog({Key? key}) : super(key: key);
 
-  void tryCreateRoom(BuildContext context, String roomID, String roomName,
-      RoomOperationCallback? callback) {
+  void tryCreateRoom(BuildContext context, String roomID, String roomName) {
     if (roomID.isEmpty) {
       Fluttertoast.showToast(
           msg: AppLocalizations.of(context)!.toastRoomIdEnterError);
@@ -27,12 +26,15 @@ class CreateRoomDialog extends HookWidget {
           msg: AppLocalizations.of(context)!.toastRoomNameError);
       return;
     }
-    // TODO@oliveryang@zego.im call sdk and wait for callback to show the taost below.
-    // The room has been created. Please join the room directly.
-    // Failed to create. Error code: xx.
-    // TODO@oliveryang@zego.im go to seats page while call sdk succeed.
     var room = context.read<ZegoRoomService>();
-    room.createRoom(roomID, roomName, "token", callback);
+    room.createRoom(roomID, roomName, "").then((code) {
+      if (code != 0) {
+        Fluttertoast.showToast(
+            msg: AppLocalizations.of(context)!.toastCreateRoomFail(code));
+      } else {
+        Navigator.pushReplacementNamed(context, "/room_main");
+      }
+    });
   }
 
   @override
@@ -90,12 +92,8 @@ class CreateRoomDialog extends HookWidget {
           child: Text(AppLocalizations.of(context)!.createPageCreate),
           isDestructiveAction: true,
           onPressed: () {
-            tryCreateRoom(
-                context,
-                dialogRoomIDInputController.text,
-                dialogRoomNameInputController.text,
-                (code) =>
-                    Navigator.pushReplacementNamed(context, "/room_main"));
+            tryCreateRoom(context, dialogRoomIDInputController.text,
+                dialogRoomNameInputController.text);
           },
         )
       ],
@@ -106,25 +104,29 @@ class CreateRoomDialog extends HookWidget {
 class RoomEntrancePage extends HookWidget {
   const RoomEntrancePage({Key? key}) : super(key: key);
 
-  void tryJoinRoom(
-      BuildContext context, String roomID, RoomOperationCallback? callback) {
+  void tryJoinRoom(BuildContext context, String roomID) {
     if (roomID.isEmpty) {
       Fluttertoast.showToast(
           msg: AppLocalizations.of(context)!.toastRoomIdEnterError);
       return;
     }
-    // TODO@oliveryang@zego.im join room by calling sdk and call callback after finished.
-    // The room does not exist. Please create a new one.
-    // Failed to join. Error code: xx.
+
     var room = context.read<ZegoRoomService>();
-    room.joinRoom(roomID, "token", callback);
-    var users = context.read<ZegoUserService>();
-    if (room.roomInfo.hostID == users.localUserInfo.userID) {
-      users.localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleHost;
-    }
-    // TODO@oliveryang below code for UI test only
-    var seats = context.read<ZegoSpeakerSeatService>();
-    seats.generateFakeDataForUITest();
+    room.joinRoom(roomID, "").then((code) {
+      if (code != 0) {
+        if (code != 0) {
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!.toastJoinRoomFail(code));
+        } else {
+          var users = context.read<ZegoUserService>();
+          if (room.roomInfo.hostID == users.localUserInfo.userID) {
+            users.localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleHost;
+          }
+
+          Navigator.pushReplacementNamed(context, "/room_main");
+        }
+      }
+    });
   }
 
   @override
@@ -169,11 +171,7 @@ class RoomEntrancePage extends HookWidget {
             CupertinoButton.filled(
                 child: Text(AppLocalizations.of(context)!.createPageJoinRoom),
                 onPressed: () {
-                  tryJoinRoom(
-                      context,
-                      roomIDInputController.text,
-                      (code) => Navigator.pushReplacementNamed(
-                          context, "/room_main"));
+                  tryJoinRoom(context, roomIDInputController.text);
                 }),
             Padding(
               padding: const EdgeInsets.all(15),

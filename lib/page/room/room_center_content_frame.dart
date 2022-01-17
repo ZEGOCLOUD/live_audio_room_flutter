@@ -67,8 +67,7 @@ class SeatItem extends StatelessWidget {
                       height: 100.h,
                       child: CircleAvatar(
                         backgroundColor: const Color(0xFFE6E6E6),
-                        backgroundImage: (ZegoSpeakerSeatStatus
-                                    .Closed ==
+                        backgroundImage: (ZegoSpeakerSeatStatus.Closed ==
                                 status)
                             ? const AssetImage(StyleIconUrls.roomSeatLock)
                             : const AssetImage(StyleIconUrls.roomSeatDefault),
@@ -186,15 +185,18 @@ class RoomCenterContentFrame extends StatelessWidget {
           }
           if (userID.isEmpty) {
             // Close or Unclose Seat
-            var setToClose =
-                ZegoSpeakerSeatStatus.Closed != status;
+            var setToClose = ZegoSpeakerSeatStatus.Closed != status;
             _showBottomModalButton(
                 context,
                 setToClose
                     ? AppLocalizations.of(context)!.roomPageLockSeat
                     : AppLocalizations.of(context)!.roomPageUnlockSeat, () {
               var seats = context.read<ZegoSpeakerSeatService>();
-              seats.closeSeat(setToClose, index, (p0) => null);
+              seats.closeSeat(setToClose, index).then((code) {
+                Fluttertoast.showToast(
+                    msg:
+                        AppLocalizations.of(context)!.toastLockSeatError(code));
+              });
             });
           } else {
             // Remove user from seat
@@ -217,9 +219,13 @@ class RoomCenterContentFrame extends StatelessWidget {
                       onPressed: () {
                         Navigator.pop(context,
                             AppLocalizations.of(context)!.dialogConfirm);
-                        // DO REMOVE JOB
+
                         var seats = context.read<ZegoSpeakerSeatService>();
-                        seats.removeUserFromSeat(index, (p0) => null);
+                        seats.removeUserFromSeat(index).then((code) {
+                          Fluttertoast.showToast(
+                              msg: AppLocalizations.of(context)!
+                                  .toastKickoutLeaveSeatError(userName, code));
+                        });
                       },
                       child: Text(AppLocalizations.of(context)!.dialogConfirm),
                     ),
@@ -237,14 +243,20 @@ class RoomCenterContentFrame extends StatelessWidget {
           var seats = context.read<ZegoSpeakerSeatService>();
 
           if (userID.isEmpty) {
-            _showBottomModalButton(context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
-              seats.switchSeat(index, (p0) => null);
+            _showBottomModalButton(
+                context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
+              seats.switchSeat(index);
             });
           } else if (users.localUserInfo.userID == userID) {
-            _showBottomModalButton(context, AppLocalizations.of(context)!.roomPageLeaveSeat, () {
-              seats.leaveSeat((p0) => null);
-              users.setUserRoleForUITest(ZegoRoomUserRole
-                  .roomUserRoleListener); // TODO@oliver FOR UI TEST ONLY
+            _showBottomModalButton(
+                context, AppLocalizations.of(context)!.roomPageLeaveSeat, () {
+              seats.leaveSeat().then((code) {
+                if (code != 0) {
+                  Fluttertoast.showToast(
+                      msg: AppLocalizations.of(context)!
+                          .toastLeaveSeatFail(code));
+                }
+              });
             });
           }
         };
@@ -257,14 +269,18 @@ class RoomCenterContentFrame extends StatelessWidget {
             return;
           }
           if (ZegoSpeakerSeatStatus.Closed == status) {
-            Fluttertoast.showToast(msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed);
+            Fluttertoast.showToast(
+                msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed);
             return;
           }
-          _showBottomModalButton(context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
-            users.setUserRoleForUITest(ZegoRoomUserRole
-                .roomUserRoleSpeaker); // TODO@oliver FOR UI TEST ONLY
+          _showBottomModalButton(
+              context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
             var seats = context.read<ZegoSpeakerSeatService>();
-            seats.takeSeat(index, (p0) => null);
+            seats.takeSeat(index).then((code) {
+              Fluttertoast.showToast(
+                  msg: AppLocalizations.of(context)!
+                      .toastTakeSpeakerSeatFail(code));
+            });
           });
         };
       }

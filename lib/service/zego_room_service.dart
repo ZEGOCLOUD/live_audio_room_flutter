@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
-import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 
 class RoomInfo {
   String roomID = "";
@@ -16,14 +15,14 @@ class RoomInfo {
   RoomInfo(this.roomID, this.roomName, this.hostID);
 
   RoomInfo.formJson(Map<String, dynamic> json)
-          : roomID = json['id'],
-            roomName = json['name'],
-            hostID = json['host_id'],
-            seatNum = json['num'],
-            isTextMessageDisable = json['disable'],
-            isSeatClosed = json['close'];
-  Map<String, dynamic> toJson() =>
-      {
+      : roomID = json['id'],
+        roomName = json['name'],
+        hostID = json['host_id'],
+        seatNum = json['num'],
+        isTextMessageDisable = json['disable'],
+        isSeatClosed = json['close'];
+
+  Map<String, dynamic> toJson() => {
         'id': roomID,
         'name': roomName,
         'host_id': hostID,
@@ -34,47 +33,53 @@ class RoomInfo {
 }
 
 typedef RoomCallback = Function(int);
+
 class ZegoRoomService extends ChangeNotifier {
   RoomInfo roomInfo = RoomInfo('', '', '');
+  String localHostID = ""; // Update while user service data is updated.
 
   ZegoRoomService() {
     // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
   }
 
-  Future<int> createRoom(String roomId, String roomName, String token, RoomCallback? callback) async {
+  Future<int> createRoom(String roomId, String roomName, String token) async {
     var result = await ZIMPlugin.createRoom(roomId, roomName);
     var code = result['errorCode'];
     if (code == 0) {
-      roomInfo = RoomInfo(roomId, roomName, ZegoRoomManager.shared.userService.localUserInfo.userID);
+      roomInfo = RoomInfo(roomId, roomName, localHostID);
+      notifyListeners();
     }
-    notifyListeners();
     return code;
   }
 
-  Future<int> joinRoom(String roomId, String token, RoomCallback? callback) async {
+  Future<int> joinRoom(String roomId, String token) async {
     var result = await ZIMPlugin.joinRoom(roomId);
     int code = result['errorCode'];
     if (code == 0) {
       var roomDic = result['roomInfo'];
-      roomInfo = new RoomInfo.formJson(jsonDecode(roomDic));
+      roomInfo = RoomInfo.formJson(jsonDecode(roomDic));
+      notifyListeners();
     }
-    notifyListeners();
     return code;
   }
 
-  Future<int> leaveRoom(RoomCallback? callback) async {
+  Future<int> leaveRoom() async {
     var result = await ZIMPlugin.leaveRoom(roomInfo.roomID);
-    notifyListeners();
     return result['errorCode'];
   }
 
-  Future<int> disableTextMessage(bool disable, RoomCallback? callback) async {
-    roomInfo.isTextMessageDisable = disable;
+  Future<int> disableTextMessage(bool disable) async {
     var json = jsonEncode(roomInfo);
-    var map = { 'room_info': json };
+    var map = {'room_info': json};
     var mapJson = jsonEncode(map);
-    var result = await ZIMPlugin.setRoomAttributes(roomInfo.roomID, mapJson, true);
-    notifyListeners();
-    return result['errorCode'];
+
+    var result =
+        await ZIMPlugin.setRoomAttributes(roomInfo.roomID, mapJson, true);
+    int code = result['errorCode'];
+    if (code == 0) {
+      roomInfo.isTextMessageDisable = disable;
+      notifyListeners();
+    }
+    return code;
   }
 }
