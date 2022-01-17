@@ -11,6 +11,16 @@
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		86AB32CF278FFF1D008AD4C9 /* ZIMPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86AB32CE278FFF1D008AD4C9 /* ZIMPlugin.swift */; };
+		86BCCD0627940C7100AB5C2E /* ZegoToken.mm in Sources */ = {isa = PBXBuildFile; fileRef = 86BCCCBF27940C7100AB5C2E /* ZegoToken.mm */; };
+		86BCCD0727940C7100AB5C2E /* ZegoRTCServerAssistantImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 86BCCCC427940C7100AB5C2E /* ZegoRTCServerAssistantImpl.cpp */; };
+		86BCCD0827940C7100AB5C2E /* ZegoRTCServerAssistant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 86BCCCC627940C7100AB5C2E /* ZegoRTCServerAssistant.cpp */; };
+		86BCCD0927940C7100AB5C2E /* ZegoServerAssistantImpl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 86BCCCCC27940C7100AB5C2E /* ZegoServerAssistantImpl.cpp */; };
+		86BCCD0A27940C7100AB5C2E /* ZegoServerAssistant.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 86BCCCCD27940C7100AB5C2E /* ZegoServerAssistant.cpp */; };
+		86BCCD0B27940C7100AB5C2E /* CMakeLists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 86BCCCFD27940C7100AB5C2E /* CMakeLists.txt */; };
+		86BCCD0C27940C7100AB5C2E /* ZegoCrypto.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 86BCCD0027940C7100AB5C2E /* ZegoCrypto.cpp */; };
+		86BCCD0D27940C7100AB5C2E /* aes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 86BCCD0327940C7100AB5C2E /* aes.cpp */; };
+		86BCCD0E27940C7100AB5C2E /* Base64.cc in Sources */ = {isa = PBXBuildFile; fileRef = 86BCCD0427940C7100AB5C2E /* Base64.cc */; };
+		86BCCD0F27940C7100AB5C2E /* AppToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86BCCD0527940C7100AB5C2E /* AppToken.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
@@ -41,6 +51,62 @@
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		7C48BBA89508FBAA914C7421 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		86AB32CE278FFF1D008AD4C9 /* ZIMPlugin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ZIMPlugin.swift; sourceTree = "<group>"; };
+		86BCCCBF27940C7100AB5C2E /* ZegoToken.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ZegoToken.mm; sourceTree = "<group>"; };
+		86BCCCC027940C7100AB5C2E /* ZegoToken.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZegoToken.h; sourceTree = "<group>"; };
+		86BCCCC427940C7100AB5C2E /* ZegoRTCServerAssistantImpl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ZegoRTCServerAssistantImpl.cpp; sourceTree = "<group>"; };
+		86BCCCC527940C7100AB5C2E /* ZegoRTCServerAssistantImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZegoRTCServerAssistantImpl.h; sourceTree = "<group>"; };
+		86BCCCC627940C7100AB5C2E /* ZegoRTCServerAssistant.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ZegoRTCServerAssistant.cpp; sourceTree = "<group>"; };
+		86BCCCC827940C7100AB5C2E /* ZegoRTCServerAssistantDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZegoRTCServerAssistantDefines.h; sourceTree = "<group>"; };
+		86BCCCC927940C7100AB5C2E /* ZegoRTCServerAssistant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZegoRTCServerAssistant.h; sourceTree = "<group>"; };
+		86BCCCCC27940C7100AB5C2E /* ZegoServerAssistantImpl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ZegoServerAssistantImpl.cpp; sourceTree = "<group>"; };
+		86BCCCCD27940C7100AB5C2E /* ZegoServerAssistant.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ZegoServerAssistant.cpp; sourceTree = "<group>"; };
+		86BCCCCE27940C7100AB5C2E /* ZegoServerAssistantImpl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZegoServerAssistantImpl.h; sourceTree = "<group>"; };
+		86BCCCD027940C7100AB5C2E /* ZegoServerAssistantDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZegoServerAssistantDefines.h; sourceTree = "<group>"; };
+		86BCCCD127940C7100AB5C2E /* ZegoServerAssistant.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ZegoServerAssistant.h; sourceTree = "<group>"; };
+		86BCCCD427940C7100AB5C2E /* fwd.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fwd.h; sourceTree = "<group>"; };
+		86BCCCD527940C7100AB5C2E /* memorystream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memorystream.h; sourceTree = "<group>"; };
+		86BCCCD627940C7100AB5C2E /* reader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reader.h; sourceTree = "<group>"; };
+		86BCCCD727940C7100AB5C2E /* prettywriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = prettywriter.h; sourceTree = "<group>"; };
+		86BCCCD827940C7100AB5C2E /* ostreamwrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ostreamwrapper.h; sourceTree = "<group>"; };
+		86BCCCD927940C7100AB5C2E /* encodedstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = encodedstream.h; sourceTree = "<group>"; };
+		86BCCCDA27940C7100AB5C2E /* filereadstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = filereadstream.h; sourceTree = "<group>"; };
+		86BCCCDB27940C7100AB5C2E /* istreamwrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = istreamwrapper.h; sourceTree = "<group>"; };
+		86BCCCDC27940C7100AB5C2E /* stringbuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stringbuffer.h; sourceTree = "<group>"; };
+		86BCCCDE27940C7100AB5C2E /* ieee754.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ieee754.h; sourceTree = "<group>"; };
+		86BCCCDF27940C7100AB5C2E /* strtod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strtod.h; sourceTree = "<group>"; };
+		86BCCCE027940C7100AB5C2E /* swap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = swap.h; sourceTree = "<group>"; };
+		86BCCCE127940C7100AB5C2E /* regex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = regex.h; sourceTree = "<group>"; };
+		86BCCCE227940C7100AB5C2E /* diyfp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = diyfp.h; sourceTree = "<group>"; };
+		86BCCCE327940C7100AB5C2E /* biginteger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = biginteger.h; sourceTree = "<group>"; };
+		86BCCCE427940C7100AB5C2E /* strfunc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strfunc.h; sourceTree = "<group>"; };
+		86BCCCE527940C7100AB5C2E /* itoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = itoa.h; sourceTree = "<group>"; };
+		86BCCCE627940C7100AB5C2E /* stack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stack.h; sourceTree = "<group>"; };
+		86BCCCE727940C7100AB5C2E /* dtoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dtoa.h; sourceTree = "<group>"; };
+		86BCCCE827940C7100AB5C2E /* meta.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = meta.h; sourceTree = "<group>"; };
+		86BCCCE927940C7100AB5C2E /* pow10.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pow10.h; sourceTree = "<group>"; };
+		86BCCCEA27940C7100AB5C2E /* encodings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = encodings.h; sourceTree = "<group>"; };
+		86BCCCEB27940C7100AB5C2E /* schema.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = schema.h; sourceTree = "<group>"; };
+		86BCCCEC27940C7100AB5C2E /* stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream.h; sourceTree = "<group>"; };
+		86BCCCED27940C7100AB5C2E /* filewritestream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = filewritestream.h; sourceTree = "<group>"; };
+		86BCCCEE27940C7100AB5C2E /* rapidjson.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rapidjson.h; sourceTree = "<group>"; };
+		86BCCCEF27940C7100AB5C2E /* document.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = document.h; sourceTree = "<group>"; };
+		86BCCCF027940C7100AB5C2E /* allocators.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = allocators.h; sourceTree = "<group>"; };
+		86BCCCF127940C7100AB5C2E /* writer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = writer.h; sourceTree = "<group>"; };
+		86BCCCF327940C7100AB5C2E /* error.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = error.h; sourceTree = "<group>"; };
+		86BCCCF427940C7100AB5C2E /* en.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = en.h; sourceTree = "<group>"; };
+		86BCCCF527940C7100AB5C2E /* memorybuffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = memorybuffer.h; sourceTree = "<group>"; };
+		86BCCCF627940C7100AB5C2E /* pointer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pointer.h; sourceTree = "<group>"; };
+		86BCCCF827940C7100AB5C2E /* inttypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = inttypes.h; sourceTree = "<group>"; };
+		86BCCCF927940C7100AB5C2E /* stdint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stdint.h; sourceTree = "<group>"; };
+		86BCCCFC27940C7100AB5C2E /* json_tools.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = json_tools.hpp; sourceTree = "<group>"; };
+		86BCCCFD27940C7100AB5C2E /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = CMakeLists.txt; sourceTree = "<group>"; };
+		86BCCCFE27940C7100AB5C2E /* Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64.h; sourceTree = "<group>"; };
+		86BCCCFF27940C7100AB5C2E /* ZegoCrypto.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = ZegoCrypto.hpp; sourceTree = "<group>"; };
+		86BCCD0027940C7100AB5C2E /* ZegoCrypto.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ZegoCrypto.cpp; sourceTree = "<group>"; };
+		86BCCD0227940C7100AB5C2E /* aes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = aes.h; sourceTree = "<group>"; };
+		86BCCD0327940C7100AB5C2E /* aes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = aes.cpp; sourceTree = "<group>"; };
+		86BCCD0427940C7100AB5C2E /* Base64.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Base64.cc; sourceTree = "<group>"; };
+		86BCCD0527940C7100AB5C2E /* AppToken.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppToken.swift; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -79,6 +145,197 @@
 			path = ZIMPlugin;
 			sourceTree = "<group>";
 		};
+		86BCCCBD27940C7100AB5C2E /* Tool */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCBE27940C7100AB5C2E /* Token */,
+				86BCCD0527940C7100AB5C2E /* AppToken.swift */,
+			);
+			path = Tool;
+			sourceTree = "<group>";
+		};
+		86BCCCBE27940C7100AB5C2E /* Token */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCBF27940C7100AB5C2E /* ZegoToken.mm */,
+				86BCCCC027940C7100AB5C2E /* ZegoToken.h */,
+				86BCCCC127940C7100AB5C2E /* TokenGenerator */,
+			);
+			path = Token;
+			sourceTree = "<group>";
+		};
+		86BCCCC127940C7100AB5C2E /* TokenGenerator */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCC227940C7100AB5C2E /* kernel03 */,
+				86BCCCCA27940C7100AB5C2E /* kernel04 */,
+				86BCCCD227940C7100AB5C2E /* common */,
+			);
+			path = TokenGenerator;
+			sourceTree = "<group>";
+		};
+		86BCCCC227940C7100AB5C2E /* kernel03 */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCC327940C7100AB5C2E /* impl */,
+				86BCCCC727940C7100AB5C2E /* include */,
+			);
+			path = kernel03;
+			sourceTree = "<group>";
+		};
+		86BCCCC327940C7100AB5C2E /* impl */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCC427940C7100AB5C2E /* ZegoRTCServerAssistantImpl.cpp */,
+				86BCCCC527940C7100AB5C2E /* ZegoRTCServerAssistantImpl.h */,
+				86BCCCC627940C7100AB5C2E /* ZegoRTCServerAssistant.cpp */,
+			);
+			path = impl;
+			sourceTree = "<group>";
+		};
+		86BCCCC727940C7100AB5C2E /* include */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCC827940C7100AB5C2E /* ZegoRTCServerAssistantDefines.h */,
+				86BCCCC927940C7100AB5C2E /* ZegoRTCServerAssistant.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		86BCCCCA27940C7100AB5C2E /* kernel04 */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCCB27940C7100AB5C2E /* impl */,
+				86BCCCCF27940C7100AB5C2E /* include */,
+			);
+			path = kernel04;
+			sourceTree = "<group>";
+		};
+		86BCCCCB27940C7100AB5C2E /* impl */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCCC27940C7100AB5C2E /* ZegoServerAssistantImpl.cpp */,
+				86BCCCCD27940C7100AB5C2E /* ZegoServerAssistant.cpp */,
+				86BCCCCE27940C7100AB5C2E /* ZegoServerAssistantImpl.h */,
+			);
+			path = impl;
+			sourceTree = "<group>";
+		};
+		86BCCCCF27940C7100AB5C2E /* include */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCD027940C7100AB5C2E /* ZegoServerAssistantDefines.h */,
+				86BCCCD127940C7100AB5C2E /* ZegoServerAssistant.h */,
+			);
+			path = include;
+			sourceTree = "<group>";
+		};
+		86BCCCD227940C7100AB5C2E /* common */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCD327940C7100AB5C2E /* rapidjson */,
+				86BCCCFA27940C7100AB5C2E /* modules */,
+			);
+			path = common;
+			sourceTree = "<group>";
+		};
+		86BCCCD327940C7100AB5C2E /* rapidjson */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCD427940C7100AB5C2E /* fwd.h */,
+				86BCCCD527940C7100AB5C2E /* memorystream.h */,
+				86BCCCD627940C7100AB5C2E /* reader.h */,
+				86BCCCD727940C7100AB5C2E /* prettywriter.h */,
+				86BCCCD827940C7100AB5C2E /* ostreamwrapper.h */,
+				86BCCCD927940C7100AB5C2E /* encodedstream.h */,
+				86BCCCDA27940C7100AB5C2E /* filereadstream.h */,
+				86BCCCDB27940C7100AB5C2E /* istreamwrapper.h */,
+				86BCCCDC27940C7100AB5C2E /* stringbuffer.h */,
+				86BCCCDD27940C7100AB5C2E /* internal */,
+				86BCCCEA27940C7100AB5C2E /* encodings.h */,
+				86BCCCEB27940C7100AB5C2E /* schema.h */,
+				86BCCCEC27940C7100AB5C2E /* stream.h */,
+				86BCCCED27940C7100AB5C2E /* filewritestream.h */,
+				86BCCCEE27940C7100AB5C2E /* rapidjson.h */,
+				86BCCCEF27940C7100AB5C2E /* document.h */,
+				86BCCCF027940C7100AB5C2E /* allocators.h */,
+				86BCCCF127940C7100AB5C2E /* writer.h */,
+				86BCCCF227940C7100AB5C2E /* error */,
+				86BCCCF527940C7100AB5C2E /* memorybuffer.h */,
+				86BCCCF627940C7100AB5C2E /* pointer.h */,
+				86BCCCF727940C7100AB5C2E /* msinttypes */,
+			);
+			path = rapidjson;
+			sourceTree = "<group>";
+		};
+		86BCCCDD27940C7100AB5C2E /* internal */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCDE27940C7100AB5C2E /* ieee754.h */,
+				86BCCCDF27940C7100AB5C2E /* strtod.h */,
+				86BCCCE027940C7100AB5C2E /* swap.h */,
+				86BCCCE127940C7100AB5C2E /* regex.h */,
+				86BCCCE227940C7100AB5C2E /* diyfp.h */,
+				86BCCCE327940C7100AB5C2E /* biginteger.h */,
+				86BCCCE427940C7100AB5C2E /* strfunc.h */,
+				86BCCCE527940C7100AB5C2E /* itoa.h */,
+				86BCCCE627940C7100AB5C2E /* stack.h */,
+				86BCCCE727940C7100AB5C2E /* dtoa.h */,
+				86BCCCE827940C7100AB5C2E /* meta.h */,
+				86BCCCE927940C7100AB5C2E /* pow10.h */,
+			);
+			path = internal;
+			sourceTree = "<group>";
+		};
+		86BCCCF227940C7100AB5C2E /* error */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCF327940C7100AB5C2E /* error.h */,
+				86BCCCF427940C7100AB5C2E /* en.h */,
+			);
+			path = error;
+			sourceTree = "<group>";
+		};
+		86BCCCF727940C7100AB5C2E /* msinttypes */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCF827940C7100AB5C2E /* inttypes.h */,
+				86BCCCF927940C7100AB5C2E /* stdint.h */,
+			);
+			path = msinttypes;
+			sourceTree = "<group>";
+		};
+		86BCCCFA27940C7100AB5C2E /* modules */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCFB27940C7100AB5C2E /* common */,
+			);
+			path = modules;
+			sourceTree = "<group>";
+		};
+		86BCCCFB27940C7100AB5C2E /* common */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCCFC27940C7100AB5C2E /* json_tools.hpp */,
+				86BCCCFD27940C7100AB5C2E /* CMakeLists.txt */,
+				86BCCCFE27940C7100AB5C2E /* Base64.h */,
+				86BCCCFF27940C7100AB5C2E /* ZegoCrypto.hpp */,
+				86BCCD0027940C7100AB5C2E /* ZegoCrypto.cpp */,
+				86BCCD0127940C7100AB5C2E /* crypto-algorithms */,
+				86BCCD0427940C7100AB5C2E /* Base64.cc */,
+			);
+			path = common;
+			sourceTree = "<group>";
+		};
+		86BCCD0127940C7100AB5C2E /* crypto-algorithms */ = {
+			isa = PBXGroup;
+			children = (
+				86BCCD0227940C7100AB5C2E /* aes.h */,
+				86BCCD0327940C7100AB5C2E /* aes.cpp */,
+			);
+			path = "crypto-algorithms";
+			sourceTree = "<group>";
+		};
 		9740EEB11CF90186004384FC /* Flutter */ = {
 			isa = PBXGroup;
 			children = (
@@ -112,6 +369,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				86BCCCBD27940C7100AB5C2E /* Tool */,
 				86AB32CD278FFF1D008AD4C9 /* ZIMPlugin */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
@@ -202,6 +460,7 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				86BCCD0B27940C7100AB5C2E /* CMakeLists.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -283,8 +542,17 @@
 			buildActionMask = 2147483647;
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				86BCCD0C27940C7100AB5C2E /* ZegoCrypto.cpp in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+				86BCCD0627940C7100AB5C2E /* ZegoToken.mm in Sources */,
+				86BCCD0927940C7100AB5C2E /* ZegoServerAssistantImpl.cpp in Sources */,
+				86BCCD0D27940C7100AB5C2E /* aes.cpp in Sources */,
 				86AB32CF278FFF1D008AD4C9 /* ZIMPlugin.swift in Sources */,
+				86BCCD0E27940C7100AB5C2E /* Base64.cc in Sources */,
+				86BCCD0827940C7100AB5C2E /* ZegoRTCServerAssistant.cpp in Sources */,
+				86BCCD0A27940C7100AB5C2E /* ZegoServerAssistant.cpp in Sources */,
+				86BCCD0727940C7100AB5C2E /* ZegoRTCServerAssistantImpl.cpp in Sources */,
+				86BCCD0F27940C7100AB5C2E /* AppToken.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

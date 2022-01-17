@@ -24,7 +24,7 @@ class RoomMemberListItem extends StatelessWidget {
           width: 68.w,
           height: 68.h,
           child: CircleAvatar(
-            child: Text(userInfo.userId),
+            child: Text(userInfo.userID),
           ),
         ),
         const SizedBox(width: 24),
