@@ -16,12 +16,16 @@ class ZegoMessageService extends ChangeNotifier {
   }
   void sendTextMessage(String message, ZegoRoomCallback? callback) {
     var roomID = ZegoRoomManager.shared.roomService.roomInfo.roomID;
-    int code = ZIMPlugin.sendRoomMessage(roomID, message);
+    int code = ZIMPlugin.sendRoomMessage(roomID, message, false);
     // Below code just for UI test
-    var msg = ZegoTextMessage();
-    msg.message = message;
-    messageList.add(msg);
+    if (code == 0) {
+      var msg = ZegoTextMessage();
+      msg.message = message;
+      messageList.add(msg);
+    }
+    if (callback != null) {
+      callback(code);
+    }
     notifyListeners();
-
   }
 }

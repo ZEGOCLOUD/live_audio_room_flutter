@@ -195,8 +195,19 @@ class ZIMPlugin: NSObject {
          let params = call.arguments as? NSDictionary
                  if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
-         let textMessage = params!["text"] as? String ?? ""
-         let message = ZIMTextMessage(message: textMessage)
+         let content = params!["content"] as? String ?? ""
+         let isCustomMessage = params!["isCustomMessage"] as? Bool ?? false
+         var message: ZIMMessage?
+         if (isCustomMessage) {
+             let contentData = content.data(using: .utf8) ?? Data()
+             message = ZIMCustomMessage(message: contentData)
+         } else {
+             message = ZIMTextMessage(message: content)
+         }
+         guard let message = message else {
+             return
+         }
+
          zim?.sendRoomMessage(message, toRoomID: roomID, callback: { message, error in
              result(error.code)
          })
