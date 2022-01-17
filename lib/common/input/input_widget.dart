@@ -64,7 +64,7 @@ class _InputWidgetState extends State<InputWidget> {
                   ),
                   GestureDetector(
                     onTap: (() {
-                      var text = editingController.text?.trim() ?? "";
+                      var text = editingController.text.trim();
                       if (text.isNotEmpty) {
                         Navigator.pop(context, text);
                       }

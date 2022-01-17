@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 //  menu action type of member list
 enum RoomMemberListMenuAction {
@@ -29,7 +30,7 @@ class RoomMemberListItem extends StatelessWidget {
         const SizedBox(width: 24),
         Text(userInfo.userName, style: StyleConstant.roomMemberListNameText),
         const Expanded(child: Text('')),
-        getRightWidgetByUserRole()
+        getRightWidgetByUserRole(context)
       ],
     );
   }
@@ -42,14 +43,14 @@ class RoomMemberListItem extends StatelessWidget {
     }
   }
 
-  Widget getRightWidgetByUserRole() {
+  Widget getRightWidgetByUserRole(BuildContext context) {
     switch (userInfo.userRole) {
       case ZegoRoomUserRole.roomUserRoleHost:
-        return const Text('Host',
+        return Text(AppLocalizations.of(context)!.roomPageRoleOwner,
             textDirection: TextDirection.rtl,
             style: StyleConstant.roomMemberListRoleText);
       case ZegoRoomUserRole.roomUserRoleSpeaker:
-        return const Text('Speaker',
+        return Text(AppLocalizations.of(context)!.roomPageRoleSpeaker,
             textDirection: TextDirection.rtl,
             style: StyleConstant.roomMemberListRoleText);
       case ZegoRoomUserRole.roomUserRoleListener:
@@ -73,7 +74,9 @@ class RoomMemberListItem extends StatelessWidget {
                       value: RoomMemberListMenuAction.inviteToBeASpeaker,
                       child: SizedBox(
                           width: 630.0.w,
-                          child: const Text('Invite to be a speaker',
+                          child: Text(
+                              AppLocalizations.of(context)!
+                                  .roomPageInviteTakeSeat,
                               textAlign: TextAlign.center)),
                     ),
                   ];
@@ -119,7 +122,9 @@ class _RoomMemberPageState extends State<RoomMemberPage> {
             height: 72.h,
             width: double.infinity,
             child: Center(
-                child: Text('Members (' + _users.length.toString() + ")",
+                child: Text(
+                    AppLocalizations.of(context)!
+                        .roomPageUserList(_users.length),
                     style: StyleConstant.roomBottomPopUpTitle))),
         SizedBox(
           width: double.infinity,

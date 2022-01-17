@@ -6,7 +6,7 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/src/provider.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
-
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class LoginPage extends HookWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -27,26 +27,11 @@ class LoginPage extends HookWidget {
             child: Column(
       children: [
         Container(
-            margin: EdgeInsets.only(
-                left: 74.w, top: 100.h, right: /*94*/ 0, bottom: 70.h),
-            child: Column(children: [
-              Row(
-                children: const [
-                  Text('Zego Cloud',
-                      style: StyleConstant.loginTitle,
-                      textAlign: TextAlign.left),
-                  Expanded(child: Text(''))
-                ],
-              ),
-              Row(
-                children: const [
-                  Text('Live Audio Room',
-                      style: StyleConstant.loginTitle,
-                      textAlign: TextAlign.left),
-                  Expanded(child: Text(''))
-                ],
-              ),
-            ])),
+          margin: EdgeInsets.only(
+              left: 74.w, top: 100.h, right: /*94*/ 0, bottom: 70.h),
+          child: Text(AppLocalizations.of(context)!.loginPageTitle,
+              style: StyleConstant.loginTitle, textAlign: TextAlign.left),
+        ),
         Container(
           margin:
               EdgeInsets.only(left: 60.w, top: 0, right: 60.w, bottom: 536.h),
@@ -54,28 +39,28 @@ class LoginPage extends HookWidget {
             children: [
               TextFormField(
                 style: StyleConstant.loginTextInput,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                     focusedBorder: textFormFieldBorder,
                     border: textFormFieldBorder,
                     hintStyle: StyleConstant.loginTextInputHintStyle,
-                    hintText: 'User ID'),
+                    hintText: AppLocalizations.of(context)!.loginPageUserId),
                 controller: userIdInputController,
               ),
               SizedBox(height: 49.h),
               TextFormField(
                 style: StyleConstant.loginTextInput,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                     focusedBorder: textFormFieldBorder,
                     border: textFormFieldBorder,
                     hintStyle: StyleConstant.loginTextInputHintStyle,
-                    hintText: 'User Name'),
+                    hintText: AppLocalizations.of(context)!.loginPageUserName),
                 controller: userNameInputController,
               ),
               SizedBox(
                 height: 70.h,
               ),
               ElevatedButton(
-                child: const Text('Login'),
+                child: Text(AppLocalizations.of(context)!.loginPageLogin),
                 style: ElevatedButton.styleFrom(
                   primary: StyleColors.blueButtonEnabledColor,
                   elevation: 3,
@@ -90,7 +75,7 @@ class LoginPage extends HookWidget {
                   var userModel = context.read<ZegoUserService>();
                   // TODO@oliver using correct token
                   userModel.login(
-                      info, 
+                      info,
                       "token",
                       (errorCode) => Navigator.pushReplacementNamed(
                           context, '/room_entrance'));

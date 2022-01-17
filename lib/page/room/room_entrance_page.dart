@@ -8,6 +8,7 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 typedef RoomOperationCallback = Function(int);
 
@@ -17,11 +18,13 @@ class CreateRoomDialog extends HookWidget {
   void tryCreateRoom(BuildContext context, String roomID, String roomName,
       RoomOperationCallback? callback) {
     if (roomID.isEmpty) {
-      Fluttertoast.showToast(msg: "Please enter the roomID.");
+      Fluttertoast.showToast(
+          msg: AppLocalizations.of(context)!.toastRoomIdEnterError);
       return;
     }
     if (roomName.isEmpty) {
-      Fluttertoast.showToast(msg: "Please enter the room name.");
+      Fluttertoast.showToast(
+          msg: AppLocalizations.of(context)!.toastRoomNameError);
       return;
     }
     // TODO@oliveryang@zego.im call sdk and wait for callback to show the taost below.
@@ -39,7 +42,7 @@ class CreateRoomDialog extends HookWidget {
 
     // TODO: implement build
     return CupertinoAlertDialog(
-      title: const Text("Create a new room"),
+      title: Text(AppLocalizations.of(context)!.createPageCreateRoom),
       content: FractionallySizedBox(
         widthFactor: 0.95,
         child: Column(
@@ -53,7 +56,7 @@ class CreateRoomDialog extends HookWidget {
                 expands: true,
                 maxLines: null,
                 maxLength: 20,
-                placeholder: "Room ID",
+                placeholder: AppLocalizations.of(context)!.createPageRoomId,
                 controller: dialogRoomIDInputController,
               ),
             ),
@@ -66,7 +69,7 @@ class CreateRoomDialog extends HookWidget {
                 expands: true,
                 maxLines: null,
                 maxLength: 16,
-                placeholder: "Room Name",
+                placeholder: AppLocalizations.of(context)!.createPageRoomName,
                 controller: dialogRoomNameInputController,
               ),
             ),
@@ -78,13 +81,13 @@ class CreateRoomDialog extends HookWidget {
       ),
       actions: [
         CupertinoDialogAction(
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context)!.createPageCancel),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         CupertinoDialogAction(
-          child: const Text('Create'),
+          child: Text(AppLocalizations.of(context)!.createPageCreate),
           isDestructiveAction: true,
           onPressed: () {
             tryCreateRoom(
@@ -106,7 +109,8 @@ class RoomEntrancePage extends HookWidget {
   void tryJoinRoom(
       BuildContext context, String roomID, RoomOperationCallback? callback) {
     if (roomID.isEmpty) {
-      Fluttertoast.showToast(msg: "Please enter the roomID.");
+      Fluttertoast.showToast(
+          msg: AppLocalizations.of(context)!.toastRoomIdEnterError);
       return;
     }
     // TODO@oliveryang@zego.im join room by calling sdk and call callback after finished.
@@ -141,7 +145,8 @@ class RoomEntrancePage extends HookWidget {
                 TextButton(
                   onPressed: () =>
                       Navigator.pushReplacementNamed(context, "/settings"),
-                  child: const Text("Settings"),
+                  child:
+                      Text(AppLocalizations.of(context)!.settingPageSettings),
                 )
               ],
             ),
@@ -154,7 +159,7 @@ class RoomEntrancePage extends HookWidget {
                 expands: true,
                 maxLines: null,
                 maxLength: 20,
-                placeholder: "Room ID",
+                placeholder: AppLocalizations.of(context)!.createPageRoomId,
                 controller: roomIDInputController,
               ),
             ),
@@ -162,7 +167,7 @@ class RoomEntrancePage extends HookWidget {
               height: 30,
             ),
             CupertinoButton.filled(
-                child: const Text("Join Room"),
+                child: Text(AppLocalizations.of(context)!.createPageJoinRoom),
                 onPressed: () {
                   tryJoinRoom(
                       context,
@@ -174,22 +179,22 @@ class RoomEntrancePage extends HookWidget {
               padding: const EdgeInsets.all(15),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [Text("Or")],
+                children: [Text(AppLocalizations.of(context)!.createPageOr)],
               ),
             ),
             CupertinoButton(
                 color: Colors.blueGrey[50],
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Icon(
+                  children: [
+                    const Icon(
                       Icons.add,
                       color: Colors.black,
                       size: 24.0,
                     ),
                     Text(
-                      "Create Room",
-                      style: TextStyle(color: Colors.black),
+                      AppLocalizations.of(context)!.createPageCreateRoom,
+                      style: const TextStyle(color: Colors.black),
                     )
                   ],
                 ),

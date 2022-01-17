@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class SettingSDKVersionWidget extends StatelessWidget {
   final String title;
   final String content;
 
-  const SettingSDKVersionWidget({required this.title, required this.content});
+  const SettingSDKVersionWidget(
+      {required this.title, required this.content, Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -49,11 +52,11 @@ class SettingsUploadLogWidget extends StatelessWidget {
                 //  TODO@yuuyj call user logout logic
               },
               child: Row(
-                children: const [
-                  Text('Upload Log',
+                children: [
+                  Text(AppLocalizations.of(context)!.settingPageUploadLog,
                       style: StyleConstant.settingTitle,
                       textDirection: TextDirection.ltr),
-                  Expanded(
+                  const Expanded(
                     child: Text(''),
                   )
                 ],
@@ -79,7 +82,7 @@ class SettingsLogoutWidget extends StatelessWidget {
             //  TODO@yuuyj call user logout logic
             Navigator.pushReplacementNamed(context, "/login");
           },
-          child: const Text('Logout',
+          child: Text(AppLocalizations.of(context)!.settingPageLogout,
               textAlign: TextAlign.center, style: StyleConstant.settingLogout),
         )));
   }
@@ -96,7 +99,7 @@ class SettingsPage extends StatelessWidget {
               icon: Image.asset(StyleIconUrls.navigatorBack),
               onPressed: () =>
                   Navigator.pushReplacementNamed(context, "/room_entrance")),
-          title: const Text('Settings',
+          title: Text(AppLocalizations.of(context)!.settingPageSettings,
               style: StyleConstant.settingAppBar,
               textDirection: TextDirection.ltr),
           centerTitle: true,
@@ -112,12 +115,16 @@ class SettingsPage extends StatelessWidget {
                     margin: EdgeInsets.only(
                         left: 0, top: 32.h, right: 0, bottom: 20.h),
                     child: Column(
-                      children: const [
+                      children: [
                         //  TODO@yuyj get sdk version
                         SettingSDKVersionWidget(
-                            title: 'EXPRESS SDK Version', content: '2.8'),
+                            title: AppLocalizations.of(context)!
+                                .settingPageSdkVersion,
+                            content: '2.8'),
                         SettingSDKVersionWidget(
-                            title: 'ZIM SDK Version', content: '1.1')
+                            title: AppLocalizations.of(context)!
+                                .settingPageZimSdkVersion,
+                            content: '1.1')
                       ]
                           .map((e) => Padding(
                                 child: e,

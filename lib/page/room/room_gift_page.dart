@@ -5,6 +5,7 @@ import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class RoomGiftMemberList extends StatefulWidget {
   const RoomGiftMemberList({Key? key}) : super(key: key);
@@ -149,10 +150,11 @@ class _RoomGiftBottomBarState extends State<RoomGiftBottomBar> {
                         textAlign: TextAlign.left,
                         maxLines: 1,
                         style: StyleConstant.roomGiftInputText,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                             border: InputBorder.none,
                             hintStyle: StyleConstant.roomGiftInputText,
-                            hintText: 'Choose a member on mic'),
+                            hintText: AppLocalizations.of(context)!
+                                .roomPageSelectDefault),
                         controller: userNameInputController,
                       ))),
                   const Expanded(child: Text('')),
@@ -168,7 +170,7 @@ class _RoomGiftBottomBarState extends State<RoomGiftBottomBar> {
                 onPressed: () {
                   //  todo@yuyj send gift logic
                 },
-                child: const Text('Send',
+                child: Text(AppLocalizations.of(context)!.roomPageSendGift,
                     style: StyleConstant.roomGiftSendButtonText),
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.resolveWith((states) {
@@ -238,8 +240,8 @@ class RoomGiftPage extends StatelessWidget {
           SizedBox(
               height: 72.h,
               width: double.infinity,
-              child: const Center(
-                  child: Text('Gifts',
+              child: Center(
+                  child: Text(AppLocalizations.of(context)!.roomPageGift,
                       textAlign: TextAlign.center,
                       style: StyleConstant.roomBottomPopUpTitle))),
           const RoomGiftSelector(),

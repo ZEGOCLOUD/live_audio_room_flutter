@@ -12,6 +12,7 @@ import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 typedef SeatItemClickCallback = Function(
     int index, String userId, ZegoSpeakerSeatStatus status);
@@ -189,33 +190,37 @@ class RoomCenterContentFrame extends StatelessWidget {
             _showBottomModalButton(
                 context,
                 setToClose
-                    ? "Close a speaker seat"
-                    : "Open a closed speaker seat ", () {
+                    ? AppLocalizations.of(context)!.roomPageLockSeat
+                    : AppLocalizations.of(context)!.roomPageUnlockSeat, () {
               var seats = context.read<ZegoSpeakerSeatService>();
               seats.closeSeat(setToClose, index, (p0) => null);
             });
           } else {
             // Remove user from seat
-            _showBottomModalButton(context, "Remove from speaker seat", () {
+            _showBottomModalButton(
+                context, AppLocalizations.of(context)!.roomPageLeaveSpeakerSeat,
+                () {
               showDialog<String>(
                 context: context,
                 builder: (BuildContext context) => AlertDialog(
-                  title: const Text('Leave the seat'),
-                  content:
-                      Text('Are you sure to let $userName leave the seat?'),
+                  title: Text(AppLocalizations.of(context)!.roomPageLeaveSeat),
+                  content: Text(AppLocalizations.of(context)!
+                      .roomPageLeaveSpeakerSeatDesc(userName!)),
                   actions: <Widget>[
                     TextButton(
-                      onPressed: () => Navigator.pop(context, 'Cancel'),
-                      child: const Text('Cancel'),
+                      onPressed: () => Navigator.pop(
+                          context, AppLocalizations.of(context)!.dialogCancel),
+                      child: Text(AppLocalizations.of(context)!.dialogCancel),
                     ),
                     TextButton(
                       onPressed: () {
-                        Navigator.pop(context, 'Confirm');
+                        Navigator.pop(context,
+                            AppLocalizations.of(context)!.dialogConfirm);
                         // DO REMOVE JOB
                         var seats = context.read<ZegoSpeakerSeatService>();
                         seats.removeUserFromSeat(index, (p0) => null);
                       },
-                      child: const Text('Confirm'),
+                      child: Text(AppLocalizations.of(context)!.dialogConfirm),
                     ),
                   ],
                 ),
@@ -231,11 +236,11 @@ class RoomCenterContentFrame extends StatelessWidget {
           var seats = context.read<ZegoSpeakerSeatService>();
 
           if (userID.isEmpty) {
-            _showBottomModalButton(context, "Take a speaker seat", () {
+            _showBottomModalButton(context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
               seats.switchSeat(index, (p0) => null);
             });
           } else if (users.localUserInfo.userId == userID) {
-            _showBottomModalButton(context, "Leave speaker seat ", () {
+            _showBottomModalButton(context, AppLocalizations.of(context)!.roomPageLeaveSeat, () {
               seats.leaveSeat((p0) => null);
               users.setUserRoleForUITest(ZegoRoomUserRole
                   .roomUserRoleListener); // TODO@oliver FOR UI TEST ONLY
@@ -251,10 +256,10 @@ class RoomCenterContentFrame extends StatelessWidget {
             return;
           }
           if (ZegoSpeakerSeatStatus.zegoSpeakerSeatStatusClosed == status) {
-            Fluttertoast.showToast(msg: "The seat is closed");
+            Fluttertoast.showToast(msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed);
             return;
           }
-          _showBottomModalButton(context, "Take a speaker seat", () {
+          _showBottomModalButton(context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
             users.setUserRoleForUITest(ZegoRoomUserRole
                 .roomUserRoleSpeaker); // TODO@oliver FOR UI TEST ONLY
             var seats = context.read<ZegoSpeakerSeatService>();
