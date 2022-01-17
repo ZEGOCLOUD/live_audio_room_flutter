@@ -39,14 +39,16 @@ class ZegoRoomManager extends ChangeNotifier {
     callback(0);
   }
 
-  void uninit() {
+  Future<int> uninit() async {
     logoutRtcRoom();
-    ZIMPlugin.destoryZIM();
+    var result = await ZIMPlugin.destoryZIM();
     ZegoExpressEngine.destroyEngine();
+    return result['errorCode'];
   }
 
-  void uploadLog(ZegoRoomCallback callback) {
-    ZIMPlugin.uploadLog();
+  Future<int> uploadLog(ZegoRoomCallback callback) async {
+    var result = await ZIMPlugin.uploadLog();
+    return result['errorCode'];
   }
 
    void logoutRtcRoom() {
