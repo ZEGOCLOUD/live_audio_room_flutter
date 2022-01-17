@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
@@ -71,17 +72,30 @@ class LoginPage extends HookWidget {
                   minimumSize: Size(630.w, 98.h),
                 ),
                 onPressed: () {
-                  ZegoUserInfo info = ZegoUserInfo.empty();
-                  info.userID = userIdInputController.text;
-                  info.userName = userNameInputController.text;
-                  var userModel = context.read<ZegoUserService>();
-                  // TODO@oliver using correct token
-                  ZegoRoomManager.shared.initWithAPPID(123, "appSign", (p0) => null);
-                  userModel.login(
-                      info,
-                      "token",
-                      (errorCode) => Navigator.pushReplacementNamed(
-                          context, '/room_entrance'));
+                  // TODO@oliveryang using key_center.json for passing AppID and AppSign
+                  ZegoRoomManager.shared.initWithAPPID(123, "appSign",
+                      (errorCode) {
+                    if (errorCode != 0) {
+                      Fluttertoast.showToast(
+                          msg: AppLocalizations.of(context)!
+                              .toastLoginFail(errorCode));
+                      return;
+                    }
+
+                    ZegoUserInfo info = ZegoUserInfo.empty();
+                    info.userID = userIdInputController.text;
+                    info.userName = userNameInputController.text;
+                    var userModel = context.read<ZegoUserService>();
+                    userModel.login(info, (errorCode) {
+                      if (errorCode != 0) {
+                        Fluttertoast.showToast(
+                            msg: AppLocalizations.of(context)!
+                                .toastLoginFail(errorCode));
+                        return;
+                      }
+                      Navigator.pushReplacementNamed(context, '/room_entrance');
+                    });
+                  });
                 },
               )
             ],

@@ -39,23 +39,25 @@ class ZegoUserService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void login(ZegoUserInfo info, String token, LoginCallback? callback) {
+  void login(ZegoUserInfo info, LoginCallback? callback) {
     localUserInfo = info;
     if (info.userName.isEmpty) {
       localUserInfo.userName = info.userID;
     }
-    Map result = ZIMPlugin.login(info.userID, info.userName, "");
     loginState = LoginState.loginStateLoggingIn;
     notifyListeners();
+    // Note: token is generate in native code
+    Map result = ZIMPlugin.login(info.userID, info.userName, "");
+    var errorCode = result['errorCode'];
     if (callback != null) {
-      // TODO@oliver call in SDK real callback
-      loginState = LoginState.loginStateLoggedIn;
-      int code = result['errorCode'];
-      callback(code);
+      callback(errorCode);
     }
+    // TODO@oliver call in SDK async callback
+    loginState = errorCode != 0 ? LoginState.loginStateLoginFailed : LoginState.loginStateLoggedIn;
+    notifyListeners();
+
     // TODO@oliver FOR UI TEST ONLY
     userList.add(localUserInfo);
-    // TODO@oliver notify in SDK callback
     notifyListeners();
   }
 
