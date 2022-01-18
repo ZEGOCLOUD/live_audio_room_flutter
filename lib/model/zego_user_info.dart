@@ -16,6 +16,15 @@ class ZegoUserInfo {
   bool isEmpty() {
     return userID.isEmpty || userName.isEmpty;
   }
+  
+  ZegoUserInfo.formJson(Map<String, dynamic> json)
+      : userID = json['userID'],
+        userName = json['userName'];
+  Map<String, dynamic> toJson() =>
+      {
+        'userID': userID,
+        'userName': userName
+      };
 
   @override
   String toString() {

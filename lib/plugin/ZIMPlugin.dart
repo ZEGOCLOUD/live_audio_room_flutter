@@ -8,6 +8,16 @@ import 'package:flutter/material.dart';
 
 class ZIMPlugin {
   static const MethodChannel channel = MethodChannel('ZIMPlugin');
+  static const EventChannel event = EventChannel('ZIMPluginEventChannel');
+
+  static void Function(String roomID, List<Map<String, dynamic>> memberList)? onRoomMemberJoined;
+  static void Function(String roomID, List<Map<String, dynamic>> memberList)? onRoomMemberLeave;
+
+  static void Function(String roomID, Map<String, dynamic> roomInfoJson)? onRoomStatusUpdate;
+  static void Function(String roomID, Map<String, dynamic> speakerListJson)? onRoomSpeakerSeatUpdate;
+
+  /// Used to receive the native event stream
+  static StreamSubscription<dynamic>? streamSubscription;
 
   static Future<Map> createZIM(int appID) async {
     return await channel.invokeMethod("createZIM", {"appID": appID});
@@ -61,21 +71,53 @@ class ZIMPlugin {
     return await channel.invokeMethod("setRoomAttributes", {"roomID": roomID, "attributes": attributes, "delete": delete});
   }
 
-  static configEventHandle() {
+  /* EventHandler */
 
-    const standardMethod = StandardMethodCodec();
-    // ServicesBinding.instance?.defaultBinaryMessenger
-    //     .setMockMessageHandler('ZIMPluginEventChannel', (message) async {
-    //   // Decode the message into MethodCallHandler.
-    //   final methodCall = standardMethod.decodeMethodCall(message);
-    //
-    //   if (methodCall.method == 'listen') {
-    //   } else if (methodCall.method == 'cancel') {
-    //   } else {
-    //   }
-    //
-    // });
+  static void registerEventHandler() async {
+    streamSubscription = event.receiveBroadcastStream().listen(eventListener);
   }
 
+  static void unregisterEventHandler() async {
+    await streamSubscription?.cancel();
+    streamSubscription = null;
+  }
 
+  static void eventListener(dynamic data) {
+    final Map<dynamic, dynamic> map = data;
+    switch (map['method']) {
+      case 'roomMemberJoined':
+        var memberList = map['memberList'];
+        String roomID = map['roomID'];
+        if (onRoomMemberJoined != null) {
+          onRoomMemberJoined!(roomID, memberList);
+        }
+        break;
+      case 'onRoomMemberLeave':
+        var memberList = map['memberList'];
+        String roomID = map['roomID'];
+        if (onRoomMemberLeave != null) {
+          onRoomMemberLeave!(roomID, memberList);
+        }
+        break;
+      case 'roomAttributesUpdated':
+        var roomID = map['roomID'];
+        var updateInfo = map['updateInfo'] as Map<String, dynamic>;
+        var roomInfoJson = updateInfo['room_info'];
+        if (roomInfoJson != null) {
+          if (onRoomStatusUpdate != null) {
+            onRoomStatusUpdate!(roomID, roomInfoJson);
+          }
+        }
+        updateInfo.removeWhere((key, value) => key == "room_info");
+        if (updateInfo.keys.length > 0) {
+          if (onRoomSpeakerSeatUpdate != null) {
+            onRoomSpeakerSeatUpdate!(roomID, updateInfo);
+          }
+        }
+        break;
+      default:
+      // TODO: Unknown callback
+        break;
+    }
+  }
 }

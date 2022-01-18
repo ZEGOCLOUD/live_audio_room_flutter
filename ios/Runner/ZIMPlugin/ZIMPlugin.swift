@@ -254,53 +254,67 @@ class ZIMPlugin: NSObject {
 extension ZIMPlugin: ZIMEventHandler {
     func zim(_ zim: ZIM, connectionStateChanged state: ZIMConnectionState, event: ZIMConnectionEvent, extendedData: [AnyHashable : Any]) {
         guard let events = self.events else { return }
-        events(["connectionStateChanged", state, event])
+        events(["method": "connectionStateChanged", "state": state, "event": event])
     }
     
     // MARK: - Main
     func zim(_ zim: ZIM, errorInfo: ZIMError) {
         guard let events = self.events else { return }
         events(["zim", errorInfo.code])
+        events(["method": "errorInfo", "code": errorInfo.code])
     }
     
     func zim(_ zim: ZIM, tokenWillExpire second: UInt32) {
         guard let events = self.events else { return }
-        events(["tokenWillExpire", second])
+        events(["method": "tokenWillExpire", "second": second])
         
     }
     
     // MARK: - Message
     func zim(_ zim: ZIM, receivePeerMessage messageList: [ZIMMessage], fromUserID: String) {
         guard let events = self.events else { return }
-        events(["receivePeerMessage", messageList, fromUserID])
+        events(["method": "receivePeerMessage", "messageList": messageList, "fromUserID": fromUserID])
     }
     
     func zim(_ zim: ZIM, receiveRoomMessage messageList: [ZIMMessage], fromRoomID: String) {
         guard let events = self.events else { return }
-        events(["receiveRoomMessage", messageList, fromRoomID])
+//        var messageJsonList = Array(AnyObject);
+//        for item in messageList {
+//            if item.type = .te
+//        }
+        events(["method": "receiveRoomMessage", "messageList": messageList, "fromRoomID": fromRoomID])
     }
     
     // MARK: - Room
     func zim(_ zim: ZIM, roomMemberJoined memberList: [ZIMUserInfo], roomID: String) {
         guard let events = self.events else { return }
-        events(["roomMemberJoined", memberList, roomID])
+        var memberArray = [Dictionary<String, Any>]()
+        for userInfo in memberList {
+            memberArray.append(["userID": userInfo.userID, "userName": userInfo.userName])
+        }
+        
+        events(["method": "roomMemberJoined", "memberList": memberArray, "roomID": roomID])
     }
     
     func zim(_ zim: ZIM, roomMemberLeft memberList: [ZIMUserInfo], roomID: String) {
         guard let events = self.events else { return }
-        events(["roomMemberLeft", memberList, roomID])
+        var memberArray = [Dictionary<String, Any>]()
+        for userInfo in memberList {
+            memberArray.append(["userID": userInfo.userID, "userName": userInfo.userName])
+        }
         
+        events(["method": "onRoomMemberLeave", "memberList": memberArray, "roomID": roomID])
     }
     
     func zim(_ zim: ZIM, roomStateChanged state: ZIMRoomState, event: ZIMRoomEvent, extendedData: [AnyHashable : Any], roomID: String) {
         guard let events = self.events else { return }
-        events(["roomStateChanged", state, event])
+        events(["method": "roomStateChanged", "state": state, "event": event])
     }
     
-//    func zim(_ zim: ZIM, roomAttributesUpdated updateInfo: ZIMRoomAttributesUpdateInfo, roomID: String) {
-//        guard let events = self.events else { return }
-//        events(["roomAttributesUpdated", updateInfo, roomID])
-//    }
+    func zim(_ zim: ZIM, roomAttributesUpdated updateInfo: ZIMRoomAttributesUpdateInfo, roomID: String) {
+        guard let events = self.events else { return }
+        events(["method": "roomAttributesUpdated", "updateInfo": updateInfo.roomAttributes, "roomID": roomID])
+    }
 }
 
 extension ZIMPlugin : FlutterStreamHandler {
