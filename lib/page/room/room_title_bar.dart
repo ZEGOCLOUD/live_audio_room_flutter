@@ -63,24 +63,23 @@ class RoomTitleBar extends StatelessWidget {
                       child: Text(AppLocalizations.of(context)!.dialogCancel),
                       onPressed: () => Navigator.of(context).pop(),
                     ),
-                    Consumer<ZegoRoomService>(
-                        builder: (_, roomService, child) => TextButton(
-                              child: Text(
-                                  AppLocalizations.of(context)!.dialogConfirm),
-                              onPressed: () {
-                                roomService.leaveRoom().then((errorCode) {
-                                  if (0 != errorCode) {
-                                    Fluttertoast.showToast(
-                                        msg: AppLocalizations.of(context)!
-                                            .toastRoomLeaveFailTip(errorCode));
-                                  }
-                                });
+                    TextButton(
+                      child: Text(AppLocalizations.of(context)!.dialogConfirm),
+                      onPressed: () {
+                        var room = context.read<ZegoRoomService>();
+                        room.leaveRoom().then((errorCode) {
+                          if (0 != errorCode) {
+                            Fluttertoast.showToast(
+                                msg: AppLocalizations.of(context)!
+                                    .toastRoomLeaveFailTip(errorCode));
+                          }
+                        });
 
-                                Navigator.of(context).pop(true);
-                                Navigator.pushReplacementNamed(
-                                    context, "/room_entrance");
-                              },
-                            )),
+                        Navigator.of(context).pop(true);
+                        Navigator.pushReplacementNamed(
+                            context, "/room_entrance");
+                      },
+                    ),
                   ],
                 );
               },

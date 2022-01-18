@@ -23,8 +23,8 @@ class ZIMPlugin {
     return await channel.invokeMethod("createZIM", {"appID": appID, "appSign": appSign, "serverSecret": serverSecret});
   }
   
-  static Future<Map> destoryZIM() async {
-    return await channel.invokeMethod("destoryZIM");
+  static Future<Map> destroyZIM() async {
+    return await channel.invokeMethod("destroyZIM");
   }
 
   static Future<Map> login(String userID, String userName, String token) async {
@@ -52,11 +52,11 @@ class ZIMPlugin {
   }
 
   static Future<Map> queryRoomAllAttributes(String roomID) async {
-    return await channel.invokeMethod("queryRoomAllAttributes", {"roomID", roomID});
+    return await channel.invokeMethod("queryRoomAllAttributes", {"roomID": roomID});
   }
 
   static Future<Map> queryRoomOnlineMemberCount(String roomID) async {
-    return await channel.invokeMethod("queryRoomOnlineMemberCount", {"roomID", roomID});
+    return await channel.invokeMethod("queryRoomOnlineMemberCount", {"roomID": roomID});
   }
 
   static Future<Map> sendPeerMessage(String userID, String content, int actionType) async {
@@ -109,7 +109,7 @@ class ZIMPlugin {
           }
         }
         updateInfo.removeWhere((key, value) => key == "room_info");
-        if (updateInfo.keys.length > 0) {
+        if (updateInfo.keys.isNotEmpty) {
           if (onRoomSpeakerSeatUpdate != null) {
             onRoomSpeakerSeatUpdate!(roomID, updateInfo);
           }

@@ -25,7 +25,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         result.success(null)
     }
 
-    fun destoryZIM(call: MethodCall, result: MethodChannel.Result) {
+    fun destroyZIM(call: MethodCall, result: MethodChannel.Result) {
         zim?.destroy()
         zim = null
         result.success(null)
