@@ -15,21 +15,15 @@ enum LoginState {
 typedef LoginCallback = Function(int);
 
 class ZegoUserService extends ChangeNotifier {
-
-  // TODO@oliver update userList on SDK callback and notify changed
-  late List<ZegoUserInfo> userList = [
-    ZegoUserInfo("111", "Host Name", ZegoRoomUserRole.roomUserRoleHost),
-    ZegoUserInfo("222", "Speaker Name", ZegoRoomUserRole.roomUserRoleHost),
-  ]; // Init list for UI test
+  List<ZegoUserInfo> userList = [];
   late ZegoUserInfo localUserInfo;
   late Map<String, ZegoUserInfo> userDic;
-  late String token;
   int totalUsersNum = 0;
   LoginState loginState = LoginState.loginStateLoggedOut;
 
   ZegoUserService() {
-    ZIMPlugin.onRoomMemberJoined = onRoomMemberJoined;
-    ZIMPlugin.onRoomMemberLeave = onRoomMemberLeave;
+    ZIMPlugin.onRoomMemberJoined = _onRoomMemberJoined;
+    ZIMPlugin.onRoomMemberLeave = _onRoomMemberLeave;
   }
 
   void fetchOnlineRoomUsersWithPage(int page) {
@@ -46,17 +40,17 @@ class ZegoUserService extends ChangeNotifier {
     return code;
   }
 
-    Future<int> login(ZegoUserInfo info, String token) async {
-      localUserInfo = info;
-      if (info.userName.isEmpty) {
-        localUserInfo.userName = info.userID;
-      }
-      loginState = LoginState.loginStateLoggingIn;
-      notifyListeners();
+  Future<int> login(ZegoUserInfo info, String token) async {
+    localUserInfo = info;
+    if (info.userName.isEmpty) {
+      localUserInfo.userName = info.userID;
+    }
+    loginState = LoginState.loginStateLoggingIn;
+    notifyListeners();
 
-      // Note: token is generate in native code
-      var result = await ZIMPlugin.login(info.userID, info.userName, "");
-      int code = result['errorCode'];
+    // Note: token is generate in native code
+    var result = await ZIMPlugin.login(info.userID, info.userName, "");
+    int code = result['errorCode'];
 
     loginState = code != 0
         ? LoginState.loginStateLoginFailed
@@ -76,23 +70,19 @@ class ZegoUserService extends ChangeNotifier {
     return result['errorCode'];
   }
 
-  // TODO@oliveryang
-  void setUserRoleForUITest(ZegoRoomUserRole role) {
-    localUserInfo.userRole = role;
-    notifyListeners();
-  }
-
-  void onRoomMemberJoined(String roomID, List<Map<String, dynamic>> memberList) {
+  void _onRoomMemberJoined(
+      String roomID, List<Map<String, dynamic>> memberList) {
     for (final item in memberList) {
-      var member = new ZegoUserInfo.formJson(item);
+      var member = ZegoUserInfo.formJson(item);
       userList.add(member);
     }
     notifyListeners();
   }
 
-  void onRoomMemberLeave(String roomID, List<Map<String, dynamic>> memberList) {
+  void _onRoomMemberLeave(
+      String roomID, List<Map<String, dynamic>> memberList) {
     for (final item in memberList) {
-      var member = new ZegoUserInfo.formJson(item);
+      var member = ZegoUserInfo.formJson(item);
       userList.removeWhere((element) => element.userID == member.userID);
     }
     notifyListeners();

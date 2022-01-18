@@ -77,6 +77,7 @@ class ZIMPlugin: NSObject {
      }
 
      func createZIM(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
+         if (zim != nil) {result(nil);return}
          let params = call.arguments as? NSDictionary
          if (params == nil) { return }
          appID = params!["appID"] as? UInt32 ?? 0
