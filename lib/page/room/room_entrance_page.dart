@@ -114,17 +114,15 @@ class RoomEntrancePage extends HookWidget {
     var room = context.read<ZegoRoomService>();
     room.joinRoom(roomID, "").then((code) {
       if (code != 0) {
-        if (code != 0) {
-          Fluttertoast.showToast(
-              msg: AppLocalizations.of(context)!.toastJoinRoomFail(code));
-        } else {
-          var users = context.read<ZegoUserService>();
-          if (room.roomInfo.hostID == users.localUserInfo.userID) {
-            users.localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleHost;
-          }
-
-          Navigator.pushReplacementNamed(context, "/room_main");
+        Fluttertoast.showToast(
+            msg: AppLocalizations.of(context)!.toastJoinRoomFail(code));
+      } else {
+        var users = context.read<ZegoUserService>();
+        if (room.roomInfo.hostID == users.localUserInfo.userID) {
+          users.localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleHost;
         }
+
+        Navigator.pushReplacementNamed(context, "/room_main");
       }
     });
   }
