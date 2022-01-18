@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:flutter/foundation.dart';
 import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
@@ -24,7 +23,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   Map userIDNameMap = {}; // Update while user service data updated for better performance.
 
   ZegoSpeakerSeatService() {
-    // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
+    ZIMPlugin.onRoomSpeakerSeatUpdate = onRoomSpeakerSeatUpdate;
   }
 
   Future<int> removeUserFromSeat(int seatIndex) async {
@@ -145,6 +144,14 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     var result = await ZIMPlugin.setRoomAttributes(ZegoRoomManager.shared.roomService.roomInfo.roomID, attributes, false);
     notifyListeners();
     return result['errorCode'];
+  }
+
+  void onRoomSpeakerSeatUpdate(String roomID, Map<String, dynamic> speakerSeat) {
+    for (final seatJson in speakerSeat.values) {
+      var speakerSeat = new ZegoSpeakerSeat.fromJson(seatJson);
+      speakerSeatList[speakerSeat.seatIndex] = speakerSeat;
+    }
+    notifyListeners();
   }
 
   void updateHostID(String id) {
