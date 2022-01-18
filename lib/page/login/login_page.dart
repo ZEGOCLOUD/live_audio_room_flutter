@@ -112,7 +112,8 @@ class LoginPage extends HookWidget {
                   // WARNING: DO NOT USE APPID AND APPSIGN IN PRODUCTION CODE!!!GET IT FROM SERVER INSTEAD!!!
                   ZegoRoomManager.shared.initWithAPPID(
                       SecretReader.instance.appID,
-                      SecretReader.instance.appSign, (errorCode) {
+                      SecretReader.instance.appSign,
+                      SecretReader.instance.serverSecret, (errorCode) {
                     if (errorCode != 0) {
                       Fluttertoast.showToast(
                           msg: AppLocalizations.of(context)!

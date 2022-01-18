@@ -46,17 +46,17 @@ class ZegoUserService extends ChangeNotifier {
     return code;
   }
 
-  Future<int> login(ZegoUserInfo info, String token) async {
-    localUserInfo = info;
-    if (info.userName.isEmpty) {
-      localUserInfo.userName = info.userID;
-    }
-    loginState = LoginState.loginStateLoggingIn;
-    notifyListeners();
+    Future<int> login(ZegoUserInfo info, String token) async {
+      localUserInfo = info;
+      if (info.userName.isEmpty) {
+        localUserInfo.userName = info.userID;
+      }
+      loginState = LoginState.loginStateLoggingIn;
+      notifyListeners();
 
-    // Note: token is generate in native code
-    var result = await ZIMPlugin.login(info.userID, info.userName, "");
-    int code = result['errorCode'];
+      // Note: token is generate in native code
+      var result = await ZIMPlugin.login(info.userID, info.userName, "");
+      int code = result['errorCode'];
 
     loginState = code != 0
         ? LoginState.loginStateLoginFailed
