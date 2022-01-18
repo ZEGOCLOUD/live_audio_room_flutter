@@ -13,6 +13,10 @@ class ZegoUserInfo {
   ZegoUserInfo.empty();
   ZegoUserInfo(this.userID, this.userName, this.userRole);
 
+  bool isEmpty() {
+    return userID.isEmpty || userName.isEmpty;
+  }
+  
   ZegoUserInfo.formJson(Map<String, dynamic> json)
       : userID = json['userID'],
         userName = json['userName'];
