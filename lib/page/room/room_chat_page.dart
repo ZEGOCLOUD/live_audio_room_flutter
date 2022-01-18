@@ -5,21 +5,24 @@ import 'package:provider/provider.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:live_audio_room_flutter/service/zego_message_service.dart';
+import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class ChatMessageModel {
-  ZegoUserInfo userInfo = ZegoUserInfo.empty();
-  String message = "";
+  ZegoUserInfo sender = ZegoUserInfo.empty();
+  ZegoTextMessage message = ZegoTextMessage();
 
-  ChatMessageModel(this.userInfo, this.message);
+  ChatMessageModel(this.sender, this.message);
 }
 
 class ChatMessageItem extends StatelessWidget {
-  const ChatMessageItem({Key? key, required this.message}) : super(key: key);
-  final ChatMessageModel message;
+  const ChatMessageItem({Key? key, required this.messageModel})
+      : super(key: key);
+  final ChatMessageModel messageModel;
 
   @override
   Widget build(BuildContext context) {
@@ -37,13 +40,13 @@ class ChatMessageItem extends StatelessWidget {
           child: RichText(
               textAlign: TextAlign.start,
               text: TextSpan(children: <TextSpan>[
-                getRoleWidget(message.userInfo),
-                getSpacerWidgetByRole(message.userInfo),
+                getRoleWidget(messageModel.sender),
+                getSpacerWidgetByRole(messageModel.sender),
                 TextSpan(
-                    text: message.userInfo.userName + ": ",
+                    text: messageModel.sender.userName + ": ",
                     style: StyleConstant.roomChatUserNameText),
                 TextSpan(
-                    text: message.message,
+                    text: messageModel.message.message,
                     style: StyleConstant.roomChatMessageText),
               ])),
         ),
@@ -78,70 +81,23 @@ class ChatMessagePage extends StatefulWidget {
 }
 
 class _ChatMessagePageState extends State<ChatMessagePage> {
-  //  todo@yuyuj this is some test data
-  final List<ChatMessageModel> _messages = [
-    ChatMessageModel(
-        ZegoUserInfo('0001', 'Liam', ZegoRoomUserRole.roomUserRoleHost),
-        "haha, i am host..."),
-    ChatMessageModel(
-        ZegoUserInfo('0002', 'Noah', ZegoRoomUserRole.roomUserRoleSpeaker),
-        "haha, i am speaker 1..."),
-    ChatMessageModel(
-        ZegoUserInfo('0003', 'Oliver', ZegoRoomUserRole.roomUserRoleSpeaker),
-        "haha, i am speaker 2..."),
-    ChatMessageModel(
-        ZegoUserInfo('0004', 'William', ZegoRoomUserRole.roomUserRoleListener),
-        "Tis the season, and it’s time to decorate the Christmas Tree. We’ll need lights, ornaments, some tinsel, and a star for the top! Let’s go!"),
-    ChatMessageModel(
-        ZegoUserInfo('0005', 'Elijah', ZegoRoomUserRole.roomUserRoleListener),
-        """There's a hero
-        If you look inside your heart
-        You don't have to be afraid of what you are
-        There's an answer If you reach into your soul
-        And the sorrow that you know will melt away"""),
-    ChatMessageModel(
-        ZegoUserInfo('0006', 'James', ZegoRoomUserRole.roomUserRoleListener),
-        """And then a hero comes alone
-With the strength to carry on
-And you cast your fears aside
-And you know you can survive
-So when you feel like hope is gone
-Look inside you and be strong
-And you'll finally see the truth
-That a hero lies in you"""),
-    ChatMessageModel(
-        ZegoUserInfo('0007', 'Benjamin', ZegoRoomUserRole.roomUserRoleListener),
-        """It's a long road
-When you face the world alone
-No one reaches out a hand for you to hold
-You can find love if you search within yourself
-And the emptiness you felt will disappear"""),
-    ChatMessageModel(
-        ZegoUserInfo('0008', 'Lucas', ZegoRoomUserRole.roomUserRoleListener),
-        """Lord knows dreams are hard to follow, But don't let anyone tear them away, Hold on, there will be tomorrow, In time, you'll find the way"""),
-    ChatMessageModel(
-        ZegoUserInfo('0009', 'Mason', ZegoRoomUserRole.roomUserRoleListener),
-        """LOL"""),
-    ChatMessageModel(
-        ZegoUserInfo('0010', 'Ethan', ZegoRoomUserRole.roomUserRoleListener),
-        """Let it be, let it be"""),
-    ChatMessageModel(
-        ZegoUserInfo(
-            '0011', 'Alexander', ZegoRoomUserRole.roomUserRoleListener),
-        """There is still a light that shines on me""")
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Container(
         margin: EdgeInsets.only(right: (118 - 32).w),
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: _messages.length,
-          itemBuilder: (_, index) {
-            ChatMessageModel message = _messages[index];
-            return ChatMessageItem(message: message);
-          },
-        ));
+        child: Consumer2<ZegoMessageService, ZegoUserService>(
+            builder: (_, messageService, userService, child) =>
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: messageService.messageList.length,
+                  itemBuilder: (_, index) {
+                    var message = messageService.messageList[index];
+                    ChatMessageModel messageModel = ChatMessageModel(
+                        userService.userDic[message.userID] ??
+                            ZegoUserInfo.empty(),
+                        message);
+                    return ChatMessageItem(messageModel: messageModel);
+                  },
+                )));
   }
 }

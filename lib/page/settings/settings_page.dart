@@ -10,6 +10,7 @@ import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+import 'package:zego_express_engine/zego_express_engine.dart';
 
 class SettingSDKVersionWidget extends StatelessWidget {
   final String title;
@@ -115,11 +116,16 @@ class SettingsLogoutWidget extends StatelessWidget {
   }
 }
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends HookWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var expressSDKVersion = useState('1.0');
+    ZegoExpressEngine.getVersion().then((value) => expressSDKVersion.value = value);
+    final zimSDKVersion = useState('1.0');
+    //  todo@yuyj get zim sdk version
+
     return Scaffold(
         appBar: AppBar(
           leading: IconButton(
@@ -143,15 +149,14 @@ class SettingsPage extends StatelessWidget {
                         left: 0, top: 32.h, right: 0, bottom: 20.h),
                     child: Column(
                       children: [
-                        //  TODO@yuyj get sdk version
                         SettingSDKVersionWidget(
                             title: AppLocalizations.of(context)!
                                 .settingPageSdkVersion,
-                            content: '2.8'),
+                            content: expressSDKVersion.value),
                         SettingSDKVersionWidget(
                             title: AppLocalizations.of(context)!
                                 .settingPageZimSdkVersion,
-                            content: '1.1')
+                            content: zimSDKVersion.value)
                       ]
                           .map((e) => Padding(
                                 child: e,
