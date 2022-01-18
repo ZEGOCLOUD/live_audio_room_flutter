@@ -1,36 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
+import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
+import 'package:live_audio_room_flutter/model/zego_room_gift.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
-class RoomGiftMemberList extends StatefulWidget {
-  const RoomGiftMemberList({Key? key}) : super(key: key);
+class RoomGiftMemberList extends HookWidget {
+  const RoomGiftMemberList({required this.memberSelectNotify, Key? key})
+      : super(key: key);
 
-  @override
-  State<StatefulWidget> createState() {
-    return _RoomGiftMemberListState();
-  }
-}
-
-class _RoomGiftMemberListState extends State<RoomGiftMemberList> {
-  //  todo@yuyuj this is some test data
-  final List<ZegoUserInfo> _users = [
-    ZegoUserInfo('0001', 'Liam', ZegoRoomUserRole.roomUserRoleHost),
-    ZegoUserInfo('0002', 'Noah', ZegoRoomUserRole.roomUserRoleSpeaker),
-    ZegoUserInfo('0003', 'Oliver', ZegoRoomUserRole.roomUserRoleSpeaker),
-    ZegoUserInfo('0004', 'William', ZegoRoomUserRole.roomUserRoleListener),
-    ZegoUserInfo('0005', 'Elijah', ZegoRoomUserRole.roomUserRoleListener),
-    ZegoUserInfo('0006', 'James', ZegoRoomUserRole.roomUserRoleListener),
-    ZegoUserInfo('0007', 'Benjamin', ZegoRoomUserRole.roomUserRoleListener),
-    ZegoUserInfo('0008', 'Lucas', ZegoRoomUserRole.roomUserRoleListener),
-    ZegoUserInfo('0009', 'Mason', ZegoRoomUserRole.roomUserRoleListener),
-    ZegoUserInfo('0010', 'Ethan', ZegoRoomUserRole.roomUserRoleListener),
-    ZegoUserInfo('0011', 'Alexander', ZegoRoomUserRole.roomUserRoleListener)
-  ];
+  final ValueChanged<ZegoUserInfo> memberSelectNotify;
 
   @override
   Widget build(BuildContext context) {
@@ -39,52 +28,49 @@ class _RoomGiftMemberListState extends State<RoomGiftMemberList> {
         color: StyleColors.giftMemberListBackgroundColor,
         borderRadius: BorderRadius.circular(17.0),
       ),
-      child: ListView.builder(
-        itemExtent: 84.h,
-        padding: EdgeInsets.only(left: 30.w),
-        itemCount: _users.length,
-        itemBuilder: (_, index) {
-          ZegoUserInfo user = _users[index];
-          return GestureDetector(
-              child: Center(
-                child: Row(
-                  children: [
-                    Text(
-                      user.userName,
-                      textAlign: TextAlign.left,
-                      style: StyleConstant.roomGiftMemberListText,
-                    ),
-                    const Expanded(child: Text(''))
-                  ],
-                ),
-              ),
-              onTap: () {
-                //  todo@yuyj change input text, userNameInputController
-              });
-        },
-      ),
+      child: Consumer<ZegoUserService>(
+          builder: (_, userService, child) => ListView.builder(
+                itemExtent: 84.h,
+                padding: const EdgeInsets.only(left: 0),
+                itemCount: userService.userList.length,
+                itemBuilder: (_, index) {
+                  ZegoUserInfo user = userService.userList[index];
+                  return GestureDetector(
+                      child: Container(
+                          padding: EdgeInsets.only(left: 30.w),
+                          child: Center(
+                            child: Row(
+                              children: [
+                                Text(
+                                  user.userName,
+                                  textAlign: TextAlign.left,
+                                  style: StyleConstant.roomGiftMemberListText,
+                                ),
+                                const Expanded(child: Text(''))
+                              ],
+                            ),
+                          )),
+                      onTap: () {
+                        memberSelectNotify(user);
+                      });
+                },
+              )),
     );
   }
 }
 
-class RoomGiftBottomBar extends StatefulWidget {
-  const RoomGiftBottomBar({Key? key}) : super(key: key);
+class RoomGiftBottomBar extends HookWidget {
+  RoomGiftBottomBar({Key? key, required this.selectedRoomGift})
+      : super(key: key);
 
-  @override
-  State<StatefulWidget> createState() {
-    return _RoomGiftBottomBarState();
-  }
-}
-
-class _RoomGiftBottomBarState extends State<RoomGiftBottomBar> {
-  final userNameInputController = TextEditingController();
-  final roomGiftMemberList = false;
+  ValueNotifier<ZegoRoomGift> selectedRoomGift;
 
   late OverlayEntry _memberListEntry;
   late OverlayState _memberListState;
   bool _isMemberListVisible = false;
+  ZegoUserInfo selectedUser = ZegoUserInfo.empty();
 
-  OverlayEntry _createOverlayEntry() {
+  OverlayEntry _createOverlayEntry(TextEditingController userNameTextCtrl) {
     return OverlayEntry(
       builder: (context) => Align(
         alignment: Alignment.center,
@@ -95,7 +81,11 @@ class _RoomGiftBottomBarState extends State<RoomGiftBottomBar> {
               child: Container(
                 padding: EdgeInsets.only(
                     left: 36.w, top: 812.h, right: 246.w, bottom: 102.h),
-                child: RoomGiftMemberList(),
+                child: RoomGiftMemberList(memberSelectNotify: (userInfo) {
+                  selectedUser = userInfo;
+                  userNameTextCtrl.text = selectedUser.userName;
+                  hideMemberList();
+                }),
               )),
           onTap: () {
             hideMemberList();
@@ -105,10 +95,10 @@ class _RoomGiftBottomBarState extends State<RoomGiftBottomBar> {
     );
   }
 
-  showMemberList() async {
+  showMemberList(context, userNameTextCtrl) async {
     if (!_isMemberListVisible) {
       _memberListState = Overlay.of(context)!;
-      _memberListEntry = _createOverlayEntry();
+      _memberListEntry = _createOverlayEntry(userNameTextCtrl);
       _memberListState.insert(_memberListEntry);
       _isMemberListVisible = true;
     }
@@ -119,8 +109,28 @@ class _RoomGiftBottomBarState extends State<RoomGiftBottomBar> {
     _memberListEntry.remove();
   }
 
+  void sendGift(context, ZegoGiftService giftService) {
+    if (selectedUser.isEmpty()) {
+      return;
+    }
+
+    List<String> toUserList = [];
+    toUserList.add(selectedUser.userID);
+    giftService
+        .sendGift(
+            selectedRoomGift.value.id.toString(), toUserList, (p0) => null)
+        .then((errorCode) {
+      if (0 != errorCode) {
+        Fluttertoast.showToast(
+            msg: AppLocalizations.of(context)!.toastSendGiftError(errorCode));
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final selectedUserNameCtrl = useTextEditingController();
+
     return SizedBox(
       height: 80.w,
       width: double.infinity,
@@ -147,6 +157,7 @@ class _RoomGiftBottomBarState extends State<RoomGiftBottomBar> {
                       height: 80.h,
                       child: Center(
                           child: TextFormField(
+                        readOnly: true,
                         textAlign: TextAlign.left,
                         maxLines: 1,
                         style: StyleConstant.roomGiftInputText,
@@ -155,80 +166,94 @@ class _RoomGiftBottomBarState extends State<RoomGiftBottomBar> {
                             hintStyle: StyleConstant.roomGiftInputText,
                             hintText: AppLocalizations.of(context)!
                                 .roomPageSelectDefault),
-                        controller: userNameInputController,
+                        controller: selectedUserNameCtrl,
                       ))),
                   const Expanded(child: Text('')),
                   IconButton(
-                      onPressed: () => showMemberList(),
+                      onPressed: () =>
+                          showMemberList(context, selectedUserNameCtrl),
                       icon: Image.asset(StyleIconUrls.roomMemberDropDownArrow))
                 ],
               )),
           SizedBox(
               width: 188.w,
               height: 80.h,
-              child: OutlinedButton(
-                onPressed: () {
-                  //  todo@yuyj send gift logic
-                },
-                child: Text(AppLocalizations.of(context)!.roomPageSendGift,
-                    style: StyleConstant.roomGiftSendButtonText),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith((states) {
-                    // If the button is pressed, return green, otherwise blue
-                    if (states.contains(MaterialState.disabled)) {
-                      return StyleColors.blueButtonDisableColor;
-                    }
-                    return StyleColors.blueButtonEnabledColor;
-                  }),
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24.0))),
-                ),
-              ))
+              child: Consumer<ZegoGiftService>(
+                  builder: (_, giftService, child) => OutlinedButton(
+                      onPressed: () => selectedUser.isEmpty()
+                          ? null
+                          : sendGift(context, giftService),
+                      child: Text(
+                          AppLocalizations.of(context)!.roomPageSendGift,
+                          style: StyleConstant.roomGiftSendButtonText),
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.resolveWith((states) {
+                          // If the button is pressed, return green, otherwise blue
+                          return StyleColors.blueButtonEnabledColor;
+                        }),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(24.0))),
+                      ))))
         ],
       ),
     );
   }
 }
 
-class RoomGiftSelector extends StatefulWidget {
-  const RoomGiftSelector({Key? key}) : super(key: key);
+class RoomGiftSelector extends HookWidget {
+  RoomGiftSelector({Key? key, required this.selectedRoomGift})
+      : super(key: key);
 
-  @override
-  State<StatefulWidget> createState() {
-    return _RoomGiftSelectorState();
-  }
-}
+  ValueNotifier<ZegoRoomGift> selectedRoomGift;
 
-class _RoomGiftSelectorState extends State<RoomGiftSelector> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: 566.h,
-      //color: Colors.black,
       width: double.infinity,
       child: GridView.count(
         primary: false,
         physics: const ScrollPhysics(),
         padding: EdgeInsets.only(left: 0, top: 20.h, right: 0, bottom: 20.h),
-        //crossAxisSpacing: 1.w,
         mainAxisSpacing: 0,
         crossAxisCount: 4,
-        children: <Widget>[
-          IconButton(
-            icon: Image.asset(StyleIconUrls.roomGiftFingerHeart),
-            onPressed: () {},
-          )
-        ],
+        children: getGiftWidgets(context),
       ),
     );
   }
+
+  List<Widget> getGiftWidgets(context) {
+    List<ZegoRoomGift> gifts = [];
+    gifts.add(ZegoRoomGift(
+        RoomGiftID.fingerHeart.value,
+        AppLocalizations.of(context)!.roomPageGiftHeart,
+        StyleIconUrls.roomGiftFingerHeart));
+
+    List<Widget> widgets = [];
+    for (var gift in gifts) {
+      widgets.add(IconButton(
+        icon: Image.asset(gift.res),
+        tooltip: gift.name,
+        onPressed: () {
+          selectedRoomGift.value = gift;
+        },
+      ));
+    }
+    return widgets;
+  }
 }
 
-class RoomGiftPage extends StatelessWidget {
+class RoomGiftPage extends HookWidget {
   const RoomGiftPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    var selectedRoomGift = useState<ZegoRoomGift>(ZegoRoomGift(
+        RoomGiftID.fingerHeart.value,
+        AppLocalizations.of(context)!.roomPageGiftHeart,
+        StyleIconUrls.roomGiftFingerHeart));
+
     return Container(
       decoration:
           const BoxDecoration(color: StyleColors.roomPopUpPageBackgroundColor),
@@ -244,8 +269,8 @@ class RoomGiftPage extends StatelessWidget {
                   child: Text(AppLocalizations.of(context)!.roomPageGift,
                       textAlign: TextAlign.center,
                       style: StyleConstant.roomBottomPopUpTitle))),
-          const RoomGiftSelector(),
-          const RoomGiftBottomBar()
+          RoomGiftSelector(selectedRoomGift: selectedRoomGift),
+          RoomGiftBottomBar(selectedRoomGift: selectedRoomGift)
         ],
       ),
     );

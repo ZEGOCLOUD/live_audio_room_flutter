@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:live_audio_room_flutter/common/style/styles.dart';
+
+import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
+import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class SettingSDKVersionWidget extends StatelessWidget {
@@ -49,7 +57,17 @@ class SettingsUploadLogWidget extends StatelessWidget {
             height: 98.h,
             child: InkWell(
               onTap: () {
-                //  TODO@yuuyj call user logout logic
+                ZegoRoomManager.shared.uploadLog().then((errorCode) {
+                  if (0 != errorCode) {
+                    Fluttertoast.showToast(
+                        msg: AppLocalizations.of(context)!
+                            .toastUploadLogFail(errorCode));
+                  } else {
+                    Fluttertoast.showToast(
+                        msg: AppLocalizations.of(context)!
+                            .toastUploadLogSuccess);
+                  }
+                });
               },
               child: Row(
                 children: [
@@ -77,14 +95,23 @@ class SettingsLogoutWidget extends StatelessWidget {
           color: StyleColors.settingsCellBackgroundColor,
         ),
         child: Center(
-            child: InkWell(
-          onTap: () {
-            //  TODO@yuuyj call user logout logic
-            Navigator.pushReplacementNamed(context, "/login");
-          },
-          child: Text(AppLocalizations.of(context)!.settingPageLogout,
-              textAlign: TextAlign.center, style: StyleConstant.settingLogout),
-        )));
+            child: Consumer<ZegoUserService>(
+                builder: (_, userService, child) => InkWell(
+                      onTap: () {
+                        userService.logout().then((errorCode) {
+                          if (0 != errorCode) {
+                            Fluttertoast.showToast(
+                                msg: AppLocalizations.of(context)!
+                                    .toastLogoutFail(errorCode));
+                          }
+                        });
+                        Navigator.pushReplacementNamed(context, "/login");
+                      },
+                      child: Text(
+                          AppLocalizations.of(context)!.settingPageLogout,
+                          textAlign: TextAlign.center,
+                          style: StyleConstant.settingLogout),
+                    ))));
   }
 }
 

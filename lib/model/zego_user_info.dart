@@ -13,6 +13,10 @@ class ZegoUserInfo {
   ZegoUserInfo.empty();
   ZegoUserInfo(this.userID, this.userName, this.userRole);
 
+  bool isEmpty() {
+    return userID.isEmpty || userName.isEmpty;
+  }
+
   @override
   String toString() {
     return "UserInfo [userId=$userID,userName=$userName,userRole=$userRole]";
