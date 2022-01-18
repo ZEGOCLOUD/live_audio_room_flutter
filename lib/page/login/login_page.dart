@@ -4,8 +4,8 @@ import 'package:provider/src/provider.dart';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
-import 'package:live_audio_room_flutter/common/device_info.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
@@ -13,6 +13,7 @@ import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+import 'package:live_audio_room_flutter/common/device_info.dart';
 
 class LoginPage extends HookWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -107,13 +108,28 @@ class LoginPage extends HookWidget {
                   minimumSize: Size(630.w, 98.h),
                 ),
                 onPressed: () {
-                  ZegoUserInfo info = ZegoUserInfo.empty();
-                  info.userID = userIdInputController.text;
-                  info.userName = userNameInputController.text;
-                  var userModel = context.read<ZegoUserService>();
-                  // TODO@oliver using correct token
-                  ZegoRoomManager.shared.initWithAPPID(123, "appSign", (p0) => null);
-                  userModel.login( info, "token");
+                  // TODO@oliveryang using key_center.json for passing AppID and AppSign
+                  ZegoRoomManager.shared.initWithAPPID(123, "appSign",
+                      (errorCode) {
+                    if (errorCode != 0) {
+                      Fluttertoast.showToast(
+                          msg: AppLocalizations.of(context)!
+                              .toastLoginFail(errorCode));
+                    }
+
+                    ZegoUserInfo info = ZegoUserInfo.empty();
+                    info.userID = userIdInputController.text;
+                    info.userName = userNameInputController.text;
+                    var userModel = context.read<ZegoUserService>();
+                    userModel.login(info, "").then((errorCode) {
+                      if (errorCode != 0) {
+                        Fluttertoast.showToast(
+                            msg: AppLocalizations.of(context)!
+                                .toastLoginFail(errorCode));
+                      }
+                      Navigator.pushReplacementNamed(context, '/room_entrance');
+                    });
+                  });
                 },
               )
             ],
