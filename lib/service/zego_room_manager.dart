@@ -47,7 +47,7 @@ class ZegoRoomManager extends ChangeNotifier {
     return result['errorCode'];
   }
 
-  Future<int> uploadLog(ZegoRoomCallback callback) async {
+  Future<int> uploadLog() async {
     var result = await ZIMPlugin.uploadLog();
     return result['errorCode'];
   }
