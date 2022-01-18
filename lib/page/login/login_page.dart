@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:live_audio_room_flutter/util/secret_reader.dart';
 
 import 'package:provider/src/provider.dart';
 
@@ -108,9 +109,10 @@ class LoginPage extends HookWidget {
                   minimumSize: Size(630.w, 98.h),
                 ),
                 onPressed: () {
-                  // TODO@oliveryang using key_center.json for passing AppID and AppSign
-                  ZegoRoomManager.shared.initWithAPPID(123, "appSign",
-                      (errorCode) {
+                  // WARNING: DO NOT USE APPID AND APPSIGN IN PRODUCTION CODE!!!GET IT FROM SERVER INSTEAD!!!
+                  ZegoRoomManager.shared.initWithAPPID(
+                      SecretReader.instance.appID,
+                      SecretReader.instance.appSign, (errorCode) {
                     if (errorCode != 0) {
                       Fluttertoast.showToast(
                           msg: AppLocalizations.of(context)!
