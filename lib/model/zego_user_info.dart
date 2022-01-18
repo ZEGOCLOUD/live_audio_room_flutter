@@ -13,6 +13,15 @@ class ZegoUserInfo {
   ZegoUserInfo.empty();
   ZegoUserInfo(this.userID, this.userName, this.userRole);
 
+  ZegoUserInfo.formJson(Map<String, dynamic> json)
+      : userID = json['userID'],
+        userName = json['userName'];
+  Map<String, dynamic> toJson() =>
+      {
+        'userID': userID,
+        'userName': userName
+      };
+
   @override
   String toString() {
     return "UserInfo [userId=$userID,userName=$userName,userRole=$userRole]";
