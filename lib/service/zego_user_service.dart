@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
@@ -13,6 +15,7 @@ enum LoginState {
 typedef LoginCallback = Function(int);
 
 class ZegoUserService extends ChangeNotifier {
+
   // TODO@oliver update userList on SDK callback and notify changed
   late List<ZegoUserInfo> userList = [
     ZegoUserInfo("111", "Host Name", ZegoRoomUserRole.roomUserRoleHost),
@@ -25,12 +28,12 @@ class ZegoUserService extends ChangeNotifier {
   LoginState loginState = LoginState.loginStateLoggedOut;
 
   ZegoUserService() {
-    // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
+    ZIMPlugin.onRoomMemberJoined = onRoomMemberJoined;
+    ZIMPlugin.onRoomMemberLeave = onRoomMemberLeave;
   }
 
   void fetchOnlineRoomUsersWithPage(int page) {
     // TODO@oliver fetch users info and update userList
-    notifyListeners();
   }
 
   Future<int> fetchOnlineRoomUsersNum(String roomID) async {
@@ -71,5 +74,32 @@ class ZegoUserService extends ChangeNotifier {
   Future<int> sendInvitation(String userID) async {
     var result = await ZIMPlugin.sendPeerMessage(userID, "", 1);
     return result['errorCode'];
+  }
+
+  // TODO@oliveryang
+  void setUserRoleForUITest(ZegoRoomUserRole role) {
+    localUserInfo.userRole = role;
+    notifyListeners();
+  }
+
+  void onRoomMemberJoined(String roomID, List<Map<String, dynamic>> memberList) {
+    for (final item in memberList) {
+      var member = new ZegoUserInfo.formJson(item);
+      userList.add(member);
+    }
+    notifyListeners();
+  }
+
+  void onRoomMemberLeave(String roomID, List<Map<String, dynamic>> memberList) {
+    for (final item in memberList) {
+      var member = new ZegoUserInfo.formJson(item);
+      userList.removeWhere((element) => element.userID == member.userID);
+    }
+    notifyListeners();
+  }
+
+  void onReceivePeerMessage() {
+    // userList.addAll(memberList);
+    notifyListeners();
   }
 }

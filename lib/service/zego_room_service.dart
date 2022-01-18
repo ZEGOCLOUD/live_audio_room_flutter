@@ -39,7 +39,7 @@ class ZegoRoomService extends ChangeNotifier {
   String localHostID = ""; // Update while user service data is updated.
 
   ZegoRoomService() {
-    // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
+    ZIMPlugin.onRoomStatusUpdate = onRoomStatusUpdate;
   }
 
   Future<int> createRoom(String roomId, String roomName, String token) async {
@@ -82,4 +82,10 @@ class ZegoRoomService extends ChangeNotifier {
     }
     return code;
   }
+
+  void onRoomStatusUpdate(String roomID, Map<String, dynamic> roomInfoJson) {
+    roomInfo = new RoomInfo.formJson(roomInfoJson);
+    notifyListeners();
+  }
+
 }

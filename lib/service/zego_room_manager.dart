@@ -31,6 +31,7 @@ class ZegoRoomManager extends ChangeNotifier {
 
   void initWithAPPID(int appID, String appSign, ZegoRoomCallback callback) {
     ZIMPlugin.createZIM(appID);
+    ZIMPlugin.registerEventHandler();
 
     // Create ZegoExpressEngine (Init SDK)
     ZegoEngineProfile profile = ZegoEngineProfile(appID, appSign, ZegoScenario.General);
@@ -43,6 +44,7 @@ class ZegoRoomManager extends ChangeNotifier {
     logoutRtcRoom();
     var result = await ZIMPlugin.destoryZIM();
     ZegoExpressEngine.destroyEngine();
+    ZIMPlugin.unregisterEventHandler();
     return result['errorCode'];
   }
 
@@ -51,7 +53,7 @@ class ZegoRoomManager extends ChangeNotifier {
     return result['errorCode'];
   }
 
-   void logoutRtcRoom() {
+  void logoutRtcRoom() {
     ZegoExpressEngine.instance.logoutRoom("123");
     userService.userList = [];
     roomService = ZegoRoomService();
