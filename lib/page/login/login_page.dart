@@ -21,6 +21,8 @@ import 'package:live_audio_room_flutter/common/device_info.dart';
 
 class LoginPage extends HookWidget {
   const LoginPage({Key? key}) : super(key: key);
+  static final RegExp userIDRegExp = RegExp('[a-zA-Z0-9]{1,20}');
+  static String userRandomID = Random().nextInt(1000).toString();
 
   @override
   Widget build(BuildContext context) {
@@ -40,13 +42,11 @@ class LoginPage extends HookWidget {
     final userNameInputController = useTextEditingController();
 
     //  user id binding by device name
-    final deviceName = useState('');
+    final deviceName = useState('Apple' + userRandomID);
     userIdInputController.text = deviceName.value;
-    if (Platform.isIOS) {
-      deviceName.value = 'Apple' + Random().nextInt(1000).toString();
-    } else {
+    if (Platform.isAndroid) {
       DeviceInfo().readDeviceName().then((value) {
-        deviceName.value = value;
+        deviceName.value = value + userRandomID;
       });
     }
 
@@ -128,9 +128,24 @@ class LoginPage extends HookWidget {
                   minimumSize: Size(630.w, 98.h),
                 ),
                 onPressed: () {
+                  if (userIdInputController.text.isEmpty) {
+                    Fluttertoast.showToast(
+                        msg:
+                            AppLocalizations.of(context)!.toastUseridLoginFail);
+                    return;
+                  }
+                  if (!userIDRegExp.hasMatch(userIdInputController.text)) {
+                    Fluttertoast.showToast(
+                        msg: AppLocalizations.of(context)!.toastUserIdError);
+                    return;
+                  }
+
                   ZegoUserInfo info = ZegoUserInfo.empty();
                   info.userID = userIdInputController.text;
                   info.userName = userNameInputController.text;
+                  if (info.userName.isEmpty) {
+                    info.userName = info.userID;
+                  }
                   var userModel = context.read<ZegoUserService>();
                   userModel.login(info, "").then((errorCode) {
                     if (errorCode != 0) {
