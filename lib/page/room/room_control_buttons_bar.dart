@@ -111,7 +111,7 @@ class RoomControlButtonsBar extends StatelessWidget {
                 }
 
                 var messageService = context.read<ZegoMessageService>();
-                messageService.sendTextMessage(value!, (p0) => null);
+                messageService.sendTextMessage(value!);
               });
             },
           ),

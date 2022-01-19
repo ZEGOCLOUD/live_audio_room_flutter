@@ -96,23 +96,21 @@ class SettingsLogoutWidget extends StatelessWidget {
           color: StyleColors.settingsCellBackgroundColor,
         ),
         child: Center(
-            child: Consumer<ZegoUserService>(
-                builder: (_, userService, child) => InkWell(
-                      onTap: () {
-                        userService.logout().then((errorCode) {
-                          if (0 != errorCode) {
-                            Fluttertoast.showToast(
-                                msg: AppLocalizations.of(context)!
-                                    .toastLogoutFail(errorCode));
-                          }
-                        });
-                        Navigator.pushReplacementNamed(context, "/login");
-                      },
-                      child: Text(
-                          AppLocalizations.of(context)!.settingPageLogout,
-                          textAlign: TextAlign.center,
-                          style: StyleConstant.settingLogout),
-                    ))));
+            child: InkWell(
+          onTap: () {
+            var userService = context.read<ZegoUserService>();
+            userService.logout().then((errorCode) {
+              if (0 != errorCode) {
+                Fluttertoast.showToast(
+                    msg: AppLocalizations.of(context)!
+                        .toastLogoutFail(errorCode));
+              }
+            });
+            Navigator.pushReplacementNamed(context, "/login");
+          },
+          child: Text(AppLocalizations.of(context)!.settingPageLogout,
+              textAlign: TextAlign.center, style: StyleConstant.settingLogout),
+        )));
   }
 }
 
@@ -122,7 +120,8 @@ class SettingsPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     var expressSDKVersion = useState('1.0');
-    ZegoExpressEngine.getVersion().then((value) => expressSDKVersion.value = value);
+    ZegoExpressEngine.getVersion()
+        .then((value) => expressSDKVersion.value = value);
     final zimSDKVersion = useState('1.0');
     //  todo@yuyj get zim sdk version
 
