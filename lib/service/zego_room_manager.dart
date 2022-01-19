@@ -41,7 +41,7 @@ class ZegoRoomManager extends ChangeNotifier {
 
   Future<int> uninit() async {
     logoutRtcRoom();
-    var result = await ZIMPlugin.destoryZIM();
+    var result = await ZIMPlugin.destroyZIM();
     ZegoExpressEngine.destroyEngine();
     ZIMPlugin.unregisterEventHandler();
     return result['errorCode'];

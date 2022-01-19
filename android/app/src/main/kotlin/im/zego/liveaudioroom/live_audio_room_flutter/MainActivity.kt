@@ -17,7 +17,7 @@ class MainActivity: FlutterActivity() {
         channel.setMethodCallHandler { call, result ->
             when(call.method) {
                 "createZIM" -> { pluginHandler.createZIM(call, result, application) }
-                "destoryZIM" -> { pluginHandler.destoryZIM(call, result) }
+                "destroyZIM" -> { pluginHandler.destroyZIM(call, result) }
                 "login" -> { pluginHandler.login(call, result) }
                 "logout" -> { pluginHandler.logout(call, result) }
                 "createRoom" -> { pluginHandler.createRoom(call, result) }

@@ -34,8 +34,8 @@ class ZIMPlugin: NSObject {
              case "createZIM":
                 self.createZIM(call, result: result)
                 break
-             case "destoryZIM":
-                self.destoryZIM(call, result: result)
+             case "destroyZIM":
+                self.destroyZIM(call, result: result)
                 break
              case "login":
                 self.login(call, result: result)
@@ -87,8 +87,8 @@ class ZIMPlugin: NSObject {
          result(nil)
      }
 
-     func destoryZIM(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
-         print("destoryZIM")
+     func destroyZIM(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
+         print("destroyZIM")
          zim?.destroy()
          zim = nil
          result(nil)
