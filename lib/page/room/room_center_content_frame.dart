@@ -328,7 +328,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
                 crossAxisSpacing: 22.w,
                 mainAxisSpacing: 0,
                 crossAxisCount: 4,
-                children: _createSeats(seats.speakerSeatList, users.userList,
+                children: _createSeats(seats.seatList, users.userList,
                     seatClickCallback(users.localUserInfo.userRole)),
               ),
             ),

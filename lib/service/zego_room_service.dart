@@ -72,7 +72,13 @@ class ZegoRoomService extends ChangeNotifier {
 
   Future<int> leaveRoom() async {
     var result = await ZIMPlugin.leaveRoom(roomInfo.roomID);
-    return result['errorCode'];
+    var code = result['errorCode'];
+    if (code == 0) {
+      roomInfo = RoomInfo('', '', '');
+      localHostID = "";
+      notifyListeners();
+    }
+    return code;
   }
 
   Future<int> disableTextMessage(bool disable) async {
