@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -11,6 +12,9 @@ class ZegoGiftService extends ChangeNotifier {
   String giftName = "";
   List<String> giftReceivers = [];
 
+  bool displayTips = false;
+  late Timer displayTimer;
+  
   ZegoGiftService() {
     ZIMPlugin.onReceiveCustomRoomMessage = _onReceiveCustomMessage;
   }
@@ -41,6 +45,16 @@ class ZegoGiftService extends ChangeNotifier {
         giftReceivers = item['target'];
       }
     }
+
+    if (displayTips) {
+      displayTimer.cancel();
+    }
+    displayTips = true;
+    displayTimer = Timer(const Duration(seconds: 10), () {
+      displayTips = false; //  hide after 10 seconds
+      notifyListeners();
+    });
+
     notifyListeners();
   }
 }

@@ -55,8 +55,7 @@ class _RoomSettingPageState extends State<RoomSettingPage> {
                         if (!value) {
                           Fluttertoast.showToast(
                               msg: AppLocalizations.of(context)!
-                                  .roomPageSetTakeSeat,
-                              backgroundColor: Colors.grey);
+                                  .roomPageSetTakeSeat);
                         }
                       });
                     },

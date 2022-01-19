@@ -20,7 +20,7 @@ class DeviceInfo {
       return deviceInfo['browserName'];
     }
     if (Platform.isAndroid) {
-      return deviceInfo['id'];
+      return deviceInfo['brand'];
     } else if (Platform.isIOS) {
       return deviceInfo['name'];
     } else if (Platform.isLinux) {

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/page/room/room_setting_page.dart';
@@ -13,6 +14,7 @@ import 'package:live_audio_room_flutter/service/zego_message_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:live_audio_room_flutter/common/input/input_dialog.dart';
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class ControllerButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -111,7 +113,13 @@ class RoomControlButtonsBar extends StatelessWidget {
                 }
 
                 var messageService = context.read<ZegoMessageService>();
-                messageService.sendTextMessage(value!, (p0) => null);
+                messageService.sendTextMessage(value!).then((errorCode) {
+                  if (0 != errorCode) {
+                    Fluttertoast.showToast(
+                        msg: AppLocalizations.of(context)!
+                            .toastSendMessageError(errorCode));
+                  }
+                });
               });
             },
           ),

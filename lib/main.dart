@@ -63,29 +63,41 @@ class ZegoApp extends StatelessWidget {
             },
           ),
         ],
-        child: ScreenUtilInit(
-          designSize: const Size(750, 1334),
-          minTextAdapt: true,
-          builder: () => MaterialApp(
-            title: "ZegoLiveAudio",
-            localizationsDelegates: const [
-              AppLocalizations.delegate,
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('en', ''), // English, no country code
-              Locale('zh', ''),
-            ],
-            initialRoute: "/login",
-            routes: {
-              "/login": (context) => LoginPage(),
-              "/settings": (context) => const SettingsPage(),
-              "/room_entrance": (context) => RoomEntrancePage(),
-              "/room_main": (context) => const RoomMainPage()
+        child: GestureDetector(
+            onTap: () {
+              //  for hide keyboard when click on empty place of all pages
+              hideKeyboard(context);
             },
-          ),
-        ));
+            child: ScreenUtilInit(
+              designSize: const Size(750, 1334),
+              minTextAdapt: true,
+              builder: () => MaterialApp(
+                title: "ZegoLiveAudio",
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                supportedLocales: const [
+                  Locale('en', ''), // English, no country code
+                  Locale('zh', ''),
+                ],
+                initialRoute: "/login",
+                routes: {
+                  "/login": (context) => LoginPage(),
+                  "/settings": (context) => const SettingsPage(),
+                  "/room_entrance": (context) => RoomEntrancePage(),
+                  "/room_main": (context) => const RoomMainPage()
+                },
+              ),
+            )));
+  }
+
+  void hideKeyboard(BuildContext context) {
+    FocusScopeNode currentFocus = FocusScope.of(context);
+    if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
   }
 }

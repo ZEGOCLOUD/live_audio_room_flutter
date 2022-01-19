@@ -35,7 +35,7 @@ class ZegoMessageService extends ChangeNotifier {
   ZegoMessageService() {
     ZIMPlugin.onReceiveTextRoomMessage = onReceiveTextMessage;
   }
-  Future<int> sendTextMessage(String message, ZegoRoomCallback? callback) async {
+  Future<int> sendTextMessage(String message) async {
     var roomID = ZegoRoomManager.shared.roomService.roomInfo.roomID;
     var result = await ZIMPlugin.sendRoomMessage(roomID, message, false);
     int code = result['errorCode'];

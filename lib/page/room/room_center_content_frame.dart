@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
@@ -127,20 +128,6 @@ class RoomCenterContentFrame extends StatefulWidget {
 }
 
 class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
-  bool giftTipsVisibility = false;
-
-  //  todo@yyuj wait gift notify
-  _showGiftTips() {
-    setState(() {
-      giftTipsVisibility = true;
-    });
-    Timer(const Duration(seconds: 10), () {
-      setState(() {
-        giftTipsVisibility = false;
-      });
-    });
-  }
-
   _createSeats(List<ZegoSpeakerSeat> seatList, List<ZegoUserInfo> userInfoList,
       SeatItemClickCallback callback) {
     var userIDNameMap = <String, String>{};
@@ -337,15 +324,13 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
           ),
           const Expanded(child: Text('')),
           //  todo@yuyj this is a test data
-          Visibility(
-              visible: giftTipsVisibility,
-              child: RoomGiftTips(
-                  gift: GiftMessageModel(
-                      ZegoUserInfo(
-                          "001", "Liam", ZegoRoomUserRole.roomUserRoleHost),
-                      ZegoUserInfo(
-                          "002", "Noah", ZegoRoomUserRole.roomUserRoleSpeaker),
-                      "Rocket"))),
+          Consumer<ZegoGiftService>(
+              builder: (_, giftService, child) => Visibility(
+                  visible: giftService.displayTips,
+                  child: RoomGiftTips(
+                    gift: GiftMessageModel(giftService.giftSender,
+                        giftService.giftReceivers, giftService.giftName),
+                  ))),
           SizedBox(height: 18.h),
           ConstrainedBox(
               constraints: BoxConstraints(
