@@ -35,8 +35,8 @@ class ZIMPlugin {
     return await channel.invokeMethod("logout");
   }
 
-  static Future<Map> createRoom(String roomID, String roomName) async {
-    return await channel.invokeMethod("createRoom", {"roomID": roomID, "roomName": roomName});
+  static Future<Map> createRoom(String roomID, String roomName, String hostID, int seatNum) async {
+    return await channel.invokeMethod("createRoom", {"roomID": roomID, "roomName": roomName, "hostID": hostID, "seatNum": seatNum});
   }
 
   static Future<Map> joinRoom(String roomID) async {

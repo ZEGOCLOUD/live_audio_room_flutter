@@ -77,7 +77,10 @@ class ZIMPlugin: NSObject {
      }
 
      func createZIM(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
-         if (zim != nil) {result(nil);return}
+         if (zim != nil) {
+             result(nil)
+             return
+         }
          let params = call.arguments as? NSDictionary
          if (params == nil) { return }
          appID = params!["appID"] as? UInt32 ?? 0
@@ -122,11 +125,13 @@ class ZIMPlugin: NSObject {
          if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
          let roomName = params!["roomName"] as? String ?? ""
+         let hostID = params!["hostID"] as? String ?? ""
+         let seatNum = params!["seatNum"] as? Int ?? 8
 
          let roomInfo = ZIMRoomInfo()
          roomInfo.roomID = roomID
          roomInfo.roomName = roomName
-         let jsonString = convertDictionaryToJSONString(dict: ["room_id": roomID, "room_name": roomName])
+         let jsonString = convertDictionaryToJSONString(dict: ["room_id": roomID, "room_name": roomName, "host_id": hostID, "num": seatNum, "disable": false, "close": false])
          let config = ZIMRoomAdvancedConfig()
          config.roomAttributes = ["room_Info": jsonString]
          zim?.createRoom(roomInfo, config: config, callback: { roomInfo, error in

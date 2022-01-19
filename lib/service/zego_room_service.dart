@@ -43,7 +43,7 @@ class ZegoRoomService extends ChangeNotifier {
   }
 
   Future<int> createRoom(String roomId, String roomName, String token) async {
-    var result = await ZIMPlugin.createRoom(roomId, roomName);
+    var result = await ZIMPlugin.createRoom(roomId, roomName, localHostID, 8);
     var code = result['errorCode'];
     if (code == 0) {
       roomInfo = RoomInfo(roomId, roomName, localHostID);
