@@ -22,6 +22,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   String _roomID = "";
   String _hostID = ""; // Sort host to index 0
   String _localUserID = "";
+  bool _isSeatClosed = false;
 
   ZegoSpeakerSeatService() {
     ZIMPlugin.onRoomSpeakerSeatUpdate = _onRoomSpeakerSeatUpdate;
@@ -124,12 +125,11 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     var preUserID = speakerSeat.userID;
     var preStatus = speakerSeat.status;
     speakerSeat.userID = '';
-    speakerSeat.status =
-        ZegoRoomManager.shared.roomService.roomInfo.isSeatClosed
-            ? ZegoSpeakerSeatStatus.Closed
-            : ZegoSpeakerSeatStatus.Untaken;
+    speakerSeat.status = _isSeatClosed
+        ? ZegoSpeakerSeatStatus.Closed
+        : ZegoSpeakerSeatStatus.Untaken;
     String speakerSeatJson = jsonEncode(speakerSeat);
-    Map speakerSeatMap = {speakerSeat.seatIndex: speakerSeatJson};
+    Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     int code = result['errorCode'];
@@ -137,6 +137,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       speakerSeat.userID = preUserID;
       speakerSeat.status = preStatus;
     }
+    updateSpeakerIDList();
     notifyListeners();
     return code;
   }
@@ -196,8 +197,9 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateRoomID(String id) {
+  void updateRoomInfo(String id, bool isSeatClosed) {
     _roomID = id;
+    _isSeatClosed = isSeatClosed;
     if (id.isEmpty) {
       speakerIDList.clear();
       for (final seat in seatList) {
