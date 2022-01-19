@@ -15,7 +15,7 @@ class ZegoSpeakerSeat {
       : userID = json['id'],
         seatIndex = json['index'],
         mic = json['mic'],
-        status = json['status'];
+        status = ZegoSpeakerSeatStatus.values[json['status']];
 
   Map<String, dynamic> toJson() => {
         'id': userID,
