@@ -1,6 +1,7 @@
 package im.zego.liveaudioroom.live_audio_room_flutter
 
 import android.app.Application
+import im.zego.liveaudioroom.util.TokenServerAssistant
 import im.zego.zim.ZIM
 import im.zego.zim.callback.ZIMEventHandler
 import im.zego.zim.callback.ZIMLogUploadedCallback
@@ -9,7 +10,9 @@ import im.zego.zim.callback.ZIMRoomAttributesBatchOperatedCallback
 import im.zego.zim.callback.ZIMRoomAttributesOperatedCallback
 import im.zego.zim.entity.*
 import im.zego.zim.enums.*
+import io.flutter.app.FlutterActivityEvents
 import io.flutter.plugin.common.EventChannel
+import io.flutter.plugin.common.EventChannel.EventSink
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import org.json.JSONObject
@@ -18,10 +21,20 @@ import java.util.ArrayList
 class ZIMPlugin: EventChannel.StreamHandler {
 
     private var zim: ZIM? = null
+    private var appID: Int = 0
+    private var appSign: String = ""
+    private var serverSecret: String = ""
+
     fun createZIM(call: MethodCall, result: MethodChannel.Result , application: Application) {
-        val appID: Int? = call.argument<Int>("appID")
+        if (zim != null) {
+            result.error("-1", "", null)
+            return
+        }
+        appID = call.argument<Int>("appID")!!
+        appSign = call.argument<String>("appSign").toString()
+        serverSecret = call.argument<String>("serverSecret").toString()
         zim = ZIM.create(appID?.toLong()!!, application)
-        setZIMHandler()
+//        zim.setEventHandler(self)
         result.success(null)
     }
 
@@ -34,27 +47,29 @@ class ZIMPlugin: EventChannel.StreamHandler {
     fun login(call: MethodCall, result: MethodChannel.Result) {
         val userID: String? = call.argument<String>("userID")
         val userName: String? = call.argument<String>("userName")
-        val token: String? = call.argument<String>("token")
-
+        var token: String? = call.argument<String>("token")
+        if (token?.length == 0) {
+            token = TokenServerAssistant
+                .generateToken(appID.toLong(), userID, serverSecret, 60 * 60 * 24).data
+        }
         var user = ZIMUserInfo()
         user.userID = userID
         user.userName = userName
         zim?.login(user, token, ZIMLoggedInCallback {
-            if (it.code.value() == ZIMErrorCode.SUCCESS.value()) {
-                result.success(null)
-            } else {
-                result.error(it.code.toString(), it.message, null)
-            }
+            result.success(mapOf("errorCode" to it.code.value()))
         })
     }
 
     fun logout(call: MethodCall, result: MethodChannel.Result) {
         zim?.logout()
+        result.success(null)
     }
 
     fun createRoom(call: MethodCall, result: MethodChannel.Result) {
         val roomID: String? = call.argument<String>("roomID")
         val roomName: String? = call.argument<String>("roomName")
+        val hostID: String? = call.argument<String>("hostID")
+        val seatNum: String? = call.argument<String>("seatNum")
 
         val roomInfo = ZIMRoomInfo()
         roomInfo.roomID = roomID
@@ -64,49 +79,35 @@ class ZIMPlugin: EventChannel.StreamHandler {
         val json = JSONObject()
         json.put("room_id", roomID)
         json.put("room_name", roomName)
+        json.put("host_id", hostID)
+        json.put("num", seatNum)
         val jsonString = json.toString()
-
 
         config.roomAttributes = hashMapOf("room_info" to jsonString)
         zim?.createRoom(roomInfo, config) { roomInfo, errorInfo ->
-            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
-                result.success(null)
-            } else {
-                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
-            }
+            result.success(mapOf("errorCode" to errorInfo.code.value()))
         }
     }
 
     fun joinRoom(call: MethodCall, result: MethodChannel.Result) {
         val roomID: String? = call.argument<String>("roomID")
         zim?.joinRoom(roomID) { roomInfo, errorInfo ->
-            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
-                result.success(null)
-            } else {
-                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
-            }
+            val roomInfoMap = mapOf("id" to roomInfo.baseInfo.roomID, "name" to roomInfo.baseInfo.roomName)
+            result.success(mapOf("errorCode" to errorInfo.code.value(), "roomInfo" to roomInfoMap))
         }
     }
 
     fun leaveRoom(call: MethodCall, result: MethodChannel.Result) {
         val roomID: String? = call.argument<String>("roomID")
         zim?.leaveRoom(roomID) { errorInfo ->
-            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
-                result.success(null)
-            } else {
-                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
-            }
+            result.success(mapOf("errorCode" to errorInfo.code.value()))
         }
 
     }
 
     fun uploadLog(call: MethodCall, result: MethodChannel.Result) {
         zim?.uploadLog(ZIMLogUploadedCallback {
-            if (it.code.value() == ZIMErrorCode.SUCCESS.value()) {
-                result.success(null)
-            } else {
-                result.error(it.code.toString(), it.message, null)
-            }
+            result.success(mapOf("errorCode" to it.code.value()))
         })
     }
 
@@ -114,11 +115,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         val roomID: String? = call.argument<String>("roomID")
         zim?.queryRoomAllAttributes(roomID
         ) { roomAttributes, errorInfo ->
-            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
-                result.success(null)
-            } else {
-                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
-            }
+            result.success(mapOf("errorCode" to errorInfo.code.value(), "roomAttributes" to roomAttributes))
         }
     }
 
@@ -126,11 +123,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         val roomID: String? = call.argument<String>("roomID")
         zim?.queryRoomOnlineMemberCount(roomID
         ) { count, errorInfo ->
-            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
-                result.success(null)
-            } else {
-                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
-            }
+            result.success(mapOf("errorCode" to errorInfo.code.value(), "count" to count))
         }
     }
 
@@ -150,27 +143,26 @@ class ZIMPlugin: EventChannel.StreamHandler {
         customMessage.message = jsonString.encodeToByteArray()
         zim?.sendPeerMessage(customMessage, userID
         ) { message, errorInfo ->
-            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
-                result.success(null)
-            } else {
-                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
-            }
+            result.success(mapOf("errorCode" to errorInfo.code.value()))
         }
     }
 
     fun sendRoomMessage(call: MethodCall, result: MethodChannel.Result) {
         val roomID: String? = call.argument<String>("roomID")
-        val textMessage: String? = call.argument<String>("textMessage")
+        val content: String? = call.argument<String>("content")
+        val isCustomMessage: Boolean? = call.argument<Boolean>("isCustomMessage")
 
-        val message = ZIMTextMessage()
-        message.message = textMessage
+        var message = ZIMMessage()
+        if (isCustomMessage == true) {
+            message = ZIMCustomMessage()
+            message.message = content?.encodeToByteArray()
+        } else {
+            message = ZIMTextMessage()
+            message.message = content
+        }
         zim?.sendRoomMessage(message, roomID
         ) { message, errorInfo ->
-            if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
-                result.success(null)
-            } else {
-                result.error(errorInfo?.code.toString(), errorInfo?.message, null)
-            }
+            result.success(mapOf("errorCode" to errorInfo.code.value()))
         }
     }
 
