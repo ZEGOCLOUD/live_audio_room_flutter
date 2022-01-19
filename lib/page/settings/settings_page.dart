@@ -127,6 +127,7 @@ class SettingsPage extends HookWidget {
 
     return Scaffold(
         appBar: AppBar(
+          elevation: 0,
           leading: IconButton(
               icon: Image.asset(StyleIconUrls.navigatorBack),
               onPressed: () =>
