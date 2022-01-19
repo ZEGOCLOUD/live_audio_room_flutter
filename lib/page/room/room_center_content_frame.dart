@@ -335,10 +335,9 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
           ),
           const Expanded(child: Text('')),
           //  todo@yuyj this is a test data
-
           Visibility(
               visible: giftTipsVisibility,
-              child: GiftMessageItem(
+              child: RoomGiftTips(
                   gift: GiftMessageModel(
                       ZegoUserInfo(
                           "001", "Liam", ZegoRoomUserRole.roomUserRoleHost),
