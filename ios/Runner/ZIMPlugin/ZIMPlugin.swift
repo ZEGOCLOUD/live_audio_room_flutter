@@ -91,7 +91,6 @@ class ZIMPlugin: NSObject {
      }
 
      func destroyZIM(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
-         print("destroyZIM")
          zim?.destroy()
          zim = nil
          result(nil)
