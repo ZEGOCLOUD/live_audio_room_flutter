@@ -12,6 +12,22 @@ enum LoginState {
   loginStateLoginFailed,
 }
 
+enum ConnectionState {
+  disconnected,
+  connecting,
+  connected,
+  reconnecting,
+}
+
+enum ConnectionEvent {
+  success,
+  activeLogin,
+  loginTimeout,
+  loginInterrupted,
+  kickedOut,
+}
+
+
 typedef LoginCallback = Function(int);
 
 class ZegoUserService extends ChangeNotifier {
@@ -26,6 +42,8 @@ class ZegoUserService extends ChangeNotifier {
   ZegoUserService() {
     ZIMPlugin.onRoomMemberJoined = _onRoomMemberJoined;
     ZIMPlugin.onRoomMemberLeave = _onRoomMemberLeave;
+    ZIMPlugin.onReceiveCustomPeerMessage = _onReceiveCustomPeerMessage;
+    ZIMPlugin.onConnectionStateChanged = _onConnectionStateChanged;
   }
 
   void fetchOnlineRoomUsersWithPage(int page) {
@@ -92,8 +110,21 @@ class ZegoUserService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void onReceivePeerMessage() {
-    // userList.addAll(memberList);
+
+  void _onReceiveCustomPeerMessage(List<Map<String, dynamic>> messageListJson) {
+    for (final item in messageListJson) {
+      var messageJson = item['message'];
+      Map<String, dynamic> messageDic = jsonDecode(messageJson);
+      int actionType = messageDic['actionType'];
+      if (actionType == 1) {
+      }
+    }
     notifyListeners();
   }
+
+  void _onConnectionStateChanged(int state, int event) {
+
+    notifyListeners();
+  }
+
 }
