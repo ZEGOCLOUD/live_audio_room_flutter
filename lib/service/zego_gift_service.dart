@@ -11,6 +11,11 @@ class ZegoGiftService extends ChangeNotifier {
   String giftName = "";
   List<String> giftReceivers = [];
 
+  ZegoGiftService() {
+    ZIMPlugin.onReceiveCustomRoomMessage = _onReceiveCustomMessage;
+  }
+
+
   Future<int> sendGift(String giftID, List<String> toUserList, ZegoRoomCallback? callback) async {
     Map message = {'actionType': 2, 'target': toUserList, 'content': {'giftID': giftID}};
     String json = jsonEncode(message);
@@ -25,7 +30,7 @@ class ZegoGiftService extends ChangeNotifier {
     return code;
   }
 
-  void onReceiveCustomMessage(String roomID, List<Map<String, dynamic>> messageListJson) {
+  void _onReceiveCustomMessage(String roomID, List<Map<String, dynamic>> messageListJson) {
     for (final item in messageListJson) {
       var messageJson = item['message'];
       Map<String, dynamic> messageDic = jsonDecode(messageJson);

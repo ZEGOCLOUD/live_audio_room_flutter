@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:flutter/services.dart';
@@ -95,28 +96,31 @@ class ZIMPlugin {
     switch (map['method']) {
       case 'roomMemberJoined':
         if (onRoomMemberJoined == null) return;
-        var memberList = map['memberList'];
+        var roomID = map['roomID'];
+        var list = map['memberList'];
         List<Map<String, dynamic>> memberArray = [];
-        for (final item in memberList) {
+        for (final item in list) {
           memberArray.add(Map<String, dynamic>.from(item));
         }
-        var roomID = map['roomID'];
-        // ZIMPlugin.test!();
         ZIMPlugin.onRoomMemberJoined!(roomID, memberArray);
         break;
       case 'onRoomMemberLeave':
         if (onRoomMemberLeave == null) return;
-        var memberList = map['memberList'];
-        String roomID = map['roomID'];
-        onRoomMemberLeave!(roomID, memberList);
+        var roomID = map['roomID'];
+        var list = map['memberList'];
+        List<Map<String, dynamic>> memberArray = [];
+        for (final item in list) {
+          memberArray.add(Map<String, dynamic>.from(item));
+        }
+        onRoomMemberLeave!(roomID, memberArray);
         break;
       case 'roomAttributesUpdated':
         if (onRoomStatusUpdate == null) return;
         if (onRoomSpeakerSeatUpdate == null) return;
         var roomID = map['roomID'];
-        var updateInfo = map['updateInfo'] as Map<String, dynamic>;
-        var roomInfoJson = updateInfo['room_info'];
-        if (roomInfoJson != null) {
+        var updateInfo = Map<String, dynamic>.from(jsonDecode(map['updateInfo']));
+        if (updateInfo.containsKey('room_info')) {
+          var roomInfoJson = Map<String, dynamic>.from(jsonDecode(updateInfo['room_info']));
           onRoomStatusUpdate!(roomID, roomInfoJson);
         }
         updateInfo.removeWhere((key, value) => key == "room_info");
@@ -126,20 +130,19 @@ class ZIMPlugin {
         break;
       case 'receiveTextRoomMessage':
         if (onReceiveTextRoomMessage == null) return;
-        var textMessagesJson = map['messageList'];
-        String roomID = map['roomID'];
+        var textMessagesJson = List<Map<String, dynamic>>.from(jsonDecode(map['messageList']));
+        var roomID = map['roomID'];
         onReceiveTextRoomMessage!(roomID, textMessagesJson);
         break;
-
       case 'receiveCustomRoomMessage':
         if (onReceiveCustomRoomMessage == null) return;
-        var customMessageJson = map['messageList'];
-        String roomID = map['roomID'];
+        var customMessageJson = List<Map<String, dynamic>>.from(jsonDecode(map['messageList']));
+        var roomID = map['roomID'];
         onReceiveCustomRoomMessage!(roomID, customMessageJson);
         break;
       case 'receiveCustomPeerMessage':
         if (onReceiveCustomPeerMessage == null) return;
-        var customMessageJson = map['messageList'];
+        var customMessageJson = List<Map<String, dynamic>>.from(jsonDecode(map['messageList']));
         onReceiveCustomPeerMessage!(customMessageJson);
         break;
       case 'connectionStateChanged':

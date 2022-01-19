@@ -170,8 +170,8 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   void _onRoomSpeakerSeatUpdate(
       String roomID, Map<String, dynamic> speakerSeat) {
     for (final seatJson in speakerSeat.values) {
-      var speakerSeat = ZegoSpeakerSeat.fromJson(seatJson);
-      seatList[speakerSeat.seatIndex] = speakerSeat;
+      var speakerSeat = ZegoSpeakerSeat.fromJson(jsonDecode(seatJson));
+      speakerSeatList[speakerSeat.seatIndex] = speakerSeat;
     }
     notifyListeners();
   }
