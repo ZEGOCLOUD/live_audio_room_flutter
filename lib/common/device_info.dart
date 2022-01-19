@@ -22,8 +22,7 @@ class DeviceInfo {
     if (Platform.isAndroid) {
       return deviceInfo['id'];
     } else if (Platform.isIOS) {
-      return 'Apple' + Random().nextInt(300).toString();
-      //return deviceInfo['name'];
+      return deviceInfo['name'];
     } else if (Platform.isLinux) {
       return deviceInfo['name'];
     } else if (Platform.isMacOS) {
