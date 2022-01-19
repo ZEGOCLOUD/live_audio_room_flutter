@@ -30,7 +30,7 @@ class ZegoTextMessage {
 
 typedef ZegoRoomCallback = Function(int);
 class ZegoMessageService extends ChangeNotifier {
-  late List<ZegoTextMessage> messageList;
+  List<ZegoTextMessage> messageList = [];
 
   ZegoMessageService() {
     // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.

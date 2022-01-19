@@ -15,9 +15,11 @@ enum LoginState {
 typedef LoginCallback = Function(int);
 
 class ZegoUserService extends ChangeNotifier {
+  // TODO@oliver update userList on SDK callback and notify changed
   List<ZegoUserInfo> userList = [];
-  late ZegoUserInfo localUserInfo;
-  late Map<String, ZegoUserInfo> userDic;
+  Map<String, ZegoUserInfo> userDic = Map<String, ZegoUserInfo>();
+
+  ZegoUserInfo localUserInfo = ZegoUserInfo.empty();
   int totalUsersNum = 0;
   LoginState loginState = LoginState.loginStateLoggedOut;
 
