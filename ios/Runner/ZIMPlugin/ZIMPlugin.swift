@@ -284,11 +284,25 @@ extension ZIMPlugin: ZIMEventHandler {
     
     func zim(_ zim: ZIM, receiveRoomMessage messageList: [ZIMMessage], fromRoomID: String) {
         guard let events = self.events else { return }
-//        var messageJsonList = Array(AnyObject);
-//        for item in messageList {
-//            if item.type = .te
-//        }
-        events(["method": "receiveRoomMessage", "messageList": messageList, "fromRoomID": fromRoomID])
+        var textMessageJsonList = Array<[String: Any]>();
+        var customMessageJsonList = Array<[String: Any]>();
+        for item in messageList {
+            if item.type == .text {
+                guard let message = item as? ZIMTextMessage else { continue }
+                let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": message.message, "timestamp": message.timestamp, "type": message.type] as [String : Any];
+                textMessageJsonList.append(messageJson)
+            } else {
+                guard let message = item as? ZIMCustomMessage else { continue }
+                let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": message.message, "timestamp": message.timestamp, "type": message.type] as [String : Any];
+                customMessageJsonList.append(messageJson)
+            }
+            if textMessageJsonList.count > 0 {
+                events(["method": "receiveTextRoomMessage", "messageList": textMessageJsonList, "roomID": fromRoomID])
+            }
+            if customMessageJsonList.count > 0 {
+                events(["method": "receiveCustomRoomMessage", "messageList": customMessageJsonList, "roomID": fromRoomID])
+            }
+        }
     }
     
     // MARK: - Room

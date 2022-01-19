@@ -24,4 +24,18 @@ class ZegoGiftService extends ChangeNotifier {
     notifyListeners();
     return code;
   }
+
+  void onReceiveCustomMessage(String roomID, List<Map<String, dynamic>> messageListJson) {
+    for (final item in messageListJson) {
+      var messageJson = item['message'];
+      Map<String, dynamic> messageDic = jsonDecode(messageJson);
+      int actionType = messageDic['actionType'];
+      if (actionType == 2) {
+        giftName = messageDic['content']['giftID'];
+        giftSender = item['userID'];
+        giftReceivers = item['target'];
+      }
+    }
+    notifyListeners();
+  }
 }
