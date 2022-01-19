@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:io';
@@ -10,7 +12,7 @@ class DeviceInfo {
 
   Future<String> readDeviceName() async {
     var deviceInfo = await readDeviceInfo();
-    if(deviceInfo.containsKey('Error')) {
+    if (deviceInfo.containsKey('Error')) {
       return '';
     }
 
@@ -20,7 +22,8 @@ class DeviceInfo {
     if (Platform.isAndroid) {
       return deviceInfo['id'];
     } else if (Platform.isIOS) {
-      return deviceInfo['name'];
+      return 'Apple' + Random().nextInt(300).toString();
+      //return deviceInfo['name'];
     } else if (Platform.isLinux) {
       return deviceInfo['name'];
     } else if (Platform.isMacOS) {
