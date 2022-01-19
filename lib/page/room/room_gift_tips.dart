@@ -1,28 +1,41 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
+import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class GiftMessageModel {
-  ZegoUserInfo fromUserInfo = ZegoUserInfo.empty();
-  ZegoUserInfo toUserInfo = ZegoUserInfo.empty();
+  String sender = '';
+  List<String> receivers = [];
   String name = "";
   int count = 1;
 
-  GiftMessageModel(this.fromUserInfo, this.toUserInfo, this.name);
+  GiftMessageModel(this.sender, this.receivers, this.name);
 }
 
-class RoomGiftTips extends StatelessWidget {
-  const RoomGiftTips({Key? key, required this.gift}) : super(key: key);
+class RoomGiftTips extends HookWidget {
+  RoomGiftTips({Key? key, required this.gift}) : super(key: key);
+
   final GiftMessageModel gift;
 
   List<InlineSpan> getTextSpans(context) {
-    var tipsText = AppLocalizations.of(context)!.roomPageReceivedGiftTips(
-        gift.toUserInfo.userName, gift.name, gift.fromUserInfo.userName);
+    String targetUserNames = '';
+    for (var receiver in gift.receivers) {
+      targetUserNames += receiver + ",";
+    }
+    targetUserNames = targetUserNames.substring(0, targetUserNames.length - 1);
+    var tipsText = AppLocalizations.of(context)!
+        .roomPageReceivedGiftTips(targetUserNames, gift.name, gift.sender);
     List<InlineSpan> spans = [];
     tipsText.split(' ').forEach((text) {
       if (text == gift.name) {
