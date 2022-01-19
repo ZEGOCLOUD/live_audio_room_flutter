@@ -15,9 +15,11 @@ enum LoginState {
 typedef LoginCallback = Function(int);
 
 class ZegoUserService extends ChangeNotifier {
+  // TODO@oliver update userList on SDK callback and notify changed
   List<ZegoUserInfo> userList = [];
-  late ZegoUserInfo localUserInfo;
-  late Map<String, ZegoUserInfo> userDic;
+  Map<String, ZegoUserInfo> userDic = Map<String, ZegoUserInfo>();
+
+  ZegoUserInfo localUserInfo = ZegoUserInfo.empty();
   int totalUsersNum = 0;
   LoginState loginState = LoginState.loginStateLoggedOut;
 
@@ -75,6 +77,7 @@ class ZegoUserService extends ChangeNotifier {
     for (final item in memberList) {
       var member = ZegoUserInfo.formJson(item);
       userList.add(member);
+      userDic[member.userID] = member;
     }
     notifyListeners();
   }
@@ -84,6 +87,7 @@ class ZegoUserService extends ChangeNotifier {
     for (final item in memberList) {
       var member = ZegoUserInfo.formJson(item);
       userList.removeWhere((element) => element.userID == member.userID);
+      userDic.removeWhere((key, value) => key == member.userID);
     }
     notifyListeners();
   }

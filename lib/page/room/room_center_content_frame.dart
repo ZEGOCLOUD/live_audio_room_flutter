@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -6,14 +8,15 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/page/room/room_chat_page.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
-import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/page/room/room_gift_tips.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
@@ -116,8 +119,27 @@ class SeatItem extends StatelessWidget {
   }
 }
 
-class RoomCenterContentFrame extends StatelessWidget {
+class RoomCenterContentFrame extends StatefulWidget {
   const RoomCenterContentFrame({Key? key}) : super(key: key);
+
+  @override
+  _RoomCenterContentFrameState createState() => _RoomCenterContentFrameState();
+}
+
+class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
+  bool giftTipsVisibility = false;
+
+  //  todo@yyuj wait gift notify
+  _showGiftTips() {
+    setState(() {
+      giftTipsVisibility = true;
+    });
+    Timer(const Duration(seconds: 10), () {
+      setState(() {
+        giftTipsVisibility = false;
+      });
+    });
+  }
 
   _createSeats(List<ZegoSpeakerSeat> seatList, List<ZegoUserInfo> userInfoList,
       SeatItemClickCallback callback) {
@@ -313,13 +335,16 @@ class RoomCenterContentFrame extends StatelessWidget {
           ),
           const Expanded(child: Text('')),
           //  todo@yuyj this is a test data
-          GiftMessageItem(
-              gift: GiftMessageModel(
-                  ZegoUserInfo(
-                      "001", "Liam", ZegoRoomUserRole.roomUserRoleHost),
-                  ZegoUserInfo(
-                      "002", "Noah", ZegoRoomUserRole.roomUserRoleSpeaker),
-                  "Rocket")),
+
+          Visibility(
+              visible: giftTipsVisibility,
+              child: GiftMessageItem(
+                  gift: GiftMessageModel(
+                      ZegoUserInfo(
+                          "001", "Liam", ZegoRoomUserRole.roomUserRoleHost),
+                      ZegoUserInfo(
+                          "002", "Noah", ZegoRoomUserRole.roomUserRoleSpeaker),
+                      "Rocket"))),
           SizedBox(height: 18.h),
           ConstrainedBox(
               constraints: BoxConstraints(
@@ -328,7 +353,7 @@ class RoomCenterContentFrame extends StatelessWidget {
                 minHeight: 1.h,
                 maxHeight: 630.h,
               ),
-              child: ChatMessagePage())
+              child: const ChatMessagePage())
         ],
       ),
     );

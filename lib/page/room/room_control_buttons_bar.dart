@@ -9,6 +9,7 @@ import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/page/room/room_setting_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_member_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_gift_page.dart';
+import 'package:live_audio_room_flutter/service/zego_message_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:live_audio_room_flutter/common/input/input_dialog.dart';
@@ -105,12 +106,12 @@ class RoomControlButtonsBar extends StatelessWidget {
             iconSrc: StyleIconUrls.roomBottomIm,
             onPressed: () {
               InputDialog.show(context).then((value) {
-                //  todo@yuuyj send message
-                print(value);
-                // setState(() {
-                //  String _inputString = "";
-                //   _inputString = value;
-                // });
+                if(value?.isEmpty ?? true) {
+                  return;
+                }
+
+                var messageService = context.read<ZegoMessageService>();
+                messageService.sendTextMessage(value!, (p0) => null);
               });
             },
           ),

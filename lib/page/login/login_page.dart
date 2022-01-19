@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/util/secret_reader.dart';
 
@@ -39,9 +42,13 @@ class LoginPage extends HookWidget {
     //  user id binding by device name
     final deviceName = useState('');
     userIdInputController.text = deviceName.value;
-    DeviceInfo().readDeviceName().then((value) {
-      deviceName.value = value;
-    });
+    if (Platform.isIOS) {
+      deviceName.value = 'Apple' + Random().nextInt(1000).toString();
+    } else {
+      DeviceInfo().readDeviceName().then((value) {
+        deviceName.value = value;
+      });
+    }
 
     // title
     final mainTitleText = useState('ZEGOCLOUD');
