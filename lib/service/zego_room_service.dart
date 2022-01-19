@@ -32,6 +32,12 @@ class RoomInfo {
       };
 }
 
+enum RoomState {
+  disconnected,
+  connecting,
+  connected,
+}
+
 typedef RoomCallback = Function(int);
 
 class ZegoRoomService extends ChangeNotifier {

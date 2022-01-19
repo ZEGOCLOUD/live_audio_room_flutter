@@ -5,10 +5,13 @@ import 'dart:ffi';
 
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
 class ZIMPlugin {
   static const MethodChannel channel = MethodChannel('ZIMPlugin');
   static const EventChannel event = EventChannel('ZIMPluginEventChannel');
+
+  static void Function(int state, int event)? onConnectionStateChanged;
 
   static void Function(String roomID, List<Map<String, dynamic>> memberList)? onRoomMemberJoined;
   static void Function(String roomID, List<Map<String, dynamic>> memberList)? onRoomMemberLeave;
@@ -19,6 +22,7 @@ class ZIMPlugin {
 
   static void Function(String roomID, List<Map<String, dynamic>> textMessageListJson)? onReceiveTextRoomMessage;
   static void Function(String roomID, List<Map<String, dynamic>> customMessageListJson)? onReceiveCustomRoomMessage;
+  static void Function(List<Map<String, dynamic>> customMessageListJson)? onReceiveCustomPeerMessage;
 
   /// Used to receive the native event stream
   static StreamSubscription<dynamic>? streamSubscription;
@@ -90,52 +94,61 @@ class ZIMPlugin {
     final Map<dynamic, dynamic> map = data;
     switch (map['method']) {
       case 'roomMemberJoined':
+        if (onRoomMemberJoined == null) return;
         var memberList = map['memberList'];
-        String roomID = map['roomID'];
-        if (onRoomMemberJoined != null) {
-          onRoomMemberJoined!(roomID, memberList);
+        List<Map<String, dynamic>> memberArray = [];
+        for (final item in memberList) {
+          memberArray.add(Map<String, dynamic>.from(item));
         }
+        var roomID = map['roomID'];
+        // ZIMPlugin.test!();
+        ZIMPlugin.onRoomMemberJoined!(roomID, memberArray);
         break;
       case 'onRoomMemberLeave':
+        if (onRoomMemberLeave == null) return;
         var memberList = map['memberList'];
         String roomID = map['roomID'];
-        if (onRoomMemberLeave != null) {
-          onRoomMemberLeave!(roomID, memberList);
-        }
+        onRoomMemberLeave!(roomID, memberList);
         break;
       case 'roomAttributesUpdated':
+        if (onRoomStatusUpdate == null) return;
+        if (onRoomSpeakerSeatUpdate == null) return;
         var roomID = map['roomID'];
         var updateInfo = map['updateInfo'] as Map<String, dynamic>;
         var roomInfoJson = updateInfo['room_info'];
         if (roomInfoJson != null) {
-          if (onRoomStatusUpdate != null) {
-            onRoomStatusUpdate!(roomID, roomInfoJson);
-          }
+          onRoomStatusUpdate!(roomID, roomInfoJson);
         }
         updateInfo.removeWhere((key, value) => key == "room_info");
         if (updateInfo.keys.isNotEmpty) {
-          if (onRoomSpeakerSeatUpdate != null) {
-            onRoomSpeakerSeatUpdate!(roomID, updateInfo);
-          }
+          onRoomSpeakerSeatUpdate!(roomID, updateInfo);
         }
         break;
       case 'receiveTextRoomMessage':
+        if (onReceiveTextRoomMessage == null) return;
         var textMessagesJson = map['messageList'];
         String roomID = map['roomID'];
-        if (onReceiveTextRoomMessage != null) {
-          onReceiveTextRoomMessage!(roomID, textMessagesJson);
-        }
+        onReceiveTextRoomMessage!(roomID, textMessagesJson);
         break;
 
       case 'receiveCustomRoomMessage':
+        if (onReceiveCustomRoomMessage == null) return;
         var customMessageJson = map['messageList'];
         String roomID = map['roomID'];
-        if (onReceiveCustomRoomMessage != null) {
-          onReceiveCustomRoomMessage!(roomID, customMessageJson);
-        }
+        onReceiveCustomRoomMessage!(roomID, customMessageJson);
+        break;
+      case 'receiveCustomPeerMessage':
+        if (onReceiveCustomPeerMessage == null) return;
+        var customMessageJson = map['messageList'];
+        onReceiveCustomPeerMessage!(customMessageJson);
+        break;
+      case 'connectionStateChanged':
+        if (onConnectionStateChanged == null) return;
+        int state = map['state'];
+        int event = map['event'];
+        onConnectionStateChanged!(state, event);
         break;
       default:
-      // TODO: Unknown callback
         break;
     }
   }

@@ -29,7 +29,6 @@ class ZIMPlugin: NSObject {
          
          let channel = FlutterMethodChannel(name: "ZIMPlugin", binaryMessenger: flutterViewController.binaryMessenger)
          channel.setMethodCallHandler { (call, result) in
-             // 根据函数名做不同的处理
              switch(call.method) {
              case "createZIM":
                 self.createZIM(call, result: result)
@@ -87,6 +86,7 @@ class ZIMPlugin: NSObject {
          appSign = params!["appSign"] as? String ?? ""
          serverSecret = params!["serverSecret"] as? String ?? ""
          zim = ZIM.create(appID)
+         zim?.setEventHandler(self)
          result(nil)
      }
 
@@ -189,7 +189,7 @@ class ZIMPlugin: NSObject {
          let content = params!["content"] as? String ?? ""
          let actionType = params!["actionType"] as? Int ?? 0
         
-         let messageDic = ["userID": userID, "content": content, "actionType":actionType] as [String : Any]
+         let messageDic = ["target": [userID], "content": content, "actionType":actionType] as [String : Any]
          let data = convertDictionaryToData(dict: messageDic as NSDictionary)
          let customMessage = ZIMCustomMessage(message: data)
          zim?.sendPeerMessage(customMessage, toUserID: userID, callback: { message, error in
@@ -260,26 +260,32 @@ class ZIMPlugin: NSObject {
 extension ZIMPlugin: ZIMEventHandler {
     func zim(_ zim: ZIM, connectionStateChanged state: ZIMConnectionState, event: ZIMConnectionEvent, extendedData: [AnyHashable : Any]) {
         guard let events = self.events else { return }
-        events(["method": "connectionStateChanged", "state": state, "event": event])
+        events(["method": "connectionStateChanged", "state": state.rawValue, "event": event.rawValue])
     }
     
     // MARK: - Main
     func zim(_ zim: ZIM, errorInfo: ZIMError) {
         guard let events = self.events else { return }
-        events(["zim", errorInfo.code])
-        events(["method": "errorInfo", "code": errorInfo.code])
+        events(["method": "errorInfo", "code": errorInfo.code.rawValue])
     }
     
     func zim(_ zim: ZIM, tokenWillExpire second: UInt32) {
         guard let events = self.events else { return }
         events(["method": "tokenWillExpire", "second": second])
-        
     }
     
     // MARK: - Message
     func zim(_ zim: ZIM, receivePeerMessage messageList: [ZIMMessage], fromUserID: String) {
         guard let events = self.events else { return }
-        events(["method": "receivePeerMessage", "messageList": messageList, "fromUserID": fromUserID])
+        var customMessageJsonList = Array<[String: Any]>();
+        for item in messageList {
+            guard let message = item as? ZIMCustomMessage else { continue }
+            let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": message.message, "timestamp": message.timestamp, "type": message.type] as [String : Any];
+            customMessageJsonList.append(messageJson)
+        }
+        if customMessageJsonList.count > 0 {
+            events(["method": "receiveCustomPeerMessage", "messageList": customMessageJsonList])
+        }
     }
     
     func zim(_ zim: ZIM, receiveRoomMessage messageList: [ZIMMessage], fromRoomID: String) {
@@ -328,7 +334,7 @@ extension ZIMPlugin: ZIMEventHandler {
     
     func zim(_ zim: ZIM, roomStateChanged state: ZIMRoomState, event: ZIMRoomEvent, extendedData: [AnyHashable : Any], roomID: String) {
         guard let events = self.events else { return }
-        events(["method": "roomStateChanged", "state": state, "event": event])
+        events(["method": "roomStateChanged", "state": state.rawValue, "event": event.rawValue])
     }
     
     func zim(_ zim: ZIM, roomAttributesUpdated updateInfo: ZIMRoomAttributesUpdateInfo, roomID: String) {
