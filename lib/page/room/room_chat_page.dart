@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -10,6 +12,7 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
+import 'package:live_audio_room_flutter/page/room/room_gift_tips.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class ChatMessageModel {
@@ -40,7 +43,7 @@ class ChatMessageItem extends StatelessWidget {
           child: RichText(
               textAlign: TextAlign.start,
               text: TextSpan(children: <TextSpan>[
-                getRoleWidget(messageModel.sender),
+                getRoleWidget(context, messageModel.sender),
                 getSpacerWidgetByRole(messageModel.sender),
                 TextSpan(
                     text: messageModel.sender.userName + ": ",
@@ -55,10 +58,11 @@ class ChatMessageItem extends StatelessWidget {
     ]);
   }
 
-  TextSpan getRoleWidget(ZegoUserInfo sender) {
+  TextSpan getRoleWidget(context, ZegoUserInfo sender) {
     if (ZegoRoomUserRole.roomUserRoleHost == sender.userRole) {
-      return const TextSpan(
-          text: "Host", style: StyleConstant.roomChatHostRoleText);
+      return TextSpan(
+          text: AppLocalizations.of(context)!.roomPageHost,
+          style: StyleConstant.roomChatHostRoleText);
     }
     return const TextSpan(text: '');
   }
