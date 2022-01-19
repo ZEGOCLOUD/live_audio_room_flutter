@@ -98,6 +98,8 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
   assets:
+    - assets/key_center.json
+
     - images/navigator_back.png
     - images/navigator_back.png
     - images/room_bottom_gift.png

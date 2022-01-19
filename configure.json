@@ -1,0 +1,6 @@
+{
+  "key_center": {
+    "key_center_file": "assets/key_center.json",
+    "key_center_template_file": "key_center_template.json"
+  }
+}

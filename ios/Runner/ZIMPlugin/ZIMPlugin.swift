@@ -77,10 +77,12 @@ class ZIMPlugin: NSObject {
      }
 
      func createZIM(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
+         if (zim != nil) {result(nil);return}
          let params = call.arguments as? NSDictionary
          if (params == nil) { return }
-         let appID = params!["appID"] as? UInt32 ?? 0
-         print("createZIM: %d", appID)
+         appID = params!["appID"] as? UInt32 ?? 0
+         appSign = params!["appSign"] as? String ?? ""
+         serverSecret = params!["serverSecret"] as? String ?? ""
          zim = ZIM.create(appID)
          result(nil)
      }
@@ -98,7 +100,6 @@ class ZIMPlugin: NSObject {
          let userID = params!["userID"] as? String ?? ""
          let userName = params!["userName"] as? String ?? ""
          var token = params!["token"] as? String ?? ""
-         serverSecret = params!["serverSecret"] as? String ?? ""
          if token.count == 0 {
              token = AppToken.getZIMToken(withUserID: userID, appID: appID, secret: serverSecret) ?? ""
          }

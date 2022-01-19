@@ -15,24 +15,15 @@ enum LoginState {
 typedef LoginCallback = Function(int);
 
 class ZegoUserService extends ChangeNotifier {
-  // TODO@oliver update userList on SDK callback and notify changed
-  late List<ZegoUserInfo> userList = [
-    ZegoUserInfo("111", "Host Name", ZegoRoomUserRole.roomUserRoleHost),
-    ZegoUserInfo("222", "Speaker Name", ZegoRoomUserRole.roomUserRoleHost),
-  ]; // Init list for UI test
-  late Map<String, ZegoUserInfo> userDic = {
-    userList[0].userID: userList[0],
-    userList[1].userID: userList[1],
-  };
-
+  List<ZegoUserInfo> userList = [];
   late ZegoUserInfo localUserInfo;
-  late String token;
+  late Map<String, ZegoUserInfo> userDic;
   int totalUsersNum = 0;
   LoginState loginState = LoginState.loginStateLoggedOut;
 
   ZegoUserService() {
-    ZIMPlugin.onRoomMemberJoined = onRoomMemberJoined;
-    ZIMPlugin.onRoomMemberLeave = onRoomMemberLeave;
+    ZIMPlugin.onRoomMemberJoined = _onRoomMemberJoined;
+    ZIMPlugin.onRoomMemberLeave = _onRoomMemberLeave;
   }
 
   void fetchOnlineRoomUsersWithPage(int page) {
@@ -79,25 +70,20 @@ class ZegoUserService extends ChangeNotifier {
     return result['errorCode'];
   }
 
-  // TODO@oliveryang
-  void setUserRoleForUITest(ZegoRoomUserRole role) {
-    localUserInfo.userRole = role;
-    notifyListeners();
-  }
-
-  void onRoomMemberJoined(
+  void _onRoomMemberJoined(
       String roomID, List<Map<String, dynamic>> memberList) {
     for (final item in memberList) {
-      var member = new ZegoUserInfo.formJson(item);
+      var member = ZegoUserInfo.formJson(item);
       userList.add(member);
       userDic[member.userID] = member;
     }
     notifyListeners();
   }
 
-  void onRoomMemberLeave(String roomID, List<Map<String, dynamic>> memberList) {
+  void _onRoomMemberLeave(
+      String roomID, List<Map<String, dynamic>> memberList) {
     for (final item in memberList) {
-      var member = new ZegoUserInfo.formJson(item);
+      var member = ZegoUserInfo.formJson(item);
       userList.removeWhere((element) => element.userID == member.userID);
       userDic.removeWhere((key, value) => key == member.userID);
     }

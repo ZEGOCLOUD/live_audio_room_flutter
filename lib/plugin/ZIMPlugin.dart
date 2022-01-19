@@ -19,8 +19,8 @@ class ZIMPlugin {
   /// Used to receive the native event stream
   static StreamSubscription<dynamic>? streamSubscription;
 
-  static Future<Map> createZIM(int appID) async {
-    return await channel.invokeMethod("createZIM", {"appID": appID});
+  static Future<void> createZIM(int appID, String appSign, String serverSecret) async {
+    return await channel.invokeMethod("createZIM", {"appID": appID, "appSign": appSign, "serverSecret": serverSecret});
   }
   
   static Future<Map> destoryZIM() async {

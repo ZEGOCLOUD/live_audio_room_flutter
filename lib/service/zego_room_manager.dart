@@ -29,11 +29,10 @@ class ZegoRoomManager extends ChangeNotifier {
   /// The gift management instance, contains the gift sending and receiving logics.
   ZegoGiftService giftService = ZegoGiftService();
 
-  void initWithAPPID(int appID, String appSign, ZegoRoomCallback callback) {
-    ZIMPlugin.createZIM(appID);
+  void initWithAPPID(int appID, String appSign, String serverSecret, ZegoRoomCallback callback) {
+    ZIMPlugin.createZIM(appID, appSign, serverSecret);
     ZIMPlugin.registerEventHandler();
 
-    // Create ZegoExpressEngine (Init SDK)
     ZegoEngineProfile profile = ZegoEngineProfile(appID, appSign, ZegoScenario.General);
     ZegoExpressEngine.createEngineWithProfile(profile);
 
@@ -48,7 +47,7 @@ class ZegoRoomManager extends ChangeNotifier {
     return result['errorCode'];
   }
 
-  Future<int> uploadLog(ZegoRoomCallback callback) async {
+  Future<int> uploadLog() async {
     var result = await ZIMPlugin.uploadLog();
     return result['errorCode'];
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:live_audio_room_flutter/util/secret_reader.dart';
 
 import 'package:provider/src/provider.dart';
 
@@ -20,6 +21,18 @@ class LoginPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Init SDK
+    useEffect(() {
+      SecretReader.instance.loadKeyCenterData().then((_) {
+        // WARNING: DO NOT USE APPID AND APPSIGN IN PRODUCTION CODE!!!GET IT FROM SERVER INSTEAD!!!
+        ZegoRoomManager.shared.initWithAPPID(
+            SecretReader.instance.appID,
+            SecretReader.instance.appSign,
+            SecretReader.instance.serverSecret,
+            (_) => null);
+      });
+    }, const []);
+
     final userIdInputController = useTextEditingController();
     final userNameInputController = useTextEditingController();
 
@@ -108,27 +121,18 @@ class LoginPage extends HookWidget {
                   minimumSize: Size(630.w, 98.h),
                 ),
                 onPressed: () {
-                  // TODO@oliveryang using key_center.json for passing AppID and AppSign
-                  ZegoRoomManager.shared.initWithAPPID(123, "appSign",
-                      (errorCode) {
+                  ZegoUserInfo info = ZegoUserInfo.empty();
+                  info.userID = userIdInputController.text;
+                  info.userName = userNameInputController.text;
+                  var userModel = context.read<ZegoUserService>();
+                  userModel.login(info, "").then((errorCode) {
                     if (errorCode != 0) {
                       Fluttertoast.showToast(
                           msg: AppLocalizations.of(context)!
                               .toastLoginFail(errorCode));
-                    }
-
-                    ZegoUserInfo info = ZegoUserInfo.empty();
-                    info.userID = userIdInputController.text;
-                    info.userName = userNameInputController.text;
-                    var userModel = context.read<ZegoUserService>();
-                    userModel.login(info, "").then((errorCode) {
-                      if (errorCode != 0) {
-                        Fluttertoast.showToast(
-                            msg: AppLocalizations.of(context)!
-                                .toastLoginFail(errorCode));
-                      }
+                    } else {
                       Navigator.pushReplacementNamed(context, '/room_entrance');
-                    });
+                    }
                   });
                 },
               )
