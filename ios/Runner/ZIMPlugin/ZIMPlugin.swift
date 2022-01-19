@@ -131,7 +131,7 @@ class ZIMPlugin: NSObject {
          let roomInfo = ZIMRoomInfo()
          roomInfo.roomID = roomID
          roomInfo.roomName = roomName
-         let jsonString = convertDictionaryToJSONString(dict: ["room_id": roomID, "room_name": roomName, "host_id": hostID, "num": seatNum, "disable": false, "close": false])
+         let jsonString = convertObjectToJSONString( ["room_id": roomID, "room_name": roomName, "host_id": hostID, "num": seatNum, "disable": false, "close": false])
          let config = ZIMRoomAdvancedConfig()
          config.roomAttributes = ["room_Info": jsonString]
          zim?.createRoom(roomInfo, config: config, callback: { roomInfo, error in
@@ -234,8 +234,8 @@ class ZIMPlugin: NSObject {
          })
      }
     
-    func convertDictionaryToJSONString(dict:NSDictionary?)->String {
-        guard let data = try? JSONSerialization.data(withJSONObject: dict!, options: JSONSerialization.WritingOptions.init(rawValue: 0)) else { return "" }
+    func convertObjectToJSONString(_ object:Any?)->String {
+        guard let data = try? JSONSerialization.data(withJSONObject: object!, options: JSONSerialization.WritingOptions.init(rawValue: 0)) else { return "" }
         guard let jsonStr = NSString(data: data, encoding: String.Encoding.utf8.rawValue) else { return "" }
         return jsonStr as String
     }
@@ -280,11 +280,13 @@ extension ZIMPlugin: ZIMEventHandler {
         var customMessageJsonList = Array<[String: Any]>();
         for item in messageList {
             guard let message = item as? ZIMCustomMessage else { continue }
-            let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": message.message, "timestamp": message.timestamp, "type": message.type] as [String : Any];
+            let content = NSString(data: message.message, encoding: String.Encoding.utf8.rawValue) ?? ""
+            
+            let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": content, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
             customMessageJsonList.append(messageJson)
         }
         if customMessageJsonList.count > 0 {
-            events(["method": "receiveCustomPeerMessage", "messageList": customMessageJsonList])
+            events(["method": "receiveCustomPeerMessage", "messageList": convertObjectToJSONString(customMessageJsonList)])
         }
     }
     
@@ -295,18 +297,19 @@ extension ZIMPlugin: ZIMEventHandler {
         for item in messageList {
             if item.type == .text {
                 guard let message = item as? ZIMTextMessage else { continue }
-                let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": message.message, "timestamp": message.timestamp, "type": message.type] as [String : Any];
+                let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": message.message, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
                 textMessageJsonList.append(messageJson)
             } else {
                 guard let message = item as? ZIMCustomMessage else { continue }
-                let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": message.message, "timestamp": message.timestamp, "type": message.type] as [String : Any];
+                let content = NSString(data: message.message, encoding: String.Encoding.utf8.rawValue) ?? ""
+                let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": content, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
                 customMessageJsonList.append(messageJson)
             }
             if textMessageJsonList.count > 0 {
-                events(["method": "receiveTextRoomMessage", "messageList": textMessageJsonList, "roomID": fromRoomID])
+                events(["method": "receiveTextRoomMessage", "messageList": convertObjectToJSONString(textMessageJsonList), "roomID": fromRoomID])
             }
             if customMessageJsonList.count > 0 {
-                events(["method": "receiveCustomRoomMessage", "messageList": customMessageJsonList, "roomID": fromRoomID])
+                events(["method": "receiveCustomRoomMessage", "messageList": convertObjectToJSONString(customMessageJsonList), "roomID": fromRoomID])
             }
         }
     }
@@ -339,7 +342,7 @@ extension ZIMPlugin: ZIMEventHandler {
     
     func zim(_ zim: ZIM, roomAttributesUpdated updateInfo: ZIMRoomAttributesUpdateInfo, roomID: String) {
         guard let events = self.events else { return }
-        events(["method": "roomAttributesUpdated", "updateInfo": updateInfo.roomAttributes, "roomID": roomID])
+        events(["method": "roomAttributesUpdated", "updateInfo": convertObjectToJSONString(updateInfo.roomAttributes), "roomID": roomID])
     }
 }
 

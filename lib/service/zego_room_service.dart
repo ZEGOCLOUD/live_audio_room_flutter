@@ -14,7 +14,7 @@ class RoomInfo {
 
   RoomInfo(this.roomID, this.roomName, this.hostID);
 
-  RoomInfo.formJson(Map<String, dynamic> json)
+  RoomInfo.fromJson(Map<String, dynamic> json)
       : roomID = json['id'],
         roomName = json['name'],
         hostID = json['host_id'],
@@ -64,7 +64,7 @@ class ZegoRoomService extends ChangeNotifier {
     if (code == 0) {
       var attributesResult = await ZIMPlugin.queryRoomAllAttributes(roomID);
       var roomDic = attributesResult['room_info'];
-      roomInfo = RoomInfo.formJson(jsonDecode(roomDic));
+      roomInfo = RoomInfo.fromJson(jsonDecode(roomDic));
       notifyListeners();
     }
     return code;
@@ -72,7 +72,13 @@ class ZegoRoomService extends ChangeNotifier {
 
   Future<int> leaveRoom() async {
     var result = await ZIMPlugin.leaveRoom(roomInfo.roomID);
-    return result['errorCode'];
+    var code = result['errorCode'];
+    if (code == 0) {
+      roomInfo = RoomInfo('', '', '');
+      localHostID = "";
+      notifyListeners();
+    }
+    return code;
   }
 
   Future<int> disableTextMessage(bool disable) async {
@@ -91,7 +97,7 @@ class ZegoRoomService extends ChangeNotifier {
   }
 
   void onRoomStatusUpdate(String roomID, Map<String, dynamic> roomInfoJson) {
-    roomInfo = new RoomInfo.formJson(roomInfoJson);
+    roomInfo = new RoomInfo.fromJson(roomInfoJson);
     notifyListeners();
   }
 }

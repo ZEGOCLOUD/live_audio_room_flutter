@@ -27,14 +27,12 @@ enum ConnectionEvent {
   kickedOut,
 }
 
-
 typedef LoginCallback = Function(int);
 
 class ZegoUserService extends ChangeNotifier {
   // TODO@oliver update userList on SDK callback and notify changed
   List<ZegoUserInfo> userList = [];
-  Map<String, ZegoUserInfo> userDic = Map<String, ZegoUserInfo>();
-
+  Map<String, ZegoUserInfo> userDic = <String, ZegoUserInfo>{};
   ZegoUserInfo localUserInfo = ZegoUserInfo.empty();
   int totalUsersNum = 0;
   LoginState loginState = LoginState.loginStateLoggedOut;
@@ -110,21 +108,48 @@ class ZegoUserService extends ChangeNotifier {
     notifyListeners();
   }
 
-
   void _onReceiveCustomPeerMessage(List<Map<String, dynamic>> messageListJson) {
     for (final item in messageListJson) {
       var messageJson = item['message'];
       Map<String, dynamic> messageDic = jsonDecode(messageJson);
       int actionType = messageDic['actionType'];
-      if (actionType == 1) {
-      }
+      if (actionType == 1) {}
     }
     notifyListeners();
   }
 
   void _onConnectionStateChanged(int state, int event) {
-
     notifyListeners();
   }
 
+  void updateUserRole(String hostID, List<String> speakerList) {
+    // Leave room or init
+    if (hostID.isEmpty) {
+      userList.clear();
+      userDic.clear();
+      // We need to reuse local user id after leave room
+      localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleListener;
+      totalUsersNum = 0;
+      loginState = LoginState.loginStateLoggedOut;
+      return;
+    }
+    // Update local user role
+    if (hostID == localUserInfo.userID) {
+      localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleHost;
+    } else if (speakerList.contains(localUserInfo.userID)) {
+      localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleSpeaker;
+    } else {
+      localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleListener;
+    }
+    for (var user in userList) {
+      if (user.userID == hostID) {
+        user.userRole = ZegoRoomUserRole.roomUserRoleHost;
+      } else if (speakerList.contains(user.userID)) {
+        user.userRole = ZegoRoomUserRole.roomUserRoleSpeaker;
+      } else {
+        user.userRole = ZegoRoomUserRole.roomUserRoleListener;
+      }
+    }
+    notifyListeners();
+  }
 }

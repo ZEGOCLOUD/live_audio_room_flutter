@@ -29,27 +29,39 @@ class ZegoApp extends StatelessWidget {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
     return MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (context) => ZegoUserService()),
           ChangeNotifierProvider(create: (context) => ZegoRoomService()),
+          ChangeNotifierProvider(create: (context) => ZegoSpeakerSeatService()),
+          ChangeNotifierProvider(create: (context) => ZegoUserService()),
+          ChangeNotifierProvider(create: (context) => ZegoGiftService()),
+          ChangeNotifierProvider(create: (context) => ZegoMessageService()),
+          ChangeNotifierProxyProvider2<ZegoRoomService, ZegoSpeakerSeatService,
+              ZegoUserService>(
+            create: (context) => context.read<ZegoUserService>(),
+            update: (_, room, seats, users) {
+              if (users == null) throw ArgumentError.notNull('users');
+              users.updateUserRole(room.roomInfo.hostID, seats.speakerIDList);
+              return users;
+            },
+          ),
           ChangeNotifierProxyProvider<ZegoUserService, ZegoRoomService>(
-              create: (_) => ZegoRoomService(),
+              create: (context) => context.read<ZegoRoomService>(),
               update: (_, users, room) {
                 if (room == null) throw ArgumentError.notNull('room');
                 room.localHostID = users.localUserInfo.userID;
                 return room;
               }),
-          ChangeNotifierProvider(create: (context) => ZegoGiftService()),
-          ChangeNotifierProvider(create: (context) => ZegoMessageService()),
           ChangeNotifierProxyProvider2<ZegoRoomService, ZegoUserService,
               ZegoSpeakerSeatService>(
-            create: (_) => ZegoSpeakerSeatService(),
+            create: (context) => context.read<ZegoSpeakerSeatService>(),
             update: (_, room, users, seats) {
               if (seats == null) throw ArgumentError.notNull('seats');
               seats.updateHostID(room.roomInfo.hostID);
+              seats.updateRoomInfo(
+                  room.roomInfo.roomID, room.roomInfo.isSeatClosed);
               seats.updateLocalUserID(users.localUserInfo.userID);
               return seats;
             },
-          )
+          ),
         ],
         child: GestureDetector(
             onTap: () {

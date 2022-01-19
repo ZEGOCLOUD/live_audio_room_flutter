@@ -288,9 +288,11 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
               context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
             var seats = context.read<ZegoSpeakerSeatService>();
             seats.takeSeat(index).then((code) {
-              Fluttertoast.showToast(
-                  msg: AppLocalizations.of(context)!
-                      .toastTakeSpeakerSeatFail(code));
+              if (code != 0) {
+                Fluttertoast.showToast(
+                    msg: AppLocalizations.of(context)!
+                        .toastTakeSpeakerSeatFail(code));
+              }
             });
           });
         };
@@ -315,7 +317,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
                 crossAxisSpacing: 22.w,
                 mainAxisSpacing: 0,
                 crossAxisCount: 4,
-                children: _createSeats(seats.speakerSeatList, users.userList,
+                children: _createSeats(seats.seatList, users.userList,
                     seatClickCallback(users.localUserInfo.userRole)),
               ),
             ),
