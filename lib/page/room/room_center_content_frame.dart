@@ -301,9 +301,11 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
               context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
             var seats = context.read<ZegoSpeakerSeatService>();
             seats.takeSeat(index).then((code) {
-              Fluttertoast.showToast(
-                  msg: AppLocalizations.of(context)!
-                      .toastTakeSpeakerSeatFail(code));
+              if (code != 0) {
+                Fluttertoast.showToast(
+                    msg: AppLocalizations.of(context)!
+                        .toastTakeSpeakerSeatFail(code));
+              }
             });
           });
         };

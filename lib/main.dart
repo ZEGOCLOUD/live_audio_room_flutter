@@ -56,7 +56,8 @@ class ZegoApp extends StatelessWidget {
             update: (_, room, users, seats) {
               if (seats == null) throw ArgumentError.notNull('seats');
               seats.updateHostID(room.roomInfo.hostID);
-              seats.updateRoomID(room.roomInfo.roomID);
+              seats.updateRoomInfo(
+                  room.roomInfo.roomID, room.roomInfo.isSeatClosed);
               seats.updateLocalUserID(users.localUserInfo.userID);
               return seats;
             },
