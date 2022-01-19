@@ -1,9 +1,4 @@
-
-enum ZegoSpeakerSeatStatus {
-  Untaken,
-  Occupied,
-  Closed
-}
+enum ZegoSpeakerSeatStatus { Untaken, Occupied, Closed }
 
 class ZegoSpeakerSeat {
   String userID = "";
@@ -13,6 +8,7 @@ class ZegoSpeakerSeat {
 
   double soundLevel = 0.0;
   double network = 0.0;
+
   ZegoSpeakerSeat({required this.seatIndex});
 
   ZegoSpeakerSeat.fromJson(Map<String, dynamic> json)
@@ -21,11 +17,18 @@ class ZegoSpeakerSeat {
         mic = json['mic'],
         status = json['status'];
 
-  Map<String, dynamic> toJson() =>
-      {
+  Map<String, dynamic> toJson() => {
         'id': userID,
         'index': seatIndex,
         'mic': mic,
-        'status': status,
+        'status': status.index,
       };
+
+  void clearData() {
+    userID = "";
+    mic = false;
+    status = ZegoSpeakerSeatStatus.Untaken;
+    soundLevel = 0.0;
+    network = 0.0;
+  }
 }
