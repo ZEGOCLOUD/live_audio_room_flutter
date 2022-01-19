@@ -16,6 +16,10 @@ class ZIMPlugin {
   static void Function(String roomID, Map<String, dynamic> roomInfoJson)? onRoomStatusUpdate;
   static void Function(String roomID, Map<String, dynamic> speakerListJson)? onRoomSpeakerSeatUpdate;
 
+
+  static void Function(String roomID, List<Map<String, dynamic>> textMessageListJson)? onReceiveTextRoomMessage;
+  static void Function(String roomID, List<Map<String, dynamic>> customMessageListJson)? onReceiveCustomRoomMessage;
+
   /// Used to receive the native event stream
   static StreamSubscription<dynamic>? streamSubscription;
 
@@ -113,6 +117,21 @@ class ZIMPlugin {
           if (onRoomSpeakerSeatUpdate != null) {
             onRoomSpeakerSeatUpdate!(roomID, updateInfo);
           }
+        }
+        break;
+      case 'receiveTextRoomMessage':
+        var textMessagesJson = map['messageList'];
+        String roomID = map['roomID'];
+        if (onReceiveTextRoomMessage != null) {
+          onReceiveTextRoomMessage!(roomID, textMessagesJson);
+        }
+        break;
+
+      case 'receiveCustomRoomMessage':
+        var customMessageJson = map['messageList'];
+        String roomID = map['roomID'];
+        if (onReceiveCustomRoomMessage != null) {
+          onReceiveCustomRoomMessage!(roomID, customMessageJson);
         }
         break;
       default:

@@ -20,10 +20,10 @@ class ZegoTextMessage {
         type = json['type'];
   Map<String, dynamic> toJson() =>
       {
+        'messageID': messageID,
         'userID': userID,
         'message': message,
         'timestamp': timestamp,
-        'messageID': messageID,
         'type': type
       };
 }
@@ -33,7 +33,7 @@ class ZegoMessageService extends ChangeNotifier {
   late List<ZegoTextMessage> messageList;
 
   ZegoMessageService() {
-    // TODO@larry binding delegate to SDK and call notifyListeners() while data changed.
+    ZIMPlugin.onReceiveTextRoomMessage = onReceiveTextMessage;
   }
   Future<int> sendTextMessage(String message, ZegoRoomCallback? callback) async {
     var roomID = ZegoRoomManager.shared.roomService.roomInfo.roomID;
