@@ -193,25 +193,6 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     }
   }
 
-  void updateHostID(String id) {
-    if (id == _hostID) {
-      return;
-    }
-    _hostID = id;
-    if (id.isNotEmpty) {
-      if (_hostID == _localUserID) {
-        takeSeat(0);
-      } else {
-        var hostSeat = seatList[0];
-        hostSeat.userID = _hostID;
-        hostSeat.status = ZegoSpeakerSeatStatus.Occupied;
-        notifyListeners();
-      }
-    } else {
-      seatList[0].clearData();
-    }
-  }
-
   void updateLocalUserID(String id) {
     if (id == _localUserID) {
       return;
@@ -219,16 +200,30 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     _localUserID = id;
   }
 
-  void updateRoomInfo(String roomID, bool isSeatClosed) {
-    if (roomID == _roomID && isSeatClosed == _isSeatClosed) {
-      return;
+  void updateRoomInfo(String roomID, String hostID, bool isSeatClosed) {
+    if (roomID != _roomID) {
+      _roomID = roomID;
+      if (roomID.isEmpty) {
+        speakerIDList.clear();
+        for (final seat in seatList) {
+          seat.clearData();
+        }
+      }
     }
-    _roomID = roomID;
-    _isSeatClosed = isSeatClosed;
-    if (roomID.isEmpty) {
-      speakerIDList.clear();
-      for (final seat in seatList) {
-        seat.clearData();
+    if (isSeatClosed != _isSeatClosed) {
+      _isSeatClosed = isSeatClosed;
+    }
+    if (hostID != _hostID) {
+      _hostID = hostID;
+      if (hostID.isNotEmpty) {
+        if (_hostID == _localUserID) {
+          takeSeat(0);
+        } else {
+          var hostSeat = seatList[0];
+          hostSeat.userID = _hostID;
+          hostSeat.status = ZegoSpeakerSeatStatus.Occupied;
+          notifyListeners();
+        }
       }
     }
   }

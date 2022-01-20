@@ -22,7 +22,7 @@ import 'package:live_audio_room_flutter/page/room/room_gift_tips.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 typedef SeatItemClickCallback = Function(
-    int index, String userId, String userName, ZegoSpeakerSeatStatus status);
+    int index, String userId, String? userName, ZegoSpeakerSeatStatus status);
 
 class SeatItem extends StatelessWidget {
   final int index;
@@ -109,7 +109,7 @@ class SeatItem extends StatelessWidget {
           Positioned.fill(
             child: TextButton(
               onPressed: () {
-                callback(index, userID, userName!, status);
+                callback(index, userID, userName, status);
               },
               child: const Text(""),
             ),
@@ -190,7 +190,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
     seatClickCallback(ZegoRoomUserRole userRole) {
       if (ZegoRoomUserRole.roomUserRoleHost == userRole) {
         // Process host click
-        return (int index, String userID, String userName,
+        return (int index, String userID, String? userName,
             ZegoSpeakerSeatStatus status) {
           if (index == 0) {
             return;
@@ -220,7 +220,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
                 builder: (BuildContext context) => AlertDialog(
                   title: Text(AppLocalizations.of(context)!.roomPageLeaveSeat),
                   content: Text(AppLocalizations.of(context)!
-                      .roomPageLeaveSpeakerSeatDesc(userName)),
+                      .roomPageLeaveSpeakerSeatDesc(userName!)),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () => Navigator.pop(
@@ -252,7 +252,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
         };
       } else if (ZegoRoomUserRole.roomUserRoleSpeaker == userRole) {
         // Process speaker click
-        return (int index, String userID, String userName,
+        return (int index, String userID, String? userName,
             ZegoSpeakerSeatStatus status) {
           print("Speaker click...$index, $userID");
           var users = context.read<ZegoUserService>();
@@ -279,7 +279,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
         };
       } else {
         // Process listener click
-        return (int index, String userID, String userName,
+        return (int index, String userID, String? userName,
             ZegoSpeakerSeatStatus status) {
           print("Listener click...$index, $userID");
           var users = context.read<ZegoUserService>();
