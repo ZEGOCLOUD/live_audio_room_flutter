@@ -7,6 +7,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
+import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
@@ -14,6 +15,10 @@ import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/model/zego_room_gift.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+import 'package:zego_express_engine/zego_express_engine.dart';
+
+const userIDOfNoSpeakerUser = '-1000';
+const userIDOfAllSpeaker = '-1001';
 
 class RoomGiftMemberList extends HookWidget {
   const RoomGiftMemberList({required this.memberSelectNotify, Key? key})
@@ -28,33 +33,61 @@ class RoomGiftMemberList extends HookWidget {
         color: StyleColors.giftMemberListBackgroundColor,
         borderRadius: BorderRadius.circular(17.0),
       ),
-      child: Consumer<ZegoUserService>(
-          builder: (_, userService, child) => ListView.builder(
-                itemExtent: 84.h,
-                padding: const EdgeInsets.only(left: 0),
-                itemCount: userService.userList.length,
-                itemBuilder: (_, index) {
-                  ZegoUserInfo user = userService.userList[index];
-                  return GestureDetector(
-                      child: Container(
-                          padding: EdgeInsets.only(left: 30.w),
-                          child: Center(
-                            child: Row(
-                              children: [
-                                Text(
-                                  user.userName,
-                                  textAlign: TextAlign.left,
-                                  style: StyleConstant.roomGiftMemberListText,
-                                ),
-                                const Expanded(child: Text(''))
-                              ],
-                            ),
-                          )),
-                      onTap: () {
-                        memberSelectNotify(user);
-                      });
-                },
-              )),
+      child: Consumer2<ZegoUserService, ZegoSpeakerSeatService>(
+          builder: (_, userService, seatService, child) {
+        List<String> speakerIDList = [...seatService.speakerIDList];
+        List<ZegoUserInfo> speakerList = [];
+        for (var speakerID in speakerIDList) {
+          if (!userService.userDic.containsKey(speakerID)) {
+            continue;
+          }
+          speakerList.add(userService.userDic[speakerID] ?? ZegoUserInfo.empty());
+        }
+        if (speakerList.isEmpty) {
+          //  display if empty
+          speakerList.add(ZegoUserInfo(
+              userIDOfNoSpeakerUser,
+              AppLocalizations.of(context)!.roomPageGiftNoSpeaker,
+              ZegoRoomUserRole.roomUserRoleListener));
+        } else {
+          //  notify all user on the list
+          speakerList.insert(
+              0,
+              ZegoUserInfo(
+                  userIDOfAllSpeaker,
+                  AppLocalizations.of(context)!.roomPageSelectAllSpeakers,
+                  ZegoRoomUserRole.roomUserRoleListener));
+          //  remove self if you are on the list
+          speakerList.removeWhere((userInfo) =>
+              userService.localUserInfo.userID == userInfo.userID);
+        }
+        return ListView.builder(
+          itemExtent: 84.h,
+          padding: const EdgeInsets.only(left: 0),
+          itemCount: speakerList.length,
+          itemBuilder: (_, index) {
+            ZegoUserInfo user = speakerList[index];
+            return GestureDetector(
+                child: Container(
+                    padding: EdgeInsets.only(left: 30.w),
+                    child: Center(
+                      child: Row(
+                        children: [
+                          Text(
+                            user.userName,
+                            textAlign: TextAlign.left,
+                            style: StyleConstant.roomGiftMemberListText,
+                          ),
+                          const Expanded(child: Text(''))
+                        ],
+                      ),
+                    )),
+                onTap: () {
+                  memberSelectNotify(user);
+                });
+          },
+        );
+      }),
     );
   }
 }
@@ -83,7 +116,10 @@ class RoomGiftBottomBar extends HookWidget {
                     left: 36.w, top: 812.h, right: 246.w, bottom: 102.h),
                 child: RoomGiftMemberList(memberSelectNotify: (userInfo) {
                   selectedUser = userInfo;
-                  userNameTextCtrl.text = selectedUser.userName;
+                  if (userIDOfNoSpeakerUser != selectedUser.userID) {
+                    //  meaningful user
+                    userNameTextCtrl.text = selectedUser.userName;
+                  }
                   hideMemberList();
                 }),
               )),
@@ -109,13 +145,24 @@ class RoomGiftBottomBar extends HookWidget {
     _memberListEntry.remove();
   }
 
-  void sendGift(context, ZegoGiftService giftService) {
-    if (selectedUser.isEmpty()) {
+  void sendGift(context) {
+    if (selectedUser.isEmpty() ||
+        userIDOfNoSpeakerUser == selectedUser.userID) {
       return;
     }
 
+    var giftService = context.read<ZegoGiftService>();
+    //  todo@yuyj seat service's user
+    var userService = context.read<ZegoUserService>();
+
     List<String> toUserList = [];
-    toUserList.add(selectedUser.userID);
+    if (userIDOfAllSpeaker == selectedUser.userID) {
+      for (var userInfo in userService.userList) {
+        toUserList.add(userInfo.userID);
+      }
+    } else {
+      toUserList.add(selectedUser.userID);
+    }
     giftService
         .sendGift(
             selectedRoomGift.value.id.toString(), toUserList, (p0) => null)
@@ -178,23 +225,20 @@ class RoomGiftBottomBar extends HookWidget {
           SizedBox(
               width: 188.w,
               height: 80.h,
-              child: Consumer<ZegoGiftService>(
-                  builder: (_, giftService, child) => OutlinedButton(
-                      onPressed: () => selectedUser.isEmpty()
-                          ? null
-                          : sendGift(context, giftService),
-                      child: Text(
-                          AppLocalizations.of(context)!.roomPageSendGift,
-                          style: StyleConstant.roomGiftSendButtonText),
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.resolveWith((states) {
-                          // If the button is pressed, return green, otherwise blue
-                          return StyleColors.blueButtonEnabledColor;
-                        }),
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24.0))),
-                      ))))
+              child: OutlinedButton(
+                  onPressed: () =>
+                      selectedUser.isEmpty() ? null : sendGift(context),
+                  child: Text(AppLocalizations.of(context)!.roomPageSendGift,
+                      style: StyleConstant.roomGiftSendButtonText),
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.resolveWith((states) {
+                      // If the button is pressed, return green, otherwise blue
+                      return StyleColors.blueButtonEnabledColor;
+                    }),
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24.0))),
+                  )))
         ],
       ),
     );
