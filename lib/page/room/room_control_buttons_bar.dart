@@ -16,6 +16,7 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:live_audio_room_flutter/common/input/input_dialog.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+import 'package:zego_express_engine/zego_express_engine.dart';
 
 class ControllerButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -109,17 +110,22 @@ class RoomControlButtonsBar extends StatelessWidget {
             iconSrc: StyleIconUrls.roomBottomIm,
             onPressed: () {
               InputDialog.show(context).then((value) {
-                if(value?.isEmpty ?? true) {
+                if (value?.isEmpty ?? true) {
                   return;
                 }
 
                 var messageService = context.read<ZegoMessageService>();
                 var roomService = context.read<ZegoRoomService>();
-                messageService.sendTextMessage(roomService.roomInfo.roomID, value!).then((errorCode) {
+                var userService = context.read<ZegoUserService>();
+                messageService
+                    .sendTextMessage(roomService.roomInfo.roomID,
+                        userService.localUserInfo.userID, value!)
+                    .then((errorCode) {
                   if (0 != errorCode) {
                     Fluttertoast.showToast(
                         msg: AppLocalizations.of(context)!
-                            .toastSendMessageError(errorCode));
+                            .toastSendMessageError(errorCode),
+                        backgroundColor: Colors.grey);
                   }
                 });
               });

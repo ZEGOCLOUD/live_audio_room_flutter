@@ -18,19 +18,22 @@ class CreateRoomDialog extends HookWidget {
   void tryCreateRoom(BuildContext context, String roomID, String roomName) {
     if (roomID.isEmpty) {
       Fluttertoast.showToast(
-          msg: AppLocalizations.of(context)!.toastRoomIdEnterError);
+          msg: AppLocalizations.of(context)!.toastRoomIdEnterError,
+          backgroundColor: Colors.grey);
       return;
     }
     if (roomName.isEmpty) {
       Fluttertoast.showToast(
-          msg: AppLocalizations.of(context)!.toastRoomNameError);
+          msg: AppLocalizations.of(context)!.toastRoomNameError,
+          backgroundColor: Colors.grey);
       return;
     }
     var room = context.read<ZegoRoomService>();
     room.createRoom(roomID, roomName, "").then((code) {
       if (code != 0) {
         Fluttertoast.showToast(
-            msg: AppLocalizations.of(context)!.toastCreateRoomFail(code));
+            msg: AppLocalizations.of(context)!.toastCreateRoomFail(code),
+            backgroundColor: Colors.grey);
       } else {
         Navigator.pushReplacementNamed(context, "/room_main");
       }
@@ -107,7 +110,8 @@ class RoomEntrancePage extends HookWidget {
   void tryJoinRoom(BuildContext context, String roomID) {
     if (roomID.isEmpty) {
       Fluttertoast.showToast(
-          msg: AppLocalizations.of(context)!.toastRoomIdEnterError);
+          msg: AppLocalizations.of(context)!.toastRoomIdEnterError,
+          backgroundColor: Colors.grey);
       return;
     }
 
@@ -115,7 +119,8 @@ class RoomEntrancePage extends HookWidget {
     room.joinRoom(roomID, "").then((code) {
       if (code != 0) {
         Fluttertoast.showToast(
-            msg: AppLocalizations.of(context)!.toastJoinRoomFail(code));
+            msg: AppLocalizations.of(context)!.toastJoinRoomFail(code),
+            backgroundColor: Colors.grey);
       } else {
         var users = context.read<ZegoUserService>();
         if (room.roomInfo.hostID == users.localUserInfo.userID) {

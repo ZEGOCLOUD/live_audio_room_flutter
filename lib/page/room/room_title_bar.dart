@@ -71,7 +71,8 @@ class RoomTitleBar extends StatelessWidget {
                           if (0 != errorCode) {
                             Fluttertoast.showToast(
                                 msg: AppLocalizations.of(context)!
-                                    .toastRoomLeaveFailTip(errorCode));
+                                    .toastRoomLeaveFailTip(errorCode),
+                                backgroundColor: Colors.grey);
                           }
                         });
 

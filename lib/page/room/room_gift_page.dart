@@ -169,7 +169,8 @@ class RoomGiftBottomBar extends HookWidget {
         .then((errorCode) {
       if (0 != errorCode) {
         Fluttertoast.showToast(
-            msg: AppLocalizations.of(context)!.toastSendGiftError(errorCode));
+            msg: AppLocalizations.of(context)!.toastSendGiftError(errorCode),
+            backgroundColor: Colors.grey);
       }
     });
   }

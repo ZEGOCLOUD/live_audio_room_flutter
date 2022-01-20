@@ -47,7 +47,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return code;
   }
 
-  Future<int> closeAllSeat(bool isClose, ZegoRoomCallback? callback) async {
+  Future<int> closeAllSeat(bool isClose) async {
     // Ignore host
     var map = {};
     for (var i = 1; i < seatList.length; i++) {
@@ -173,6 +173,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       var speakerSeat = ZegoSpeakerSeat.fromJson(jsonDecode(seatJson));
       seatList[speakerSeat.seatIndex] = speakerSeat;
     }
+
     notifyListeners();
   }
 

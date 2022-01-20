@@ -205,8 +205,8 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
               var seats = context.read<ZegoSpeakerSeatService>();
               seats.closeSeat(setToClose, index).then((code) {
                 Fluttertoast.showToast(
-                    msg:
-                        AppLocalizations.of(context)!.toastLockSeatError(code));
+                    msg: AppLocalizations.of(context)!.toastLockSeatError(code),
+                    backgroundColor: Colors.grey);
               });
             });
           } else {
@@ -235,7 +235,8 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
                         seats.removeUserFromSeat(index).then((code) {
                           Fluttertoast.showToast(
                               msg: AppLocalizations.of(context)!
-                                  .toastKickoutLeaveSeatError(userName, code));
+                                  .toastKickoutLeaveSeatError(userName, code),
+                              backgroundColor: Colors.grey);
                         });
                       },
                       child: Text(AppLocalizations.of(context)!.dialogConfirm),
@@ -265,7 +266,8 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
                 if (code != 0) {
                   Fluttertoast.showToast(
                       msg: AppLocalizations.of(context)!
-                          .toastLeaveSeatFail(code));
+                          .toastLeaveSeatFail(code),
+                      backgroundColor: Colors.grey);
                 }
               });
             });
@@ -281,7 +283,8 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
           }
           if (ZegoSpeakerSeatStatus.Closed == status) {
             Fluttertoast.showToast(
-                msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed);
+                msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed,
+                backgroundColor: Colors.grey);
             return;
           }
           _showBottomModalButton(
@@ -291,7 +294,8 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
               if (code != 0) {
                 Fluttertoast.showToast(
                     msg: AppLocalizations.of(context)!
-                        .toastTakeSpeakerSeatFail(code));
+                        .toastTakeSpeakerSeatFail(code),
+                    backgroundColor: Colors.grey);
               }
             });
           });
