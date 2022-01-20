@@ -180,6 +180,8 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       seatList[speakerSeat.seatIndex] = speakerSeat;
     }
 
+    updateSpeakerIDList();
+
     notifyListeners();
   }
 

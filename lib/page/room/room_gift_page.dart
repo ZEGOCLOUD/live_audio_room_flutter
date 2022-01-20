@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:provider/provider.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
@@ -33,8 +35,8 @@ class RoomGiftMemberList extends HookWidget {
         color: StyleColors.giftMemberListBackgroundColor,
         borderRadius: BorderRadius.circular(17.0),
       ),
-      child: Consumer2<ZegoUserService, ZegoSpeakerSeatService>(
-          builder: (_, userService, seatService, child) {
+      child: Consumer<ZegoSpeakerSeatService>(builder: (_, seatService, child) {
+        var userService = context.read<ZegoUserService>();
         List<String> speakerIDList = [...seatService.speakerIDList];
         List<ZegoUserInfo> speakerList = [];
         for (var speakerID in speakerIDList) {
@@ -149,7 +151,7 @@ class RoomGiftBottomBar extends HookWidget {
     _memberListEntry.remove();
   }
 
-  void sendGift(context) {
+  void sendGift(BuildContext context) {
     if (selectedUser.isEmpty() ||
         userIDOfNoSpeakerUser == selectedUser.userID) {
       return;
@@ -157,6 +159,7 @@ class RoomGiftBottomBar extends HookWidget {
 
     var giftService = context.read<ZegoGiftService>();
     var userService = context.read<ZegoUserService>();
+    var roomService = context.read<ZegoRoomService>();
     var seatService = context.read<ZegoSpeakerSeatService>();
 
     List<String> toUserList = [];
@@ -165,14 +168,15 @@ class RoomGiftBottomBar extends HookWidget {
         if (userService.localUserInfo.userID == speakerID) {
           continue; // ignore self
         }
-        toUserList.add(speakerID);
+        toUserList.add(speakerID); //  host must be a speaker
       }
+      toUserList.add(roomService.roomInfo.hostID);
     } else {
       toUserList.add(selectedUser.userID);
     }
     giftService
-        .sendGift(
-            selectedRoomGift.value.id.toString(), toUserList, (p0) => null)
+        .sendGift(roomService.roomInfo.roomID,
+            selectedRoomGift.value.id.toString(), toUserList)
         .then((errorCode) {
       if (0 != errorCode) {
         Fluttertoast.showToast(
