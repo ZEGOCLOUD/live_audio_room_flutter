@@ -20,7 +20,7 @@ class RoomInfo {
         hostID = json['host_id'],
         seatNum = json['num'],
         isTextMessageDisable = json['disable'],
-        isSeatClosed = json['isSeatClosed'];
+        isSeatClosed = json['close'];
 
   Map<String, dynamic> toJson() => {
         'id': roomID,
@@ -28,7 +28,7 @@ class RoomInfo {
         'host_id': hostID,
         'num': seatNum,
         'disable': isTextMessageDisable,
-        'isSeatClosed': isSeatClosed
+        'close': isSeatClosed
       };
 }
 
