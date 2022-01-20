@@ -36,7 +36,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     speakerSeat.userID = "";
     speakerSeat.status = ZegoSpeakerSeatStatus.Untaken;
     String speakerSeatJson = jsonEncode(speakerSeat);
-    Map speakerSeatMap = {speakerSeat.seatIndex: speakerSeatJson};
+    Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     int code = result['errorCode'];

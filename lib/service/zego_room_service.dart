@@ -48,11 +48,13 @@ class ZegoRoomService extends ChangeNotifier {
     ZIMPlugin.onRoomStatusUpdate = onRoomStatusUpdate;
   }
 
-  Future<int> createRoom(String roomId, String roomName, String token) async {
-    var result = await ZIMPlugin.createRoom(roomId, roomName, localHostID, 8);
+  Future<int> createRoom(String roomID, String roomName, String token) async {
+    var result = await ZIMPlugin.createRoom(roomID, roomName, localHostID, 8);
     var code = result['errorCode'];
     if (code == 0) {
-      roomInfo = RoomInfo(roomId, roomName, localHostID);
+      var attributesResult = await ZIMPlugin.queryRoomAllAttributes(roomID);
+      var roomDic = attributesResult['room_info'];
+      roomInfo = RoomInfo.fromJson(jsonDecode(roomDic));
       notifyListeners();
     }
     return code;
@@ -75,7 +77,6 @@ class ZegoRoomService extends ChangeNotifier {
     var code = result['errorCode'];
     if (code == 0) {
       roomInfo = RoomInfo('', '', '');
-      localHostID = "";
       notifyListeners();
     }
     return code;
