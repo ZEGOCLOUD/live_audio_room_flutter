@@ -112,7 +112,7 @@ class RoomMemberPage extends HookWidget {
                 builder: (_, userService, child) => Center(
                     child: Text(
                         AppLocalizations.of(context)!
-                            .roomPageUserList(userService.totalUsersNum),
+                            .roomPageUserList(userService.userList.length),
                         style: StyleConstant.roomBottomPopUpTitle)))),
         Consumer<ZegoUserService>(
             builder: (_, userService, child) => SizedBox(
