@@ -22,7 +22,7 @@ import 'package:live_audio_room_flutter/page/room/room_gift_tips.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 typedef SeatItemClickCallback = Function(
-    int index, String userId, ZegoSpeakerSeatStatus status);
+    int index, String userId, String userName, ZegoSpeakerSeatStatus status);
 
 class SeatItem extends StatelessWidget {
   final int index;
@@ -109,7 +109,7 @@ class SeatItem extends StatelessWidget {
           Positioned.fill(
             child: TextButton(
               onPressed: () {
-                callback(index, userID, status);
+                callback(index, userID, userName!, status);
               },
               child: const Text(""),
             ),
@@ -187,10 +187,11 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
 
   @override
   Widget build(BuildContext context) {
-    seatClickCallback(ZegoRoomUserRole userRole, {String? userName}) {
+    seatClickCallback(ZegoRoomUserRole userRole) {
       if (ZegoRoomUserRole.roomUserRoleHost == userRole) {
         // Process host click
-        return (int index, String userID, ZegoSpeakerSeatStatus status) {
+        return (int index, String userID, String userName,
+            ZegoSpeakerSeatStatus status) {
           if (index == 0) {
             return;
           }
@@ -233,9 +234,12 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
 
                         var seats = context.read<ZegoSpeakerSeatService>();
                         seats.removeUserFromSeat(index).then((code) {
-                          Fluttertoast.showToast(
-                              msg: AppLocalizations.of(context)!
-                                  .toastKickoutLeaveSeatError(userName, code));
+                          if (code != 0) {
+                            Fluttertoast.showToast(
+                                msg: AppLocalizations.of(context)!
+                                    .toastKickoutLeaveSeatError(
+                                        userName!, code));
+                          }
                         });
                       },
                       child: Text(AppLocalizations.of(context)!.dialogConfirm),
@@ -248,7 +252,8 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
         };
       } else if (ZegoRoomUserRole.roomUserRoleSpeaker == userRole) {
         // Process speaker click
-        return (int index, String userID, ZegoSpeakerSeatStatus status) {
+        return (int index, String userID, String userName,
+            ZegoSpeakerSeatStatus status) {
           print("Speaker click...$index, $userID");
           var users = context.read<ZegoUserService>();
           var seats = context.read<ZegoSpeakerSeatService>();
@@ -273,7 +278,8 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
         };
       } else {
         // Process listener click
-        return (int index, String userID, ZegoSpeakerSeatStatus status) {
+        return (int index, String userID, String userName,
+            ZegoSpeakerSeatStatus status) {
           print("Listener click...$index, $userID");
           var users = context.read<ZegoUserService>();
           if (userID.isNotEmpty) {
