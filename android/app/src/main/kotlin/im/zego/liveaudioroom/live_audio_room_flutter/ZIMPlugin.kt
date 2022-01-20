@@ -34,7 +34,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         appSign = call.argument<String>("appSign").toString()
         serverSecret = call.argument<String>("serverSecret").toString()
         zim = ZIM.create(appID?.toLong()!!, application)
-//        zim.setEventHandler(self)
+//        zim.setEventHandler(handler)
         result.success(null)
     }
 
@@ -213,12 +213,14 @@ class ZIMPlugin: EventChannel.StreamHandler {
             extendedData: JSONObject?
         ) {
             super.onConnectionStateChanged(zim, state, event, extendedData)
-            eventSink.success(arrayOf("onConnectionStateChanged", state, event))
+            eventSink.success(mapOf("method" to "onConnectionStateChanged", "state" to (state?.value()
+                ?: 0), "event" to (event?.value() ?: 0)
+            ))
         }
 
         override fun onError(zim: ZIM?, errorInfo: ZIMError?) {
             super.onError(zim, errorInfo)
-            eventSink.success(arrayOf("onError", errorInfo))
+            eventSink.success(mapOf("method" to "onError", "code" to (errorInfo?.code ?: 0)))
         }
 
         override fun onReceivePeerMessage(
@@ -227,6 +229,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
             fromUserID: String?
         ) {
             super.onReceivePeerMessage(zim, messageList, fromUserID)
+//            eventSink.success(mapOf("method" to "onReceivePeerMessage", "code" to (errorInfo?.code ?: 0)))
             eventSink.success(arrayOf("onReceivePeerMessage", messageList, fromUserID))
         }
 
