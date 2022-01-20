@@ -130,7 +130,7 @@ class ZIMPlugin: NSObject {
          let roomInfo = ZIMRoomInfo()
          roomInfo.roomID = roomID
          roomInfo.roomName = roomName
-         let jsonString = convertObjectToJSONString( ["room_id": roomID, "room_name": roomName, "host_id": hostID, "num": seatNum, "disable": false, "close": false])
+         let jsonString = convertObjectToJSONString( ["id": roomID, "name": roomName, "host_id": hostID, "num": seatNum, "disable": false, "close": false])
          let config = ZIMRoomAdvancedConfig()
          config.roomAttributes = ["room_Info": jsonString]
          zim?.createRoom(roomInfo, config: config, callback: { roomInfo, error in

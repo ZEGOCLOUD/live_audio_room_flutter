@@ -185,19 +185,11 @@ class ZIMPlugin: EventChannel.StreamHandler {
         zim?.setRoomAttributes(map, roomID, config, object : ZIMRoomAttributesBatchOperatedCallback,
             ZIMRoomAttributesOperatedCallback {
             override fun onRoomAttributesBatchOperated(errorInfo: ZIMError?) {
-                if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
-                    result.success(null)
-                } else {
-                    result.error(errorInfo?.code.toString(), errorInfo?.message, null)
-                }
+                result.success(mapOf("errorCode" to (errorInfo?.code?.value() ?: 0)))
             }
 
             override fun onRoomAttributesOperated(errorInfo: ZIMError?) {
-                if (errorInfo?.code?.value() == ZIMErrorCode.SUCCESS.value()) {
-                    result.success(null)
-                } else {
-                    result.error(errorInfo?.code.toString(), errorInfo?.message, null)
-                }
+                result.success(mapOf("errorCode" to (errorInfo?.code?.value() ?: 0)))
             }
 
         })
