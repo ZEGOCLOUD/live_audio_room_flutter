@@ -20,7 +20,7 @@ class RoomInfo {
         hostID = json['host_id'],
         seatNum = json['num'],
         isTextMessageDisable = json['disable'],
-        isSeatClosed = json['close'];
+        isSeatClosed = json['isSeatClosed'];
 
   Map<String, dynamic> toJson() => {
         'id': roomID,
@@ -82,6 +82,7 @@ class ZegoRoomService extends ChangeNotifier {
   }
 
   Future<int> disableTextMessage(bool disable) async {
+    roomInfo.isTextMessageDisable = disable;
     var json = jsonEncode(roomInfo);
     var map = {'room_info': json};
     var mapJson = jsonEncode(map);
@@ -90,7 +91,6 @@ class ZegoRoomService extends ChangeNotifier {
         await ZIMPlugin.setRoomAttributes(roomInfo.roomID, mapJson, true);
     int code = result['errorCode'];
     if (code == 0) {
-      roomInfo.isTextMessageDisable = disable;
       notifyListeners();
     }
     return code;
