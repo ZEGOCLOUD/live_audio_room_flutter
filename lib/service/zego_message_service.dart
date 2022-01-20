@@ -36,13 +36,14 @@ class ZegoMessageService extends ChangeNotifier {
     ZIMPlugin.onReceiveTextRoomMessage = onReceiveTextMessage;
   }
 
-  Future<int> sendTextMessage(String message) async {
-    var roomID = "";
+  Future<int> sendTextMessage(String roomID, String userID, String message) async {
     var result = await ZIMPlugin.sendRoomMessage(roomID, message, false);
     int code = result['errorCode'];
     if (code == 0) {
       var msg = ZegoTextMessage();
       msg.message = message;
+      msg.userID = userID;
+      msg.timestamp = DateTime.now().millisecondsSinceEpoch;
       messageList.add(msg);
       notifyListeners();
     }
@@ -51,7 +52,7 @@ class ZegoMessageService extends ChangeNotifier {
 
   void onReceiveTextMessage(String roomID, List<Map<String, dynamic>> messageListJson) {
     for (final item in messageListJson) {
-      var message = new ZegoTextMessage.formJson(item);
+      var message = ZegoTextMessage.formJson(item);
       messageList.add(message);
     }
     notifyListeners();

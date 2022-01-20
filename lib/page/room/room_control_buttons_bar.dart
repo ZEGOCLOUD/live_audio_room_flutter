@@ -11,6 +11,7 @@ import 'package:live_audio_room_flutter/page/room/room_setting_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_member_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_gift_page.dart';
 import 'package:live_audio_room_flutter/service/zego_message_service.dart';
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:live_audio_room_flutter/common/input/input_dialog.dart';
@@ -113,7 +114,8 @@ class RoomControlButtonsBar extends StatelessWidget {
                 }
 
                 var messageService = context.read<ZegoMessageService>();
-                messageService.sendTextMessage(value!).then((errorCode) {
+                var roomService = context.read<ZegoRoomService>();
+                messageService.sendTextMessage(roomService.roomInfo.roomID, value!).then((errorCode) {
                   if (0 != errorCode) {
                     Fluttertoast.showToast(
                         msg: AppLocalizations.of(context)!
