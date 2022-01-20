@@ -12,6 +12,7 @@ import 'package:live_audio_room_flutter/page/room/room_member_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_gift_page.dart';
 import 'package:live_audio_room_flutter/service/zego_message_service.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:live_audio_room_flutter/common/input/input_dialog.dart';
@@ -47,14 +48,16 @@ class ControllerButton extends StatelessWidget {
 class RoomControlButtonsBar extends StatelessWidget {
   const RoomControlButtonsBar({Key? key}) : super(key: key);
 
-  createControllerButtons(ZegoRoomUserRole userRole,
+  createControllerButtons(ZegoRoomUserRole userRole, bool isMute,
       {required VoidCallback micCallback,
       required VoidCallback memberCallback,
       required VoidCallback giftCallback,
       required VoidCallback settingsCallback}) {
     var buttons = <Widget>[];
     var micBtn = ControllerButton(
-      iconSrc: StyleIconUrls.roomBottomMicrophone,
+      iconSrc: isMute
+          ? StyleIconUrls.roomBottomMicrophoneMuted
+          : StyleIconUrls.roomBottomMicrophone,
       onPressed: micCallback,
     );
     var micBtnSpacing = SizedBox(
@@ -116,13 +119,16 @@ class RoomControlButtonsBar extends StatelessWidget {
                       showMessageInput(context);
                     },
                   )),
-          Consumer<ZegoUserService>(
-              builder: (_, users, child) => Row(
+          Consumer2<ZegoUserService, ZegoSpeakerSeatService>(
+              builder: (_, users, seats, child) => Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: createControllerButtons(
-                        users.localUserInfo.userRole,
-                        micCallback: () {}, memberCallback: () {
+                        users.localUserInfo.userRole, seats.isMute,
+                        micCallback: () {
+                      var seatService = context.read<ZegoSpeakerSeatService>();
+                      seatService.toggleMic();
+                    }, memberCallback: () {
                       showModalBottomSheet(
                           context: context,
                           shape: RoundedRectangleBorder(
