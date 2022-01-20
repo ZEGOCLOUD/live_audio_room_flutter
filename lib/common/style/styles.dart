@@ -40,8 +40,10 @@ class StyleColors {
 
   static const Color giftMessageTypeTextColor = Color(0xffFFCE00);
   static const Color giftMessageContentColor = Colors.white;
-  static Color giftMessageBackgroundStartColor = const Color(0xffA500FF).withOpacity(0.8);
-  static Color giftMessageBackgroundEndColor = const Color(0xff6C00FF).withOpacity(0.8);
+  static Color giftMessageBackgroundStartColor =
+      const Color(0xffA500FF).withOpacity(0.8);
+  static Color giftMessageBackgroundEndColor =
+      const Color(0xff6C00FF).withOpacity(0.8);
 }
 
 /// icons
@@ -53,6 +55,10 @@ class StyleIconUrls {
   static const String roomBottomMember = 'images/room_bottom_member.png';
   static const String roomBottomMicrophone =
       'images/room_bottom_microphone.png';
+  static const String roomBottomMicrophoneMuted =
+      'images/room_bottom_microphone_muted.png';
+  static const String roomSeatMicrophoneMuted =
+      'images/room_seat_microphone_muted.png';
   static const String roomBottomSettings = 'images/room_bottom_settings.png';
   static const String roomGiftFingerHeart = 'images/room_gift_finger_heart.png';
   static const String roomMemberDropDownArrow =

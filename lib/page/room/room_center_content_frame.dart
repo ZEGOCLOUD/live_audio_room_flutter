@@ -83,6 +83,21 @@ class SeatItem extends StatelessWidget {
                                 : AssetImage(avatar!),
                       ),
                     ),
+                    // Microphone muted icon
+                    (mic ?? false)
+                        ? Container(
+                            color: Colors.transparent,
+                          )
+                        : Container(
+                            width: 100.w,
+                            height: 100.h,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Image.asset(
+                                StyleIconUrls.roomSeatMicrophoneMuted),
+                          )
                   ],
                 )),
           ),
