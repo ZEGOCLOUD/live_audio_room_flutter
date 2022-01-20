@@ -220,7 +220,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
                 builder: (BuildContext context) => AlertDialog(
                   title: Text(AppLocalizations.of(context)!.roomPageLeaveSeat),
                   content: Text(AppLocalizations.of(context)!
-                      .roomPageLeaveSpeakerSeatDesc(userName!)),
+                      .roomPageLeaveSpeakerSeatDesc(userName)),
                   actions: <Widget>[
                     TextButton(
                       onPressed: () => Navigator.pop(
@@ -238,7 +238,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
                             Fluttertoast.showToast(
                                 msg: AppLocalizations.of(context)!
                                     .toastKickoutLeaveSeatError(
-                                        userName!, code));
+                                        userName, code));
                           }
                         });
                       },

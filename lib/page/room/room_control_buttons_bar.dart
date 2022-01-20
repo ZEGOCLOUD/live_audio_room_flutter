@@ -115,7 +115,8 @@ class RoomControlButtonsBar extends StatelessWidget {
 
                 var messageService = context.read<ZegoMessageService>();
                 var roomService = context.read<ZegoRoomService>();
-                messageService.sendTextMessage(roomService.roomInfo.roomID, value!).then((errorCode) {
+                var userService = context.read<ZegoUserService>();
+                messageService.sendTextMessage(roomService.roomInfo.roomID, userService.localUserInfo.userID, value!).then((errorCode) {
                   if (0 != errorCode) {
                     Fluttertoast.showToast(
                         msg: AppLocalizations.of(context)!
