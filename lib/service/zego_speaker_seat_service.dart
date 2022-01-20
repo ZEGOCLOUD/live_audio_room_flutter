@@ -194,22 +194,38 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   }
 
   void updateHostID(String id) {
+    if (id == _hostID) {
+      return;
+    }
     _hostID = id;
+    if (id.isNotEmpty) {
+      if (_hostID == _localUserID) {
+        takeSeat(0);
+      } else {
+        var hostSeat = seatList[0];
+        hostSeat.userID = _hostID;
+        hostSeat.status = ZegoSpeakerSeatStatus.Occupied;
+        notifyListeners();
+      }
+    } else {
+      seatList[0].clearData();
+    }
   }
 
   void updateLocalUserID(String id) {
+    if (id == _localUserID) {
+      return;
+    }
     _localUserID = id;
-    seatList[0].userID = _hostID;
-    seatList[0].status = id.isEmpty
-        ? ZegoSpeakerSeatStatus.Untaken
-        : ZegoSpeakerSeatStatus.Occupied;
-    notifyListeners();
   }
 
-  void updateRoomInfo(String id, bool isSeatClosed) {
-    _roomID = id;
+  void updateRoomInfo(String roomID, bool isSeatClosed) {
+    if (roomID == _roomID && isSeatClosed == _isSeatClosed) {
+      return;
+    }
+    _roomID = roomID;
     _isSeatClosed = isSeatClosed;
-    if (id.isEmpty) {
+    if (roomID.isEmpty) {
       speakerIDList.clear();
       for (final seat in seatList) {
         seat.clearData();
