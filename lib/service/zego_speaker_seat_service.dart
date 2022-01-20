@@ -65,8 +65,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     //  set room_info attribute
     roomInfo.isSeatClosed = isClose;
     var json = jsonEncode(roomInfo);
-    map['room_info'] = json;
-
+    map['room_info'] = json; edeed2c (🐛fix android data error)
     String attributes = jsonEncode(map);
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     return result['errorCode'];

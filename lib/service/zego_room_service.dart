@@ -64,7 +64,8 @@ class ZegoRoomService extends ChangeNotifier {
     var joinResult = await ZIMPlugin.joinRoom(roomID);
     var code = joinResult['errorCode'];
     if (code == 0) {
-      var attributesResult = await ZIMPlugin.queryRoomAllAttributes(roomID);
+      var result = await ZIMPlugin.queryRoomAllAttributes(roomID);
+      var attributesResult = result['roomAttributes'];
       var roomDic = attributesResult['room_info'];
       roomInfo = RoomInfo.fromJson(jsonDecode(roomDic));
       notifyListeners();
@@ -92,8 +93,11 @@ class ZegoRoomService extends ChangeNotifier {
         await ZIMPlugin.setRoomAttributes(roomInfo.roomID, mapJson, true);
     int code = result['errorCode'];
     if (code == 0) {
-      notifyListeners();
+      roomInfo.isTextMessageDisable = disable;
+    } else {
+      roomInfo.isTextMessageDisable = !disable;
     }
+    notifyListeners();
     return code;
   }
 

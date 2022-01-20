@@ -168,7 +168,7 @@ class ZIMPlugin: NSObject {
          if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
          zim?.queryRoomAllAttributes(byRoomID: roomID, callback: { roomAttributes, error in
-             result(roomAttributes)
+             result(["errorCode": NSNumber(value: error.code.rawValue), "roomAttributes": roomAttributes])
          })
      }
 
@@ -331,7 +331,7 @@ extension ZIMPlugin: ZIMEventHandler {
             memberArray.append(["userID": userInfo.userID, "userName": userInfo.userName])
         }
         
-        events(["method": "onRoomMemberLeave", "memberList": memberArray, "roomID": roomID])
+        events(["method": "roomMemberLeave", "memberList": memberArray, "roomID": roomID])
     }
     
     func zim(_ zim: ZIM, roomStateChanged state: ZIMRoomState, event: ZIMRoomEvent, extendedData: [AnyHashable : Any], roomID: String) {
