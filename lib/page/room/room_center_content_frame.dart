@@ -205,9 +205,12 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
                     : AppLocalizations.of(context)!.roomPageUnlockSeat, () {
               var seats = context.read<ZegoSpeakerSeatService>();
               seats.closeSeat(setToClose, index).then((code) {
-                Fluttertoast.showToast(
-                    msg: AppLocalizations.of(context)!.toastLockSeatError(code),
-                    backgroundColor: Colors.grey);
+                if (code != 0) {
+                  Fluttertoast.showToast(
+                      msg: AppLocalizations.of(context)!
+                          .toastLockSeatError(code),
+                      backgroundColor: Colors.grey);
+                }
               });
             });
           } else {
