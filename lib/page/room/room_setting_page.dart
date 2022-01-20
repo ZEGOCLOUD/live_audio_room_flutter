@@ -1,23 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
+import 'package:provider/provider.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
-class RoomSettingPage extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _RoomSettingPageState();
-  }
-}
-
-class _RoomSettingPageState extends State<RoomSettingPage> {
-  bool _isProhibitBeASpeaker = false; // prohibit listeners being a speaker
-  bool _isProhibitSendMessages = false; // prohibit others sending messages
-
+class RoomSettingPage extends HookWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -42,24 +36,29 @@ class _RoomSettingPageState extends State<RoomSettingPage> {
                   Text(AppLocalizations.of(context)!.roomPageSetTakeSeat,
                       style: StyleConstant.roomSettingSwitchText),
                   const Expanded(child: Text('')),
-                  Switch(
-                    activeColor: StyleColors.switchActiveColor,
-                    activeTrackColor: StyleColors.switchActiveTrackColor,
-                    inactiveTrackColor: StyleColors.switchInactiveTrackColor,
-                    value: _isProhibitBeASpeaker,
-                    onChanged: (value) {
-                      setState(() {
-                        _isProhibitBeASpeaker = value;
-                        //  todo@yuyj to prohibit listeners being a speaker
-
-                        if (!value) {
-                          Fluttertoast.showToast(
-                              msg: AppLocalizations.of(context)!
-                                  .roomPageSetTakeSeat);
-                        }
-                      });
-                    },
-                  )
+                  Consumer<ZegoRoomService>(
+                      builder: (_, roomService, child) => Switch(
+                            activeColor: StyleColors.switchActiveColor,
+                            activeTrackColor:
+                                StyleColors.switchActiveTrackColor,
+                            inactiveTrackColor:
+                                StyleColors.switchInactiveTrackColor,
+                            value: roomService.roomInfo.isSeatClosed,
+                            onChanged: (value) {
+                              var seatService =
+                                  context.read<ZegoSpeakerSeatService>();
+                              seatService
+                                  .closeAllSeat(value, roomService.roomInfo)
+                                  .then((errorCode) {
+                                if (0 != errorCode) {
+                                  Fluttertoast.showToast(
+                                      msg: AppLocalizations.of(context)!
+                                          .toastLockSeatError(errorCode),
+                                      backgroundColor: Colors.grey);
+                                }
+                              });
+                            },
+                          ))
                 ],
               )),
           SizedBox(
@@ -68,25 +67,27 @@ class _RoomSettingPageState extends State<RoomSettingPage> {
                 children: [
                   Text(AppLocalizations.of(context)!.roomPageSetSilence),
                   const Expanded(child: Text('')),
-                  Switch(
-                    activeColor: StyleColors.switchActiveColor,
-                    activeTrackColor: StyleColors.switchActiveTrackColor,
-                    inactiveTrackColor: StyleColors.switchInactiveTrackColor,
-                    value: _isProhibitSendMessages,
-                    onChanged: (value) {
-                      setState(() {
-                        _isProhibitSendMessages = value;
-                        //  todo@yuyj to prohibit others sending messages
-
-                        if (!value) {
-                          Fluttertoast.showToast(
-                              msg: AppLocalizations.of(context)!
-                                  .roomPageSetSilence,
-                              backgroundColor: Colors.grey);
-                        }
-                      });
-                    },
-                  )
+                  Consumer<ZegoRoomService>(
+                      builder: (_, roomService, child) => Switch(
+                            activeColor: StyleColors.switchActiveColor,
+                            activeTrackColor:
+                                StyleColors.switchActiveTrackColor,
+                            inactiveTrackColor:
+                                StyleColors.switchInactiveTrackColor,
+                            value: roomService.roomInfo.isTextMessageDisable,
+                            onChanged: (value) {
+                              roomService
+                                  .disableTextMessage(value)
+                                  .then((errorCode) {
+                                if (0 != errorCode) {
+                                  Fluttertoast.showToast(
+                                      msg: AppLocalizations.of(context)!
+                                          .toastMuteMessageError(errorCode),
+                                      backgroundColor: Colors.grey);
+                                }
+                              });
+                            },
+                          ))
                 ],
               )),
           const Expanded(child: Text(''))

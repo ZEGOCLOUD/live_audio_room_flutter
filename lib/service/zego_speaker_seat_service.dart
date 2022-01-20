@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 
 typedef ZegoRoomCallback = Function(int);
 
@@ -47,7 +48,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return code;
   }
 
-  Future<int> closeAllSeat(bool isClose, ZegoRoomCallback? callback) async {
+  Future<int> closeAllSeat(bool isClose, RoomInfo roomInfo) async {
     // Ignore host
     var map = {};
     for (var i = 1; i < seatList.length; i++) {
@@ -60,6 +61,12 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
           : ZegoSpeakerSeatStatus.Untaken;
       map[i] = jsonEncode(speakerSeat);
     }
+
+    //  set room_info attribute
+    roomInfo.isSeatClosed = isClose;
+    var json = jsonEncode(roomInfo);
+    map['room_info'] = json;
+
     String attributes = jsonEncode(map);
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     return result['errorCode'];
@@ -173,6 +180,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       var speakerSeat = ZegoSpeakerSeat.fromJson(jsonDecode(seatJson));
       seatList[speakerSeat.seatIndex] = speakerSeat;
     }
+
     notifyListeners();
   }
 

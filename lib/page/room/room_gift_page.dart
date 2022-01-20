@@ -41,7 +41,8 @@ class RoomGiftMemberList extends HookWidget {
           if (!userService.userDic.containsKey(speakerID)) {
             continue;
           }
-          speakerList.add(userService.userDic[speakerID] ?? ZegoUserInfo.empty());
+          speakerList
+              .add(userService.userDic[speakerID] ?? ZegoUserInfo.empty());
         }
         if (speakerList.isEmpty) {
           //  display if empty
@@ -83,6 +84,9 @@ class RoomGiftMemberList extends HookWidget {
                       ),
                     )),
                 onTap: () {
+                  if (userIDOfNoSpeakerUser == user.userID) {
+                    return;
+                  }
                   memberSelectNotify(user);
                 });
           },
@@ -152,13 +156,16 @@ class RoomGiftBottomBar extends HookWidget {
     }
 
     var giftService = context.read<ZegoGiftService>();
-    //  todo@yuyj seat service's user
     var userService = context.read<ZegoUserService>();
+    var seatService = context.read<ZegoSpeakerSeatService>();
 
     List<String> toUserList = [];
     if (userIDOfAllSpeaker == selectedUser.userID) {
-      for (var userInfo in userService.userList) {
-        toUserList.add(userInfo.userID);
+      for (var speakerID in seatService.speakerIDList) {
+        if (userService.localUserInfo.userID == speakerID) {
+          continue; // ignore self
+        }
+        toUserList.add(speakerID);
       }
     } else {
       toUserList.add(selectedUser.userID);
@@ -169,7 +176,8 @@ class RoomGiftBottomBar extends HookWidget {
         .then((errorCode) {
       if (0 != errorCode) {
         Fluttertoast.showToast(
-            msg: AppLocalizations.of(context)!.toastSendGiftError(errorCode));
+            msg: AppLocalizations.of(context)!.toastSendGiftError(errorCode),
+            backgroundColor: Colors.grey);
       }
     });
   }

@@ -62,11 +62,13 @@ class SettingsUploadLogWidget extends StatelessWidget {
                   if (0 != errorCode) {
                     Fluttertoast.showToast(
                         msg: AppLocalizations.of(context)!
-                            .toastUploadLogFail(errorCode));
+                            .toastUploadLogFail(errorCode),
+                        backgroundColor: Colors.grey);
                   } else {
                     Fluttertoast.showToast(
-                        msg: AppLocalizations.of(context)!
-                            .toastUploadLogSuccess);
+                        msg:
+                            AppLocalizations.of(context)!.toastUploadLogSuccess,
+                        backgroundColor: Colors.grey);
                   }
                 });
               },
@@ -103,7 +105,8 @@ class SettingsLogoutWidget extends StatelessWidget {
               if (0 != errorCode) {
                 Fluttertoast.showToast(
                     msg: AppLocalizations.of(context)!
-                        .toastLogoutFail(errorCode));
+                        .toastLogoutFail(errorCode),
+                    backgroundColor: Colors.grey);
               }
             });
             Navigator.pushReplacementNamed(context, "/login");

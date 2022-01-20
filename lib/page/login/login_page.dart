@@ -130,13 +130,14 @@ class LoginPage extends HookWidget {
                 onPressed: () {
                   if (userIdInputController.text.isEmpty) {
                     Fluttertoast.showToast(
-                        msg:
-                            AppLocalizations.of(context)!.toastUseridLoginFail);
+                        msg: AppLocalizations.of(context)!.toastUseridLoginFail,
+                        backgroundColor: Colors.grey);
                     return;
                   }
                   if (!userIDRegExp.hasMatch(userIdInputController.text)) {
                     Fluttertoast.showToast(
-                        msg: AppLocalizations.of(context)!.toastUserIdError);
+                        msg: AppLocalizations.of(context)!.toastUserIdError,
+                        backgroundColor: Colors.grey);
                     return;
                   }
 
@@ -151,7 +152,8 @@ class LoginPage extends HookWidget {
                     if (errorCode != 0) {
                       Fluttertoast.showToast(
                           msg: AppLocalizations.of(context)!
-                              .toastLoginFail(errorCode));
+                              .toastLoginFail(errorCode),
+                          backgroundColor: Colors.grey);
                     } else {
                       Navigator.pushReplacementNamed(context, '/room_entrance');
                     }
