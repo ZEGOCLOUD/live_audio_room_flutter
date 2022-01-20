@@ -23,7 +23,8 @@ class ZegoGiftService extends ChangeNotifier {
   Future<int> sendGift(String giftID, List<String> toUserList, ZegoRoomCallback? callback) async {
     Map message = {'actionType': 2, 'target': toUserList, 'content': {'giftID': giftID}};
     String json = jsonEncode(message);
-    var result = await ZIMPlugin.sendRoomMessage(ZegoRoomManager.shared.roomService.roomInfo.roomID, json, true);
+    var roomID = "";
+    var result = await ZIMPlugin.sendRoomMessage(roomID, json, true);
     int code = result['errorCode'];
     if (code == 0) {
       giftName = giftID;
