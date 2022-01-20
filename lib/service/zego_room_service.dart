@@ -52,7 +52,8 @@ class ZegoRoomService extends ChangeNotifier {
     var result = await ZIMPlugin.createRoom(roomID, roomName, localHostID, 8);
     var code = result['errorCode'];
     if (code == 0) {
-      var attributesResult = await ZIMPlugin.queryRoomAllAttributes(roomID);
+      var result = await ZIMPlugin.queryRoomAllAttributes(roomID);
+      var attributesResult = result['roomAttributes'];
       var roomDic = attributesResult['room_info'];
       roomInfo = RoomInfo.fromJson(jsonDecode(roomDic));
       notifyListeners();
