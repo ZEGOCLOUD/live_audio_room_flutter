@@ -25,6 +25,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   String _localUserID = "";
   bool _isSeatClosed = false;
 
+  bool get isMute {
+    return !_localSpeakerSeat()!.mic;
+  }
+
   ZegoSpeakerSeatService() {
     ZIMPlugin.onRoomSpeakerSeatUpdate = _onRoomSpeakerSeatUpdate;
   }
@@ -78,7 +82,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
         isClose ? ZegoSpeakerSeatStatus.Closed : ZegoSpeakerSeatStatus.Untaken;
 
     String speakerSeatJson = jsonEncode(speakerSeat);
-    Map speakerSeatMap = {speakerSeat.seatIndex: speakerSeatJson};
+    Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     int code = result['errorCode'];
@@ -89,14 +93,14 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return code;
   }
 
-  Future<int> muteMic(bool isMute, ZegoRoomCallback? callback) async {
+  Future<int> toggleMic() async {
     if (_localSpeakerSeat() == null) {
       return -1;
     }
-    _localSpeakerSeat()?.mic = !isMute;
+    _localSpeakerSeat()!.mic = !_localSpeakerSeat()!.mic;
 
     String speakerSeatJson = jsonEncode(_localSpeakerSeat());
-    Map speakerSeatMap = {_localSpeakerSeat()?.seatIndex: speakerSeatJson};
+    Map speakerSeatMap = {"${_localSpeakerSeat()?.seatIndex}": speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     notifyListeners();

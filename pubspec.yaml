@@ -106,6 +106,8 @@ flutter:
     - images/room_bottom_im.png
     - images/room_bottom_member.png
     - images/room_bottom_microphone.png
+    - images/room_bottom_microphone_muted.png
+    - images/room_seat_microphone_muted.png
     - images/room_bottom_settings.png
     - images/room_gift_finger_heart.png
     - images/room_member_drop_down_arrow.png
@@ -134,6 +136,8 @@ flutter:
     - images/2.0x/room_bottom_im.png
     - images/2.0x/room_bottom_member.png
     - images/2.0x/room_bottom_microphone.png
+    - images/2.0x/room_bottom_microphone_muted.png
+    - images/2.0x/room_seat_microphone_muted.png
     - images/2.0x/room_bottom_settings.png
     - images/2.0x/room_gift_finger_heart.png
     - images/2.0x/room_member_drop_down_arrow.png
@@ -162,6 +166,8 @@ flutter:
     - images/3.0x/room_bottom_im.png
     - images/3.0x/room_bottom_member.png
     - images/3.0x/room_bottom_microphone.png
+    - images/3.0x/room_bottom_microphone_muted.png
+    - images/3.0x/room_seat_microphone_muted.png
     - images/3.0x/room_bottom_settings.png
     - images/3.0x/room_gift_finger_heart.png
     - images/3.0x/room_member_drop_down_arrow.png
