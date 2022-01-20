@@ -183,7 +183,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
 
         val config = ZIMRoomAttributesSetConfig()
         config.isForce = true
-        config.isDeleteAfterOwnerLeft = isDeleteAfterOwnerLeft!!
+        config.isDeleteAfterOwnerLeft = isDeleteAfterOwnerLeft == true
 
         zim?.setRoomAttributes(map, roomID, config, object : ZIMRoomAttributesBatchOperatedCallback,
             ZIMRoomAttributesOperatedCallback {
@@ -197,6 +197,21 @@ class ZIMPlugin: EventChannel.StreamHandler {
 
         })
     }
+
+    fun getSDKToken(call: MethodCall, result: MethodChannel.Result) {
+        val roomID: String? = call.argument<String>("roomID")
+        val userID: String? = call.argument<String>("userID")
+
+        val token = TokenServerAssistant
+            .generateToken(appID.toLong(), userID, serverSecret, 60 * 60 * 24).data
+        result.success(mapOf("errorCode" to 0, "token" to token))
+    }
+
+    fun getZIMVersion(call: MethodCall, result: MethodChannel.Result) {
+        val version = ZIM.getVersion()
+        result.success(mapOf("errorCode" to 0, "version" to version))
+    }
+
 
     private lateinit var eventSink: EventChannel.EventSink
     override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {

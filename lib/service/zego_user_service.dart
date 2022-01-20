@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
+import 'package:zego_express_engine/zego_express_engine.dart';
 
 enum LoginState {
   loginStateLoggedOut,
@@ -42,6 +43,7 @@ class ZegoUserService extends ChangeNotifier {
     ZIMPlugin.onRoomMemberLeave = _onRoomMemberLeave;
     ZIMPlugin.onReceiveCustomPeerMessage = _onReceiveCustomPeerMessage;
     ZIMPlugin.onConnectionStateChanged = _onConnectionStateChanged;
+
   }
 
   void fetchOnlineRoomUsersWithPage(int page) {

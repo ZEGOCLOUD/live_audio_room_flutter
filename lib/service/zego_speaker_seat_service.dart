@@ -5,6 +5,7 @@ import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+import 'package:zego_express_engine/zego_express_engine.dart';
 
 typedef ZegoRoomCallback = Function(int);
 
@@ -31,6 +32,9 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
 
   ZegoSpeakerSeatService() {
     ZIMPlugin.onRoomSpeakerSeatUpdate = _onRoomSpeakerSeatUpdate;
+
+    ZegoExpressEngine.onCapturedSoundLevelUpdate = _onCapturedSoundLevelUpdate;
+    ZegoExpressEngine.onRemoteSoundLevelUpdate = _onRemoteSoundLevelUpdate;
   }
 
   Future<int> removeUserFromSeat(int seatIndex) async {
@@ -121,6 +125,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     if (code != 0) {
       speakerSeat.userID = preUserID;
       speakerSeat.status = preStatus;
+    } else {
+      var userStreamID = _roomID + "_" + _localUserID + "_main";
+      ZegoExpressEngine.instance.startPublishingStream(userStreamID);
+      ZegoExpressEngine.instance.muteMicrophone(speakerSeat.mic == false);
     }
     updateSpeakerIDList();
     notifyListeners();
@@ -146,6 +154,8 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     if (code != 0) {
       speakerSeat.userID = preUserID;
       speakerSeat.status = preStatus;
+    } else {
+      ZegoExpressEngine.instance.stopPublishingStream();
     }
     updateSpeakerIDList();
     notifyListeners();
@@ -182,10 +192,36 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     for (final seatJson in speakerSeat.values) {
       var speakerSeat = ZegoSpeakerSeat.fromJson(jsonDecode(seatJson));
       seatList[speakerSeat.seatIndex] = speakerSeat;
+      if (speakerSeat.userID == _localUserID) {
+        var userStreamID = _roomID + "_" + _localUserID + "_main";
+        ZegoExpressEngine.instance.startPublishingStream(userStreamID);
+        ZegoExpressEngine.instance.muteMicrophone(speakerSeat.mic == false);
+      }
     }
-
     updateSpeakerIDList();
+    notifyListeners();
+  }
 
+
+  void _onCapturedSoundLevelUpdate(double soundLevel) {
+    for (final speaker in seatList) {
+      if (speaker.userID == _localUserID) {
+        speaker.soundLevel = soundLevel;
+      }
+    }
+    notifyListeners();
+  }
+
+  void _onRemoteSoundLevelUpdate(Map<String, double> soundLevels) {
+    for (final streamID in soundLevels.keys) {
+      for (final speaker in seatList) {
+        var userStreamID = _roomID + "_" + speaker.userID + "_main";
+        if (userStreamID == streamID) {
+          var sound = soundLevels[streamID];
+          speaker.soundLevel = sound!;
+        }
+      }
+    }
     notifyListeners();
   }
 

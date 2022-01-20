@@ -47,7 +47,8 @@ class ZegoApp extends StatelessWidget {
               create: (context) => context.read<ZegoRoomService>(),
               update: (_, users, room) {
                 if (room == null) throw ArgumentError.notNull('room');
-                room.localHostID = users.localUserInfo.userID;
+                room.localUserID = users.localUserInfo.userID;
+                room.localUserName = users.localUserInfo.userName;
                 return room;
               }),
           ChangeNotifierProxyProvider2<ZegoRoomService, ZegoUserService,
