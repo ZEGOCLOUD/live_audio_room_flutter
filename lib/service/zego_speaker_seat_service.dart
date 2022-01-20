@@ -51,7 +51,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   Future<int> closeAllSeat(bool isClose, RoomInfo roomInfo) async {
     // Ignore host
     var map = {};
-    for (var i = 1; i < seatList.length; i++) {
+    for (var i = 0; i < seatList.length; i++) {
       var speakerSeat = seatList[i];
       if (speakerSeat.status == ZegoSpeakerSeatStatus.Occupied) {
         continue;
@@ -59,14 +59,13 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       speakerSeat.status = isClose
           ? ZegoSpeakerSeatStatus.Closed
           : ZegoSpeakerSeatStatus.Untaken;
-      map[i] = jsonEncode(speakerSeat);
+      map[i.toString()] = jsonEncode(speakerSeat);
     }
 
     //  set room_info attribute
     roomInfo.isSeatClosed = isClose;
     var json = jsonEncode(roomInfo);
     map['room_info'] = json;
-
     String attributes = jsonEncode(map);
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     return result['errorCode'];

@@ -15,6 +15,7 @@ import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.EventChannel.EventSink
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import org.json.JSONArray
 import org.json.JSONObject
 import java.util.ArrayList
 
@@ -34,7 +35,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         appSign = call.argument<String>("appSign").toString()
         serverSecret = call.argument<String>("serverSecret").toString()
         zim = ZIM.create(appID?.toLong()!!, application)
-//        zim.setEventHandler(handler)
+        setZIMHandler()
         result.success(null)
     }
 
@@ -69,7 +70,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         val roomID: String? = call.argument<String>("roomID")
         val roomName: String? = call.argument<String>("roomName")
         val hostID: String? = call.argument<String>("hostID")
-        val seatNum: String? = call.argument<String>("seatNum")
+        val seatNum: Int? = call.argument<Int>("seatNum")
 
         val roomInfo = ZIMRoomInfo()
         roomInfo.roomID = roomID
@@ -77,10 +78,12 @@ class ZIMPlugin: EventChannel.StreamHandler {
         val config = ZIMRoomAdvancedConfig()
 
         val json = JSONObject()
-        json.put("room_id", roomID)
-        json.put("room_name", roomName)
+        json.put("id", roomID)
+        json.put("name", roomName)
         json.put("host_id", hostID)
         json.put("num", seatNum)
+        json.put("disable", false)
+        json.put("close", false)
         val jsonString = json.toString()
 
         config.roomAttributes = hashMapOf("room_info" to jsonString)
@@ -229,8 +232,31 @@ class ZIMPlugin: EventChannel.StreamHandler {
             fromUserID: String?
         ) {
             super.onReceivePeerMessage(zim, messageList, fromUserID)
-//            eventSink.success(mapOf("method" to "onReceivePeerMessage", "code" to (errorInfo?.code ?: 0)))
-            eventSink.success(arrayOf("onReceivePeerMessage", messageList, fromUserID))
+            var customMessageJson = JSONArray()
+            var textMessageJson = JSONArray()
+            messageList?.forEach {
+                var json = JSONObject()
+                if (it.type == ZIMMessageType.CUSTOM) {
+                    var customMessage = it as ZIMCustomMessage
+                    json.put("messageID", customMessage.messageID)
+                    json.put("userID", customMessage.userID)
+                    json.put("message", String(customMessage.message))
+                    json.put("type", customMessage.type.value())
+                    customMessageJson.put(json)
+                } else {
+                    var textMessage = it as ZIMTextMessage
+                    json.put("messageID", textMessage.messageID)
+                    json.put("userID", textMessage.userID)
+                    json.put("message", textMessage.message)
+                    json.put("type", textMessage.type.value())
+                    textMessageJson.put(json)
+                }
+            }
+            if (customMessageJson.length() > 0) {
+                eventSink.success(mapOf("method" to "receiveCustomPeerMessage", "messageList" to customMessageJson.toString()))
+            } else {
+                eventSink.success(mapOf("method" to "receiveTextPeerMessage", "messageList" to textMessageJson.toString()))
+            }
         }
 
         override fun onReceiveRoomMessage(
@@ -239,7 +265,31 @@ class ZIMPlugin: EventChannel.StreamHandler {
             fromRoomID: String?
         ) {
             super.onReceiveRoomMessage(zim, messageList, fromRoomID)
-            eventSink.success(arrayOf("onReceiveRoomMessage", messageList, fromRoomID))
+            var customMessageJson = JSONArray()
+            var textMessageJson = JSONArray()
+            messageList?.forEach {
+                var json = JSONObject()
+                if (it.type == ZIMMessageType.CUSTOM) {
+                    var customMessage = it as ZIMCustomMessage
+                    json.put("messageID", customMessage.messageID)
+                    json.put("userID", customMessage.userID)
+                    json.put("message", String(customMessage.message))
+                    json.put("type", customMessage.type.value())
+                    customMessageJson.put(json)
+                } else {
+                    var textMessage = it as ZIMTextMessage
+                    json.put("messageID", textMessage.messageID)
+                    json.put("userID", textMessage.userID)
+                    json.put("message", textMessage.message)
+                    json.put("type", textMessage.type.value())
+                    textMessageJson.put(json)
+                }
+            }
+            if (customMessageJson.length() > 0) {
+                eventSink.success(mapOf("method" to "receiveCustomRoomMessage", "messageList" to customMessageJson.toString()))
+            } else {
+                eventSink.success(mapOf("method" to "receiveTextRoomMessage", "messageList" to textMessageJson.toString()))
+            }
         }
 
         override fun onRoomAttributesBatchUpdated(
@@ -257,7 +307,11 @@ class ZIMPlugin: EventChannel.StreamHandler {
             roomID: String?
         ) {
             super.onRoomAttributesUpdated(zim, info, roomID)
-            eventSink.success(arrayOf("onRoomAttributesUpdated", info, roomID))
+            var json = JSONObject()
+            info?.roomAttributes?.forEach { (t, u) ->
+                json.put(t, u)
+            }
+            eventSink.success(mapOf("method" to "roomAttributesUpdated", "updateInfo" to json.toString(), "roomID" to roomID))
         }
 
         override fun onRoomMemberJoined(
@@ -266,7 +320,10 @@ class ZIMPlugin: EventChannel.StreamHandler {
             roomID: String?
         ) {
             super.onRoomMemberJoined(zim, memberList, roomID)
-            eventSink.success(arrayOf("onRoomMemberJoined", memberList, roomID))
+            var array  = memberList?.map {
+                mapOf("userID" to it.userID, "userName" to it.userName)
+            }
+            eventSink.success(mapOf("method" to "roomMemberJoined", "memberList" to array, "roomID" to roomID))
         }
 
         override fun onRoomMemberLeft(
@@ -275,7 +332,10 @@ class ZIMPlugin: EventChannel.StreamHandler {
             roomID: String?
         ) {
             super.onRoomMemberLeft(zim, memberList, roomID)
-            eventSink.success(arrayOf("onRoomMemberLeft", memberList, roomID))
+            var array  = memberList?.map {
+                mapOf("userID" to it.userID, "userName" to it.userName)
+            }
+            eventSink.success(mapOf("method" to "roomMemberLeave", "memberList" to array, "roomID" to roomID))
         }
 
         override fun onRoomStateChanged(
@@ -286,12 +346,13 @@ class ZIMPlugin: EventChannel.StreamHandler {
             roomID: String?
         ) {
             super.onRoomStateChanged(zim, state, event, extendedData, roomID)
-            eventSink.success(arrayOf("onRoomStateChanged", state, event, extendedData, roomID))
+            eventSink.success(mapOf("method" to "roomStateChanged", "state" to (state?.value() ?: 0), "event" to (event?.value()
+                ?: 0)))
         }
 
         override fun onTokenWillExpire(zim: ZIM?, second: Int) {
             super.onTokenWillExpire(zim, second)
-            eventSink.success(arrayOf("onTokenWillExpire", second))
+            eventSink.success(mapOf("method" to "tokenWillExpire", "second" to second, ))
         }
     }
 

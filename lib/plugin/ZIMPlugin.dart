@@ -104,7 +104,7 @@ class ZIMPlugin {
         }
         ZIMPlugin.onRoomMemberJoined!(roomID, memberArray);
         break;
-      case 'onRoomMemberLeave':
+      case 'roomMemberLeave':
         if (onRoomMemberLeave == null) return;
         var roomID = map['roomID'];
         var list = map['memberList'];
