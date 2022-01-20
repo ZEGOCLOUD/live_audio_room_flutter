@@ -27,7 +27,11 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   bool _isSeatClosed = false;
 
   bool get isMute {
-    return !_localSpeakerSeat()!.mic;
+    if (_localSpeakerSeat() == null) {
+      return true;
+    } else {
+      return !_localSpeakerSeat()!.mic;
+    }
   }
 
   ZegoSpeakerSeatService() {
