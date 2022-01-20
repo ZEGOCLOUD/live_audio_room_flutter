@@ -55,10 +55,11 @@ class ZegoApp extends StatelessWidget {
             create: (context) => context.read<ZegoSpeakerSeatService>(),
             update: (_, room, users, seats) {
               if (seats == null) throw ArgumentError.notNull('seats');
+              // Note: Update localUserID before update hostID cause we will call takeSeat() after hostID updated.
+              seats.updateLocalUserID(users.localUserInfo.userID);
               seats.updateHostID(room.roomInfo.hostID);
               seats.updateRoomInfo(
                   room.roomInfo.roomID, room.roomInfo.isSeatClosed);
-              seats.updateLocalUserID(users.localUserInfo.userID);
               return seats;
             },
           ),
