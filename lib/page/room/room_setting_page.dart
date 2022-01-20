@@ -47,14 +47,14 @@ class RoomSettingPage extends HookWidget {
                             onChanged: (value) {
                               var seatService =
                                   context.read<ZegoSpeakerSeatService>();
-                              seatService.closeAllSeat(value).then((errorCode) {
-                                if (0 == errorCode) {
+                              seatService
+                                  .closeAllSeat(value, roomService.roomInfo)
+                                  .then((errorCode) {
+                                if (0 != errorCode) {
                                   Fluttertoast.showToast(
                                       msg: AppLocalizations.of(context)!
                                           .toastLockSeatError(errorCode),
                                       backgroundColor: Colors.grey);
-                                } else {
-                                  print('close all seat fail, ${errorCode}');
                                 }
                               });
                             },
