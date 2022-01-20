@@ -106,31 +106,16 @@ class RoomControlButtonsBar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          ControllerButton(
-            iconSrc: StyleIconUrls.roomBottomIm,
-            onPressed: () {
-              InputDialog.show(context).then((value) {
-                if (value?.isEmpty ?? true) {
-                  return;
-                }
-
-                var messageService = context.read<ZegoMessageService>();
-                var roomService = context.read<ZegoRoomService>();
-                var userService = context.read<ZegoUserService>();
-                messageService
-                    .sendTextMessage(roomService.roomInfo.roomID,
-                        userService.localUserInfo.userID, value!)
-                    .then((errorCode) {
-                  if (0 != errorCode) {
-                    Fluttertoast.showToast(
-                        msg: AppLocalizations.of(context)!
-                            .toastSendMessageError(errorCode),
-                        backgroundColor: Colors.grey);
-                  }
-                });
-              });
-            },
-          ),
+          Consumer<ZegoRoomService>(
+              builder: (_, roomService, child) => ControllerButton(
+                    iconSrc: StyleIconUrls.roomBottomIm,
+                    onPressed: () {
+                      if (roomService.roomInfo.isTextMessageDisable) {
+                        return;
+                      }
+                      showMessageInput(context);
+                    },
+                  )),
           Consumer<ZegoUserService>(
               builder: (_, users, child) => Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -172,5 +157,28 @@ class RoomControlButtonsBar extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  showMessageInput(BuildContext context) {
+    InputDialog.show(context).then((value) {
+      if (value?.isEmpty ?? true) {
+        return;
+      }
+
+      var messageService = context.read<ZegoMessageService>();
+      var roomService = context.read<ZegoRoomService>();
+      var userService = context.read<ZegoUserService>();
+      messageService
+          .sendTextMessage(roomService.roomInfo.roomID,
+              userService.localUserInfo.userID, value!)
+          .then((errorCode) {
+        if (0 != errorCode) {
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!
+                  .toastSendMessageError(errorCode),
+              backgroundColor: Colors.grey);
+        }
+      });
+    });
   }
 }
