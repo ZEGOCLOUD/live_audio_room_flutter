@@ -9,7 +9,7 @@ typedef ZegoRoomCallback = Function(int);
 
 class ZegoGiftService extends ChangeNotifier {
   String giftSender = "";
-  String giftName = "";
+  String giftID = "";
   List<String> giftReceivers = [];
 
   bool displayTips = false;
@@ -20,14 +20,13 @@ class ZegoGiftService extends ChangeNotifier {
   }
 
 
-  Future<int> sendGift(String giftID, List<String> toUserList, ZegoRoomCallback? callback) async {
+  Future<int> sendGift(String roomID, String giftID, List<String> toUserList) async {
     Map message = {'actionType': 2, 'target': toUserList, 'content': {'giftID': giftID}};
     String json = jsonEncode(message);
-    var roomID = "";
     var result = await ZIMPlugin.sendRoomMessage(roomID, json, true);
     int code = result['errorCode'];
     if (code == 0) {
-      giftName = giftID;
+      this.giftID = giftID;
       giftReceivers = toUserList;
       giftSender = "Some One";
     }
@@ -41,9 +40,9 @@ class ZegoGiftService extends ChangeNotifier {
       Map<String, dynamic> messageDic = jsonDecode(messageJson);
       int actionType = messageDic['actionType'];
       if (actionType == 2) {
-        giftName = messageDic['content']['giftID'];
+        giftID = messageDic['content']['giftID'];
         giftSender = item['userID'];
-        giftReceivers = item['target'];
+        giftReceivers = messageDic['target'].cast<String>();
       }
     }
 

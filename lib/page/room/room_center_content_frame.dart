@@ -350,13 +350,12 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
             ),
           ),
           const Expanded(child: Text('')),
-          //  todo@yuyj this is a test data
           Consumer<ZegoGiftService>(
               builder: (_, giftService, child) => Visibility(
                   visible: giftService.displayTips,
                   child: RoomGiftTips(
                     gift: GiftMessageModel(giftService.giftSender,
-                        giftService.giftReceivers, giftService.giftName),
+                        giftService.giftReceivers, giftService.giftID),
                   ))),
           SizedBox(height: 18.h),
           ConstrainedBox(
@@ -364,7 +363,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
                 minWidth: 632.w,
                 maxWidth: 632.w,
                 minHeight: 1.h,
-                maxHeight: 630.h,
+                maxHeight: 570.h, //  630.h change by gift tips
               ),
               child: const ChatMessagePage())
         ],

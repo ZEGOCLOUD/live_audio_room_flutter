@@ -57,5 +57,4 @@ class ZegoMessageService extends ChangeNotifier {
     }
     notifyListeners();
   }
-
 }

@@ -79,12 +79,21 @@ class RoomSettingPage extends HookWidget {
                               roomService
                                   .disableTextMessage(value)
                                   .then((errorCode) {
+                                String message = '';
                                 if (0 != errorCode) {
-                                  Fluttertoast.showToast(
-                                      msg: AppLocalizations.of(context)!
-                                          .toastMuteMessageError(errorCode),
-                                      backgroundColor: Colors.grey);
+                                  message = AppLocalizations.of(context)!
+                                      .toastMuteMessageError(errorCode);
+                                } else {
+                                  if (value) {
+                                    message = AppLocalizations.of(context)!
+                                        .toastDisableTextChatSuccess;
+                                  } else {
+                                    message = AppLocalizations.of(context)!
+                                        .toastAllowTextChatSuccess;
+                                  }
                                 }
+                                Fluttertoast.showToast(
+                                    msg: message, backgroundColor: Colors.grey);
                               });
                             },
                           ))
