@@ -69,6 +69,12 @@ class ZIMPlugin: NSObject {
              case "setRoomAttributes":
                 self.setRoomAttributes(call, result: result)
                 break
+             case "getRTCToken":
+                self.getRTCToken(call, result: result)
+                break
+             case "getZIMVersion":
+                self.getZIMVersion(call, result: result)
+                break
              default:
                  result(nil)
              }
@@ -232,6 +238,22 @@ class ZIMPlugin: NSObject {
              result(["errorCode": NSNumber(value: error.code.rawValue)])
          })
      }
+    
+    func getRTCToken(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
+        let params = call.arguments as? NSDictionary
+                if (params == nil) { return }
+        let roomID = params!["roomID"] as? String ?? ""
+        let userID = params!["userID"] as? String ?? ""
+        
+        let token = AppToken.getRtcToken(withRoomID: roomID, userID: userID, appID: appID, secret: serverSecret) ?? ""
+        result(["errorCode": NSNumber(0), "token": token])
+    }
+    
+    func getZIMVersion(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
+        let version = ZIM.getVersion()
+        result(["errorCode": NSNumber(0), "version": version])
+    }
+    
     
     func convertObjectToJSONString(_ object:Any?)->String {
         guard let data = try? JSONSerialization.data(withJSONObject: object!, options: JSONSerialization.WritingOptions.init(rawValue: 0)) else { return "" }

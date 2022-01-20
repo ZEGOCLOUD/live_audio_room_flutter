@@ -80,6 +80,14 @@ class ZIMPlugin {
     return await channel.invokeMethod("setRoomAttributes", {"roomID": roomID, "attributes": attributes, "delete": delete});
   }
 
+  static Future<Map> getRTCToken(String roomID, String userID) async {
+    return await channel.invokeMethod("getRTCToken", {"roomID": roomID, "userID": userID});
+  }
+
+  static Future<Map> getZIMVersion(String roomID, String userID) async {
+    return await channel.invokeMethod("getZIMVersion", {});
+  }
+
   /* EventHandler */
 
   static void registerEventHandler() async {

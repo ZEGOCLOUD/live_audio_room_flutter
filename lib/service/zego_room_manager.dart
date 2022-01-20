@@ -11,18 +11,16 @@ class ZegoRoomManager extends ChangeNotifier {
 
   static var shared = ZegoRoomManager();
 
-  void initWithAPPID(int appID, String appSign, String serverSecret, ZegoRoomCallback callback) {
-    ZIMPlugin.createZIM(appID, appSign, serverSecret);
+  Future<void> initWithAPPID(int appID, String appSign, String serverSecret, ZegoRoomCallback callback) async {
+    var result = await ZIMPlugin.createZIM(appID, appSign, serverSecret);
     ZIMPlugin.registerEventHandler();
 
     ZegoEngineProfile profile = ZegoEngineProfile(appID, appSign, ZegoScenario.General);
     ZegoExpressEngine.createEngineWithProfile(profile);
-
-    callback(0);
+    ZegoExpressEngine.onRoomStreamUpdate = _onRoomStreamUpdate;
   }
 
   Future<int> uninit() async {
-    logoutRtcRoom();
     var result = await ZIMPlugin.destroyZIM();
     ZegoExpressEngine.destroyEngine();
     ZIMPlugin.unregisterEventHandler();
@@ -34,8 +32,14 @@ class ZegoRoomManager extends ChangeNotifier {
     return result['errorCode'];
   }
 
-  void logoutRtcRoom() {
-    ZegoExpressEngine.instance.logoutRoom("123");
+  void _onRoomStreamUpdate(String roomID, ZegoUpdateType updateType, List<ZegoStream> streamList, Map<String, dynamic> extendedData) {
+    for (final stream in streamList) {
+      if (updateType == ZegoUpdateType.Add) {
+        ZegoExpressEngine.instance.startPlayingStream(stream.streamID);
+      } else {
+        ZegoExpressEngine.instance.stopPlayingStream(stream.streamID);
+      }
+    }
   }
 
 }

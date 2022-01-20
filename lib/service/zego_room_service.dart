@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
+import 'package:zego_express_engine/zego_express_engine.dart';
 
 class RoomInfo {
   String roomID = "";
@@ -42,14 +43,15 @@ typedef RoomCallback = Function(int);
 
 class ZegoRoomService extends ChangeNotifier {
   RoomInfo roomInfo = RoomInfo('', '', '');
-  String localHostID = ""; // Update while user service data is updated.
+  String localUserID = ""; // Update while user service data is updated.
+  String localUserName = ""; // Update while user service data is updated.
 
   ZegoRoomService() {
-    ZIMPlugin.onRoomStatusUpdate = onRoomStatusUpdate;
+    ZIMPlugin.onRoomStatusUpdate = _onRoomStatusUpdate;
   }
 
   Future<int> createRoom(String roomID, String roomName, String token) async {
-    var result = await ZIMPlugin.createRoom(roomID, roomName, localHostID, 8);
+    var result = await ZIMPlugin.createRoom(roomID, roomName, localUserID, 8);
     var code = result['errorCode'];
     if (code == 0) {
       var result = await ZIMPlugin.queryRoomAllAttributes(roomID);
@@ -102,8 +104,24 @@ class ZegoRoomService extends ChangeNotifier {
     return code;
   }
 
-  void onRoomStatusUpdate(String roomID, Map<String, dynamic> roomInfoJson) {
+  void _onRoomStatusUpdate(String roomID, Map<String, dynamic> roomInfoJson) {
     roomInfo = new RoomInfo.fromJson(roomInfoJson);
     notifyListeners();
+  }
+
+  Future<void> _loginRtcRoom() async {
+    if (roomInfo.roomID == null || localUserID == null) { return; }
+    var user = ZegoUser(localUserID, localUserName);
+    var config = ZegoRoomConfig.defaultConfig();
+    var result = await ZIMPlugin.getRTCToken(roomInfo.roomID, localUserID);
+    config.token =  result["token"];
+    config.maxMemberCount = 0;
+    ZegoExpressEngine.instance.loginRoom(roomInfo.roomID, user, config: config);
+    var soundConfig = ZegoSoundLevelConfig(1000, false);
+    ZegoExpressEngine.instance.startSoundLevelMonitor(config: soundConfig);
+  }
+
+  void _logoutRtcRoom() {
+    ZegoExpressEngine.instance.logoutRoom(roomInfo.roomID);
   }
 }
