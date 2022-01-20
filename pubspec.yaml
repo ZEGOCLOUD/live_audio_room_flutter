@@ -42,7 +42,7 @@ dependencies:
   flutter_provider_utilities: ^1.0.4
   loader_overlay: ^2.0.5
   permission_handler: ^8.3.0
-
+  crypto: ^3.0.1
 
 dev_dependencies:
   flutter_test:
