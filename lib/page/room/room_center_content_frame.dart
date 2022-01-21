@@ -277,6 +277,12 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
           var seats = context.read<ZegoSpeakerSeatService>();
 
           if (userID.isEmpty) {
+            if (ZegoSpeakerSeatStatus.Closed == status) {
+              Fluttertoast.showToast(
+                  msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed,
+                  backgroundColor: Colors.grey);
+              return;
+            }
             _showBottomModalButton(
                 context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
               seats.switchSeat(index);
