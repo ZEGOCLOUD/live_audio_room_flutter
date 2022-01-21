@@ -178,6 +178,7 @@ class RoomGiftBottomBar extends HookWidget {
         .sendGift(roomService.roomInfo.roomID,
             selectedRoomGift.value.id.toString(), toUserList)
         .then((errorCode) {
+
       if (0 != errorCode) {
         Fluttertoast.showToast(
             msg: AppLocalizations.of(context)!.toastSendGiftError(errorCode),
