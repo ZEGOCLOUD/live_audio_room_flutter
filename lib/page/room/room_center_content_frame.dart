@@ -63,7 +63,7 @@ class SeatItem extends StatelessWidget {
                   alignment: Alignment.center,
                   children: [
                     // sound wave background
-                    (soundLevel ?? 0) > 0
+                    (soundLevel ?? 0) > 10
                         ? Image.asset(StyleIconUrls.roomSoundWave)
                         : Container(
                             color: Colors.transparent,
