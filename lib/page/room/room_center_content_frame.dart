@@ -342,7 +342,6 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
             //height: 212.h * 2,
             height: 300.h,
             width: 622.w, //(152.w + 22.w) * 3,
-
             child: Consumer2<ZegoSpeakerSeatService, ZegoUserService>(
               builder: (context, seats, users, child) => GridView.count(
                 childAspectRatio: (152 / 165),
