@@ -17,7 +17,8 @@ class ZIMPlugin {
   static void Function(String roomID, List<Map<String, dynamic>> memberList)? onRoomMemberJoined;
   static void Function(String roomID, List<Map<String, dynamic>> memberList)? onRoomMemberLeave;
 
-  static void Function(String roomID, Map<String, dynamic> roomInfoJson)? onRoomStatusUpdate;
+  static void Function(String roomID, Map<String, dynamic> roomInfoJson)? onRoomInfoUpdate;
+  static void Function(int state, int event)? onRoomStateChanged;
   static void Function(String roomID, Map<String, dynamic> speakerListJson)? onRoomSpeakerSeatUpdate;
 
 
@@ -123,18 +124,24 @@ class ZIMPlugin {
         onRoomMemberLeave!(roomID, memberArray);
         break;
       case 'roomAttributesUpdated':
-        if (onRoomStatusUpdate == null) return;
+        if (onRoomInfoUpdate == null) return;
         if (onRoomSpeakerSeatUpdate == null) return;
         var roomID = map['roomID'];
         var updateInfo = Map<String, dynamic>.from(jsonDecode(map['updateInfo']));
         if (updateInfo.containsKey('room_info')) {
           var roomInfoJson = Map<String, dynamic>.from(jsonDecode(updateInfo['room_info']));
-          onRoomStatusUpdate!(roomID, roomInfoJson);
+          onRoomInfoUpdate!(roomID, roomInfoJson);
         }
         updateInfo.removeWhere((key, value) => key == "room_info");
         if (updateInfo.keys.isNotEmpty) {
           onRoomSpeakerSeatUpdate!(roomID, updateInfo);
         }
+        break;
+      case 'roomStateChanged':
+        if (onRoomStateChanged == null) return;
+        int state = map['state'];
+        int event = map['event'];
+        onRoomStateChanged!(state, event);
         break;
       case 'receiveTextRoomMessage':
         if (onReceiveTextRoomMessage == null) return;
