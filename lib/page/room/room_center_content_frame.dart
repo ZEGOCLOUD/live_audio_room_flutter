@@ -63,7 +63,7 @@ class SeatItem extends StatelessWidget {
                   alignment: Alignment.center,
                   children: [
                     // sound wave background
-                    (soundLevel ?? 0) > 0
+                    (soundLevel ?? 0) > 10
                         ? Image.asset(StyleIconUrls.roomSoundWave)
                         : Container(
                             color: Colors.transparent,
@@ -84,7 +84,7 @@ class SeatItem extends StatelessWidget {
                       ),
                     ),
                     // Microphone muted icon
-                    (mic ?? false)
+                    (mic ?? false) || userID.isEmpty
                         ? Container(
                             color: Colors.transparent,
                           )
@@ -277,6 +277,12 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
           var seats = context.read<ZegoSpeakerSeatService>();
 
           if (userID.isEmpty) {
+            if (ZegoSpeakerSeatStatus.Closed == status) {
+              Fluttertoast.showToast(
+                  msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed,
+                  backgroundColor: Colors.grey);
+              return;
+            }
             _showBottomModalButton(
                 context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
               seats.switchSeat(index);
