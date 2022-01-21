@@ -15,9 +15,14 @@ class ZegoRoomManager extends ChangeNotifier {
     var result = await ZIMPlugin.createZIM(appID, appSign, serverSecret);
     ZIMPlugin.registerEventHandler();
 
+    ZegoExpressEngine.onApiCalledResult = _onApiCalledResult;
     ZegoEngineProfile profile = ZegoEngineProfile(appID, appSign, ZegoScenario.General);
     ZegoExpressEngine.createEngineWithProfile(profile);
     ZegoExpressEngine.onRoomStreamUpdate = _onRoomStreamUpdate;
+  }
+
+  void _onApiCalledResult(int errorCode, String funcName, String info) {
+    print("========= $errorCode $funcName");
   }
 
   Future<int> uninit() async {
