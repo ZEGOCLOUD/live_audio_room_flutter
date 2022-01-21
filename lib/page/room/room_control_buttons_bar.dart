@@ -113,7 +113,12 @@ class RoomControlButtonsBar extends StatelessWidget {
               builder: (_, roomService, child) => ControllerButton(
                     iconSrc: StyleIconUrls.roomBottomIm,
                     onPressed: () {
-                      if (roomService.roomInfo.isTextMessageDisable) {
+                      var userService = context.read<ZegoUserService>();
+                      var localUser =
+                          userService.userDic[roomService.localUserID];
+                      if (ZegoRoomUserRole.roomUserRoleHost !=
+                              localUser?.userRole &&
+                          roomService.roomInfo.isTextMessageDisable) {
                         return;
                       }
                       showMessageInput(context);
