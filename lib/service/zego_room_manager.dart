@@ -15,9 +15,10 @@ class ZegoRoomManager extends ChangeNotifier {
     var result = await ZIMPlugin.createZIM(appID, appSign, serverSecret);
     ZIMPlugin.registerEventHandler();
 
+    ZegoExpressEngine.onRoomStreamUpdate = _onRoomStreamUpdate;
+    ZegoExpressEngine.onApiCalledResult = _onApiCalledResult;
     ZegoEngineProfile profile = ZegoEngineProfile(appID, appSign, ZegoScenario.General);
     ZegoExpressEngine.createEngineWithProfile(profile);
-    ZegoExpressEngine.onRoomStreamUpdate = _onRoomStreamUpdate;
   }
 
   Future<int> uninit() async {
@@ -40,6 +41,10 @@ class ZegoRoomManager extends ChangeNotifier {
         ZegoExpressEngine.instance.stopPlayingStream(stream.streamID);
       }
     }
+  }
+
+  void _onApiCalledResult(int errorCode, String funcName, String info) {
+    print("=========$funcName: $errorCode");
   }
 
 }

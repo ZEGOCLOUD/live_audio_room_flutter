@@ -58,6 +58,7 @@ class ZegoRoomService extends ChangeNotifier {
       var attributesResult = result['roomAttributes'];
       var roomDic = attributesResult['room_info'];
       roomInfo = RoomInfo.fromJson(jsonDecode(roomDic));
+      _loginRtcRoom();
       notifyListeners();
     }
     return code;
@@ -71,6 +72,7 @@ class ZegoRoomService extends ChangeNotifier {
       var attributesResult = result['roomAttributes'];
       var roomDic = attributesResult['room_info'];
       roomInfo = RoomInfo.fromJson(jsonDecode(roomDic));
+      _loginRtcRoom();
       notifyListeners();
     }
     return code;
@@ -79,6 +81,7 @@ class ZegoRoomService extends ChangeNotifier {
   Future<int> leaveRoom() async {
     var result = await ZIMPlugin.leaveRoom(roomInfo.roomID);
     var code = result['errorCode'];
+    _logoutRtcRoom();
     if (code == 0) {
       roomInfo = RoomInfo('', '', '');
       notifyListeners();
