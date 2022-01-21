@@ -13,6 +13,8 @@ import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
 
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+import 'package:live_audio_room_flutter/service/zego_message_service.dart';
+import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 
 import 'package:live_audio_room_flutter/page/room/room_center_content_frame.dart';
 import 'package:live_audio_room_flutter/page/room/room_control_buttons_bar.dart';
@@ -42,32 +44,34 @@ class RoomMainPage extends StatelessWidget {
               const Expanded(child: RoomCenterContentFrame()),
               const RoomControlButtonsBar(),
               //  room toast tips
-              MessageListener<ZegoRoomService>(
-                child: const Text(''),
-                showError: (error) {},
-                showInfo: (jsonInfo) {
-                  var toastContent =
-                      RoomToastContent.fromJson(jsonDecode(jsonInfo));
-                  if (toastContent.toastType !=
-                      RoomToastType.textMessageDisable) {
-                    return;
-                  }
+              Offstage(
+                  offstage: true,
+                  child: MessageListener<ZegoRoomService>(
+                    child: const Text(''),
+                    showError: (error) {},
+                    showInfo: (jsonInfo) {
+                      var toastContent =
+                          RoomToastContent.fromJson(jsonDecode(jsonInfo));
+                      if (toastContent.toastType !=
+                          RoomToastType.textMessageDisable) {
+                        return;
+                      }
 
-                  var isTextMessageDisable =
-                      toastContent.message.toLowerCase() == 'true';
-                  String message;
-                  if (isTextMessageDisable) {
-                    message =
-                        AppLocalizations.of(context)!.toastDisableTextChatTips;
-                  } else {
-                    message =
-                        AppLocalizations.of(context)!.toastAllowTextChatTips;
-                  }
+                      var isTextMessageDisable =
+                          toastContent.message.toLowerCase() == 'true';
+                      String message;
+                      if (isTextMessageDisable) {
+                        message = AppLocalizations.of(context)!
+                            .toastDisableTextChatTips;
+                      } else {
+                        message = AppLocalizations.of(context)!
+                            .toastAllowTextChatTips;
+                      }
 
-                  Fluttertoast.showToast(
-                      msg: message, backgroundColor: Colors.grey);
-                },
-              ),
+                      Fluttertoast.showToast(
+                          msg: message, backgroundColor: Colors.grey);
+                    },
+                  )),
             ],
           ),
         ),
