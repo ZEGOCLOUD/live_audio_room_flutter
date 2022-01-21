@@ -84,7 +84,7 @@ class SeatItem extends StatelessWidget {
                       ),
                     ),
                     // Microphone muted icon
-                    (mic ?? false)
+                    (mic ?? false) || userID.isEmpty
                         ? Container(
                             color: Colors.transparent,
                           )
