@@ -51,6 +51,15 @@ class ZegoApp extends StatelessWidget {
                 room.localUserName = users.localUserInfo.userName;
                 return room;
               }),
+          ChangeNotifierProxyProvider<ZegoUserService, ZegoMessageService>(
+              create: (context) => context.read<ZegoMessageService>(),
+              update: (_, users, message) {
+                //  sync member online/offline message
+                if (message == null) throw ArgumentError.notNull('message');
+                message.onRoomMemberJoined(users.addedUserInfo);
+                message.onRoomMemberLeave(users.leaveUserInfo);
+                return message;
+              }),
           ChangeNotifierProxyProvider2<ZegoRoomService, ZegoUserService,
               ZegoSpeakerSeatService>(
             create: (context) => context.read<ZegoSpeakerSeatService>(),

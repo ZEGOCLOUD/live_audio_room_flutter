@@ -34,6 +34,10 @@ class ZegoUserService extends ChangeNotifier {
   // TODO@oliver update userList on SDK callback and notify changed
   List<ZegoUserInfo> userList = [];
   Map<String, ZegoUserInfo> userDic = <String, ZegoUserInfo>{};
+
+  ZegoUserInfo addedUserInfo = ZegoUserInfo.empty();
+  ZegoUserInfo leaveUserInfo = ZegoUserInfo.empty();
+
   ZegoUserInfo localUserInfo = ZegoUserInfo.empty();
   int totalUsersNum = 0;
   LoginState loginState = LoginState.loginStateLoggedOut;
@@ -95,6 +99,10 @@ class ZegoUserService extends ChangeNotifier {
       var member = ZegoUserInfo.formJson(item);
       userList.add(member);
       userDic[member.userID] = member;
+
+      if (member.userID.isNotEmpty && localUserInfo.userID != member.userID) {
+        addedUserInfo = member.clone();
+      }
     }
     notifyListeners();
   }
@@ -105,6 +113,10 @@ class ZegoUserService extends ChangeNotifier {
       var member = ZegoUserInfo.formJson(item);
       userList.removeWhere((element) => element.userID == member.userID);
       userDic.removeWhere((key, value) => key == member.userID);
+
+      if (member.userID.isNotEmpty && localUserInfo.userID != member.userID) {
+        leaveUserInfo = member.clone();
+      }
     }
     notifyListeners();
   }
