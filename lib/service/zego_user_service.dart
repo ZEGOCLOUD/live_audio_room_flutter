@@ -43,7 +43,6 @@ class ZegoUserService extends ChangeNotifier {
     ZIMPlugin.onRoomMemberLeave = _onRoomMemberLeave;
     ZIMPlugin.onReceiveCustomPeerMessage = _onReceiveCustomPeerMessage;
     ZIMPlugin.onConnectionStateChanged = _onConnectionStateChanged;
-
   }
 
   void fetchOnlineRoomUsersWithPage(int page) {
