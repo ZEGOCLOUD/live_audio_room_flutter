@@ -84,7 +84,7 @@ class ZIMPlugin {
     return await channel.invokeMethod("getRTCToken", {"roomID": roomID, "userID": userID});
   }
 
-  static Future<Map> getZIMVersion(String roomID, String userID) async {
+  static Future<Map> getZIMVersion() async {
     return await channel.invokeMethod("getZIMVersion", {});
   }
 

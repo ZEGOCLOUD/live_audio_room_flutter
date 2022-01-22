@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
+import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -50,43 +52,62 @@ class RoomTitleBar extends StatelessWidget {
           icon: Image.asset(StyleIconUrls.roomTopQuit),
           iconSize: 68.w,
           onPressed: () {
-            showDialog<bool>(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title:
-                      Text(AppLocalizations.of(context)!.roomPageDestroyRoom),
-                  content: Text(
-                      AppLocalizations.of(context)!.dialogSureToDestroyRoom),
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text(AppLocalizations.of(context)!.dialogCancel),
-                      onPressed: () => Navigator.of(context).pop(),
-                    ),
-                    TextButton(
-                      child: Text(AppLocalizations.of(context)!.dialogConfirm),
-                      onPressed: () {
-                        var room = context.read<ZegoRoomService>();
-                        room.leaveRoom().then((errorCode) {
-                          if (0 != errorCode) {
-                            Fluttertoast.showToast(
-                                msg: AppLocalizations.of(context)!
-                                    .toastRoomLeaveFailTip(errorCode),
-                                backgroundColor: Colors.grey);
-                          }
-                        });
-
-                        Navigator.of(context).pop(true);
-                        Navigator.pushReplacementNamed(
-                            context, "/room_entrance");
-                      },
-                    ),
-                  ],
-                );
-              },
-            );
+            var userService = context.read<ZegoUserService>();
+            var isLocalHost = ZegoRoomUserRole.roomUserRoleHost ==
+                userService.localUserInfo.userRole;
+            if (isLocalHost) {
+              showDialog<bool>(
+                context: context,
+                builder: (context) => getEndRoomDialog(context),
+              );
+            } else {
+              var roomService = context.read<ZegoRoomService>();
+              roomService.leaveRoom().then((errorCode) {
+                if (0 != errorCode) {
+                  Fluttertoast.showToast(
+                      msg: AppLocalizations.of(context)!
+                          .toastRoomLeaveFailTip(errorCode),
+                      backgroundColor: Colors.grey);
+                } else {
+                  Navigator.pushReplacementNamed(context, "/room_entrance");
+                }
+              });
+            }
           },
         )
+      ],
+    );
+  }
+
+  getEndRoomDialog(BuildContext context) {
+    var title = Text(AppLocalizations.of(context)!.roomPageDestroyRoom);
+    var content = Text(AppLocalizations.of(context)!.dialogSureToDestroyRoom);
+
+    return AlertDialog(
+      title: title,
+      content: content,
+      actions: <Widget>[
+        TextButton(
+          child: Text(AppLocalizations.of(context)!.dialogCancel),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        TextButton(
+          child: Text(AppLocalizations.of(context)!.dialogConfirm),
+          onPressed: () {
+            var roomService = context.read<ZegoRoomService>();
+            roomService.leaveRoom().then((errorCode) {
+              if (0 != errorCode) {
+                Fluttertoast.showToast(
+                    msg: AppLocalizations.of(context)!
+                        .toastRoomEndFailTip(errorCode),
+                    backgroundColor: Colors.grey);
+              }
+            });
+
+            Navigator.of(context).pop(true);
+            Navigator.pushReplacementNamed(context, "/room_entrance");
+          },
+        ),
       ],
     );
   }

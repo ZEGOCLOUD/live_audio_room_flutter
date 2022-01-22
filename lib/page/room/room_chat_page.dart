@@ -14,6 +14,7 @@ import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/page/room/room_gift_tips.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+import 'package:zego_express_engine/zego_express_engine.dart';
 
 class ChatMessageModel {
   ZegoUserInfo sender = ZegoUserInfo.empty();
@@ -42,20 +43,44 @@ class ChatMessageItem extends StatelessWidget {
           ),
           child: RichText(
               textAlign: TextAlign.start,
-              text: TextSpan(children: <TextSpan>[
-                getRoleWidget(context, messageModel.sender),
-                getSpacerWidgetByRole(messageModel.sender),
-                TextSpan(
-                    text: messageModel.sender.userName + ": ",
-                    style: StyleConstant.roomChatUserNameText),
-                TextSpan(
-                    text: messageModel.message.message,
-                    style: StyleConstant.roomChatMessageText),
-              ])),
+              text: TextSpan(children: getMessageWidgets(context))),
         ),
       ),
       const Expanded(flex: 1, child: Text('')),
     ]);
+  }
+
+  List<TextSpan> getMessageWidgets(BuildContext context) {
+    List<TextSpan> spans = [];
+    spans.add(getRoleWidget(context, messageModel.sender));
+    spans.add(getSpacerWidgetByRole(messageModel.sender));
+    if (messageModel.sender.userName.isNotEmpty) {
+      spans.add(TextSpan(
+          text: messageModel.sender.userName + ": ",
+          style: StyleConstant.roomChatUserNameText));
+    }
+
+    var isMemberJoinedMessage = messageModel.message.message.contains(
+        AppLocalizations.of(context)!
+            .roomPageJoinedTheRoom
+            .replaceAll('%@', '')
+            .trim());
+    var isMemberLeaveMessage = messageModel.message.message.contains(
+        AppLocalizations.of(context)!
+            .roomPageHasLeftTheRoom
+            .replaceAll('%@', '')
+            .trim());
+    if (isMemberJoinedMessage || isMemberLeaveMessage) {
+      spans.add(TextSpan(
+          text: messageModel.message.message,
+          style: StyleConstant.roomChatUserNameText));
+    } else {
+      spans.add(TextSpan(
+          text: messageModel.message.message,
+          style: StyleConstant.roomChatMessageText));
+    }
+
+    return spans;
   }
 
   TextSpan getRoleWidget(context, ZegoUserInfo sender) {
@@ -75,33 +100,32 @@ class ChatMessageItem extends StatelessWidget {
   }
 }
 
-class ChatMessagePage extends StatefulWidget {
+class ChatMessagePage extends HookWidget {
   const ChatMessagePage({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() {
-    return _ChatMessagePageState();
-  }
-}
-
-class _ChatMessagePageState extends State<ChatMessagePage> {
-  @override
   Widget build(BuildContext context) {
+    var messageService = context.read<ZegoMessageService>();
+    messageService.setTranslateTexts(
+        AppLocalizations.of(context)!.roomPageJoinedTheRoom,
+        AppLocalizations.of(context)!.roomPageHasLeftTheRoom);
+
     return Container(
-        margin: EdgeInsets.only(right: (118 - 32).w),
-        child: Consumer2<ZegoMessageService, ZegoUserService>(
-            builder: (_, messageService, userService, child) =>
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: messageService.messageList.length,
-                  itemBuilder: (_, index) {
-                    var message = messageService.messageList[index];
-                    ChatMessageModel messageModel = ChatMessageModel(
-                        userService.userDic[message.userID] ??
-                            ZegoUserInfo.empty(),
-                        message);
-                    return ChatMessageItem(messageModel: messageModel);
-                  },
-                )));
+      margin: EdgeInsets.only(right: (118 - 32).w),
+      child: Consumer<ZegoMessageService>(builder: (_, messageService, child) {
+        var userService = context.read<ZegoUserService>();
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: messageService.messageList.length,
+          itemBuilder: (_, index) {
+            var message = messageService.messageList[index];
+            ChatMessageModel messageModel = ChatMessageModel(
+                userService.userDic[message.userID] ?? ZegoUserInfo.empty(),
+                message);
+            return ChatMessageItem(messageModel: messageModel);
+          },
+        );
+      }),
+    );
   }
 }

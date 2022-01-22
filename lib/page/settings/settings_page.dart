@@ -126,8 +126,9 @@ class SettingsPage extends HookWidget {
     ZegoExpressEngine.getVersion()
         .then((value) => expressSDKVersion.value = value);
     final zimSDKVersion = useState('1.0');
-    //  todo@yuyj get zim sdk version
-
+    ZegoRoomManager.shared
+        .getZimVersion()
+        .then((version) => zimSDKVersion.value = version);
     return Scaffold(
         appBar: AppBar(
           elevation: 0,

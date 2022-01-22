@@ -9,7 +9,10 @@ extension RoomToastTypeExtension on RoomToastType {
     RoomToastType.textMessageDisable: 0,
   };
 
-  int get value => valueMap[this] ?? -1;
+  static const Map<int, RoomToastType> mapValue = {
+    -1: RoomToastType.none,
+    0: RoomToastType.textMessageDisable,
+  };
 }
 
 class RoomToastContent {
@@ -22,7 +25,7 @@ class RoomToastContent {
 
   RoomToastContent.fromJson(Map<String, dynamic> json) {
     int typeIntValue = json['type'];
-    toastType = RoomToastType.values[typeIntValue];
+    toastType = RoomToastTypeExtension.mapValue[typeIntValue] as RoomToastType;
     message = json['message'];
   }
 

@@ -8,16 +8,17 @@ import 'package:zego_express_engine/zego_express_engine.dart';
 typedef ZegoRoomCallback = Function(int);
 
 class ZegoRoomManager extends ChangeNotifier {
-
   static var shared = ZegoRoomManager();
 
-  Future<void> initWithAPPID(int appID, String appSign, String serverSecret, ZegoRoomCallback callback) async {
+  Future<void> initWithAPPID(int appID, String appSign, String serverSecret,
+      ZegoRoomCallback callback) async {
     var result = await ZIMPlugin.createZIM(appID, appSign, serverSecret);
     ZIMPlugin.registerEventHandler();
 
     ZegoExpressEngine.onRoomStreamUpdate = _onRoomStreamUpdate;
     ZegoExpressEngine.onApiCalledResult = _onApiCalledResult;
-    ZegoEngineProfile profile = ZegoEngineProfile(appID, appSign, ZegoScenario.General);
+    ZegoEngineProfile profile =
+        ZegoEngineProfile(appID, appSign, ZegoScenario.General);
     ZegoExpressEngine.createEngineWithProfile(profile);
   }
 
@@ -33,7 +34,18 @@ class ZegoRoomManager extends ChangeNotifier {
     return result['errorCode'];
   }
 
-  void _onRoomStreamUpdate(String roomID, ZegoUpdateType updateType, List<ZegoStream> streamList, Map<String, dynamic> extendedData) {
+  Future<String> getZimVersion() async {
+    var result = await ZIMPlugin.getZIMVersion();
+    var errorCode = result['errorCode'];
+    if (0 == errorCode) {
+      return result["version"].toString();
+    }
+
+    return '';
+  }
+
+  void _onRoomStreamUpdate(String roomID, ZegoUpdateType updateType,
+      List<ZegoStream> streamList, Map<String, dynamic> extendedData) {
     for (final stream in streamList) {
       if (updateType == ZegoUpdateType.Add) {
         ZegoExpressEngine.instance.startPlayingStream(stream.streamID);
@@ -46,5 +58,4 @@ class ZegoRoomManager extends ChangeNotifier {
   void _onApiCalledResult(int errorCode, String funcName, String info) {
     print("=========$funcName: $errorCode");
   }
-
 }
