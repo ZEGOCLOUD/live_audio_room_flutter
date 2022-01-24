@@ -299,6 +299,10 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
                 }
               });
             });
+          } else {
+            Fluttertoast.showToast(
+                msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed,
+                backgroundColor: Colors.grey);
           }
         };
       } else {

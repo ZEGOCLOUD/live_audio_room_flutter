@@ -21,7 +21,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     ZegoSpeakerSeat(seatIndex: 6),
     ZegoSpeakerSeat(seatIndex: 7)
   ];
-  List<String> speakerIDList = [];
+  Set<String> speakerIDSet = {};
   String _roomID = "";
   String _hostID = ""; // Sort host to index 0
   String _localUserID = "";
@@ -254,10 +254,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   }
 
   void updateSpeakerIDList() {
-    speakerIDList.clear();
+    speakerIDSet.clear();
     for (var seat in seatList) {
       if (seat.userID.isNotEmpty && seat.userID != _hostID) {
-        speakerIDList.add(seat.userID);
+        speakerIDSet.add(seat.userID);
       }
     }
   }
@@ -273,7 +273,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     if (roomID != _roomID) {
       _roomID = roomID;
       if (roomID.isEmpty) {
-        speakerIDList.clear();
+        speakerIDSet.clear();
         for (final seat in seatList) {
           seat.clearData();
         }
