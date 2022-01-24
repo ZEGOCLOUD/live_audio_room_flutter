@@ -129,8 +129,13 @@ class ZIMPlugin {
         var roomID = map['roomID'];
         var updateInfo = Map<String, dynamic>.from(jsonDecode(map['updateInfo']));
         if (updateInfo.containsKey('room_info')) {
-          var roomInfoJson = Map<String, dynamic>.from(jsonDecode(updateInfo['room_info']));
-          onRoomInfoUpdate!(roomID, roomInfoJson);
+          String jsonString = updateInfo['room_info'];
+          if (jsonString.length > 0) {
+            var roomInfoJson = Map<String, dynamic>.from(jsonDecode(jsonString));
+            onRoomInfoUpdate!(roomID, roomInfoJson);
+          } else {
+            onRoomInfoUpdate!(roomID, Map());
+          }
         }
         updateInfo.removeWhere((key, value) => key == "room_info");
         if (updateInfo.keys.isNotEmpty) {

@@ -145,6 +145,10 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
   }
 
   void _onRoomInfoUpdate(String roomID, Map<String, dynamic> roomInfoJson) {
+    if (roomInfoJson.keys.length == 0) {
+      // room has end
+      return;
+    }
     _updateRoomInfo(RoomInfo.fromJson(roomInfoJson));
     notifyListeners();
   }
