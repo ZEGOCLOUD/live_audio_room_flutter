@@ -1,17 +1,23 @@
 enum RoomToastType {
   none,
   textMessageDisable,
+  roomEndByHost,
+  roomNetworkLeave,
 }
 
 extension RoomToastTypeExtension on RoomToastType {
   static const valueMap = {
     RoomToastType.none: -1,
     RoomToastType.textMessageDisable: 0,
+    RoomToastType.roomEndByHost: 1,
+    RoomToastType.roomNetworkLeave: 2,
   };
 
   static const Map<int, RoomToastType> mapValue = {
     -1: RoomToastType.none,
     0: RoomToastType.textMessageDisable,
+    1: RoomToastType.roomEndByHost,
+    2: RoomToastType.roomNetworkLeave,
   };
 }
 

@@ -52,24 +52,17 @@ class RoomMainPage extends StatelessWidget {
                     showInfo: (jsonInfo) {
                       var toastContent =
                           RoomToastContent.fromJson(jsonDecode(jsonInfo));
-                      if (toastContent.toastType !=
-                          RoomToastType.textMessageDisable) {
-                        return;
-                      }
 
-                      var isTextMessageDisable =
-                          toastContent.message.toLowerCase() == 'true';
-                      String message;
-                      if (isTextMessageDisable) {
-                        message = AppLocalizations.of(context)!
-                            .toastDisableTextChatTips;
-                      } else {
-                        message = AppLocalizations.of(context)!
-                            .toastAllowTextChatTips;
+                      switch (toastContent.toastType) {
+                        case RoomToastType.textMessageDisable:
+                          _showTextMessageTips(context, toastContent);
+                          break;
+                        case RoomToastType.roomEndByHost:
+                          _showRoomEndByHostTips(context, toastContent);
+                          break;
+                        case RoomToastType.roomNetworkLeave:
+                          break;
                       }
-
-                      Fluttertoast.showToast(
-                          msg: message, backgroundColor: Colors.grey);
                     },
                   )),
             ],
@@ -77,5 +70,55 @@ class RoomMainPage extends StatelessWidget {
         ),
       ),
     ));
+  }
+
+  _showTextMessageTips(BuildContext context, RoomToastContent toastContent) {
+    if (toastContent.toastType != RoomToastType.textMessageDisable) {
+      return;
+    }
+
+    var isTextMessageDisable = toastContent.message.toLowerCase() == 'true';
+    String message;
+    if (isTextMessageDisable) {
+      message = AppLocalizations.of(context)!.toastDisableTextChatTips;
+    } else {
+      message = AppLocalizations.of(context)!.toastAllowTextChatTips;
+    }
+
+    Fluttertoast.showToast(msg: message, backgroundColor: Colors.grey);
+  }
+
+  _showRoomEndByHostTips(BuildContext context, RoomToastContent toastContent) {
+    if (toastContent.toastType != RoomToastType.roomEndByHost) {
+      return;
+    }
+
+    var title = Text(AppLocalizations.of(context)!.dialogTipsTitle,
+        textAlign: TextAlign.center);
+    var content = Text(AppLocalizations.of(context)!.toastRoomHasDestroyed,
+        textAlign: TextAlign.center);
+
+    var alert = AlertDialog(
+      title: title,
+      content: content,
+      actions: <Widget>[
+        TextButton(
+          child: Text(AppLocalizations.of(context)!.dialogConfirm,
+              textAlign: TextAlign.center),
+          onPressed: () {
+            Navigator.of(context).pop(true);
+            Navigator.pushReplacementNamed(context, "/room_entrance");
+          },
+        ),
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 }
