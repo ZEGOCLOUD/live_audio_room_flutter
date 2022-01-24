@@ -7,7 +7,8 @@ import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
 
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
 import 'package:zego_express_engine/zego_express_engine.dart';
-import 'package:live_audio_room_flutter/common/toast_content.dart';
+import 'package:live_audio_room_flutter/common/room_info_content.dart';
+import 'package:live_audio_room_flutter/constants/zego_constant.dart';
 
 class RoomInfo {
   String roomID = "";
@@ -125,28 +126,53 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
   }
 
   Future<void> _onRoomStateChanged(int state, int event) async {
-    if(state == 2 && event == 0) {
+    zimRoomState? roomState = zimRoomStateExtension.mapValue[state];
+    zimRoomEvent? roomEvent = zimRoomEventExtension.mapValue[event];
+
+    print("_onRoomStateChanged state:${state}, ${roomState}, event:${event}, ${roomEvent}");
+
+    if (roomState == zimRoomState.zimRoomStateConnected &&
+        roomEvent == zimRoomEvent.zimRoomEventSuccess) {
       var result = await ZIMPlugin.queryRoomAllAttributes(roomInfo.roomID);
       var attributesResult = result['roomAttributes'];
       var roomDic = attributesResult['room_info'];
       if (roomDic == null) {
         // room has end
-        RoomToastContent toastContent = RoomToastContent.empty();
-        toastContent.toastType = RoomToastType.roomEndByHost;
+        RoomInfoContent toastContent = RoomInfoContent.empty();
+        toastContent.toastType = RoomInfoType.roomEndByHost;
         notifyInfo(json.encode(toastContent.toJson()));
       }
-    } else if(state == 0 && event == 7) {
+    } else if (roomState == zimRoomState.zimRoomStateDisconnected &&
+        roomEvent == zimRoomEvent.zimRoomEventEnterFailed) {
       // network error leave room
-      RoomToastContent toastContent = RoomToastContent.empty();
-      toastContent.toastType = RoomToastType.roomNetworkLeave;
+      RoomInfoContent toastContent = RoomInfoContent.empty();
+      toastContent.toastType = RoomInfoType.roomNetworkLeave;
+      notifyInfo(json.encode(toastContent.toJson()));
+    } else if (roomState == zimRoomState.zimRoomStateConnecting &&
+        roomEvent == zimRoomEvent.zimRoomEventNetworkInterrupted) {
+      //  temp network broken
+      RoomInfoContent toastContent = RoomInfoContent.empty();
+      toastContent.toastType = RoomInfoType.roomNetworkTempBroken;
+      notifyInfo(json.encode(toastContent.toJson()));
+    } else if (roomState == zimRoomState.zimRoomStateConnected &&
+        roomEvent == zimRoomEvent.zimRoomEventSuccess) {
+      //  reconnected after temp network broken
+      RoomInfoContent toastContent = RoomInfoContent.empty();
+      toastContent.toastType = RoomInfoType.roomNetworkReconnected;
       notifyInfo(json.encode(toastContent.toJson()));
     }
+
     notifyListeners();
   }
 
   void _onRoomInfoUpdate(String roomID, Map<String, dynamic> roomInfoJson) {
-    if (roomInfoJson.keys.length == 0) {
-      // room has end
+    if (roomInfoJson.keys.isEmpty) {
+      // room has end by host
+
+      RoomInfoContent toastContent = RoomInfoContent.empty();
+      toastContent.toastType = RoomInfoType.roomEndByHost;
+      notifyInfo(json.encode(toastContent.toJson()));
+
       return;
     }
     _updateRoomInfo(RoomInfo.fromJson(roomInfoJson));
@@ -175,9 +201,9 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     var oldRoomInfo = roomInfo.clone();
     roomInfo = updatedRoomInfo.clone();
 
-    RoomToastContent toastContent = RoomToastContent.empty();
+    RoomInfoContent toastContent = RoomInfoContent.empty();
     if (oldRoomInfo.isTextMessageDisable != roomInfo.isTextMessageDisable) {
-      toastContent.toastType = RoomToastType.textMessageDisable;
+      toastContent.toastType = RoomInfoType.textMessageDisable;
       toastContent.message = roomInfo.isTextMessageDisable.toString();
     }
     notifyInfo(json.encode(toastContent.toJson()));

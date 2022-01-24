@@ -3,7 +3,7 @@ import 'dart:ffi';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:live_audio_room_flutter/common/toast_content.dart';
+import 'package:live_audio_room_flutter/common/room_info_content.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -29,55 +29,61 @@ class RoomMainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
-      child: Center(
-        child: Container(
-          color: const Color(0xFFF4F4F6),
-          // padding: const EdgeInsets.all(80.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(
-                height: 16.h,
-              ),
-              const RoomTitleBar(),
-              const Expanded(child: RoomCenterContentFrame()),
-              const RoomControlButtonsBar(),
-              //  room toast tips
-              Offstage(
-                  offstage: true,
-                  child: MessageListener<ZegoRoomService>(
-                    child: const Text(''),
-                    showError: (error) {},
-                    showInfo: (jsonInfo) {
-                      var toastContent =
-                          RoomToastContent.fromJson(jsonDecode(jsonInfo));
+          child: Center(
+            child: Container(
+              color: const Color(0xFFF4F4F6),
+              // padding: const EdgeInsets.all(80.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    height: 16.h,
+                  ),
+                  const RoomTitleBar(),
+                  const Expanded(child: RoomCenterContentFrame()),
+                  const RoomControlButtonsBar(),
+                  //  room toast tips
+                  Offstage(
+                      offstage: true,
+                      child: MessageListener<ZegoRoomService>(
+                        child: const Text(''),
+                        showError: (error) {},
+                        showInfo: (jsonInfo) {
+                          var infoContent =
+                          RoomInfoContent.fromJson(jsonDecode(jsonInfo));
 
-                      switch (toastContent.toastType) {
-                        case RoomToastType.textMessageDisable:
-                          _showTextMessageTips(context, toastContent);
-                          break;
-                        case RoomToastType.roomEndByHost:
-                          _showRoomEndByHostTips(context, toastContent);
-                          break;
-                        case RoomToastType.roomNetworkLeave:
-                          break;
-                      }
-                    },
-                  )),
-            ],
+                          switch (infoContent.toastType) {
+                            case RoomInfoType.textMessageDisable:
+                              _showTextMessageTips(context, infoContent);
+                              break;
+                            case RoomInfoType.roomEndByHost:
+                              _showRoomEndByHostTips(context, infoContent);
+                              break;
+                            case RoomInfoType.roomNetworkLeave:
+                              break;
+                            case RoomInfoType.roomNetworkTempBroken:
+                              _showNetworkTempBrokenTips(context, infoContent);
+                              break;
+                            case RoomInfoType.roomNetworkReconnected:
+                              _hideNetworkTempBrokenTips(context, infoContent);
+                              break;
+                          }
+                        },
+                      )),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
-    ));
+        ));
   }
 
-  _showTextMessageTips(BuildContext context, RoomToastContent toastContent) {
-    if (toastContent.toastType != RoomToastType.textMessageDisable) {
+  _showTextMessageTips(BuildContext context, RoomInfoContent infoContent) {
+    if (infoContent.toastType != RoomInfoType.textMessageDisable) {
       return;
     }
 
-    var isTextMessageDisable = toastContent.message.toLowerCase() == 'true';
+    var isTextMessageDisable = infoContent.message.toLowerCase() == 'true';
     String message;
     if (isTextMessageDisable) {
       message = AppLocalizations.of(context)!.toastDisableTextChatTips;
@@ -88,8 +94,8 @@ class RoomMainPage extends StatelessWidget {
     Fluttertoast.showToast(msg: message, backgroundColor: Colors.grey);
   }
 
-  _showRoomEndByHostTips(BuildContext context, RoomToastContent toastContent) {
-    if (toastContent.toastType != RoomToastType.roomEndByHost) {
+  _showRoomEndByHostTips(BuildContext context, RoomInfoContent infoContent) {
+    if (infoContent.toastType != RoomInfoType.roomEndByHost) {
       return;
     }
 
@@ -120,5 +126,20 @@ class RoomMainPage extends StatelessWidget {
         return alert;
       },
     );
+  }
+
+  _showNetworkTempBrokenTips(BuildContext context,
+      RoomInfoContent infoContent) {
+    if (infoContent.toastType != RoomInfoType.roomNetworkTempBroken) {
+      return;
+    }
+  }
+
+  _hideNetworkTempBrokenTips(BuildContext context,
+      RoomInfoContent infoContent) {
+    if (infoContent.toastType != RoomInfoType.roomNetworkReconnected) {
+      return;
+    }
+    Navigator.of(context).pop(true);
   }
 }
