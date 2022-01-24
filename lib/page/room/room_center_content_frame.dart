@@ -31,7 +31,7 @@ class SeatItem extends StatelessWidget {
   final bool? mic;
   final ZegoSpeakerSeatStatus status;
   final double? soundLevel;
-  final double? network;
+  final ZegoNetworkQuality? networkQuality;
   final String? avatar;
   final SeatItemClickCallback callback;
 
@@ -42,7 +42,7 @@ class SeatItem extends StatelessWidget {
       this.mic,
       required this.status,
       this.soundLevel,
-      this.network,
+      this.networkQuality,
       this.avatar,
       required this.callback,
       Key? key})
@@ -50,6 +50,18 @@ class SeatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String getNetworkQualityIconName() {
+      switch ((networkQuality ?? ZegoNetworkQuality.Bad)) {
+        case ZegoNetworkQuality.Good:
+          return StyleIconUrls.roomNetworkStatusGood;
+        case ZegoNetworkQuality.Medium:
+          return StyleIconUrls.roomNetworkStatusNormal;
+        case ZegoNetworkQuality.Bad:
+        case ZegoNetworkQuality.Unknow:
+          return StyleIconUrls.roomNetworkStatusBad;
+      }
+    }
+
     return Container(
       height: 152.h + 30.h,
       width: 152.w,
@@ -68,6 +80,7 @@ class SeatItem extends StatelessWidget {
                         : Container(
                             color: Colors.transparent,
                           ),
+                    // Avatar
                     SizedBox(
                       width: 100.w,
                       height: 100.h,
@@ -114,9 +127,19 @@ class SeatItem extends StatelessWidget {
                 SizedBox(
                   height: 9.h,
                 ),
-                Text(
-                  userName ?? "",
-                  style: TextStyle(fontSize: 20.sp),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      userName ?? "",
+                      style: TextStyle(fontSize: 20.sp),
+                    ),
+                    userID.isEmpty
+                        ? Container(
+                            color: Colors.transparent,
+                          )
+                        : Image.asset(getNetworkQualityIconName())
+                  ],
                 )
               ],
             ),
@@ -159,6 +182,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
         mic: seat.mic,
         status: seat.status,
         soundLevel: seat.soundLevel,
+        networkQuality: seat.network,
         avatar: "images/seat_$i.png",
         callback: callback,
       );
