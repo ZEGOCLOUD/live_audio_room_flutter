@@ -124,7 +124,17 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     return code;
   }
 
-  void _onRoomStateChanged(int state, int event) {
+  Future<void> _onRoomStateChanged(int state, int event) async {
+    if(state == 2 && event == 0) {
+      var result = await ZIMPlugin.queryRoomAllAttributes(roomInfo.roomID);
+      var attributesResult = result['roomAttributes'];
+      var roomDic = attributesResult['room_info'];
+      if (roomDic == null) {
+        // room has end
+      }
+    } else if(state == 0 && event == 7) {
+      // network error leave room
+    }
     notifyListeners();
   }
 
