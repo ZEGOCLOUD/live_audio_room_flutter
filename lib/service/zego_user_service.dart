@@ -96,8 +96,8 @@ class ZegoUserService extends ChangeNotifier {
     return result['errorCode'];
   }
 
-  void _onRoomMemberJoined(
-      String roomID, List<Map<String, dynamic>> memberList) {
+  void _onRoomMemberJoined(String roomID,
+      List<Map<String, dynamic>> memberList) {
     for (final item in memberList) {
       var member = ZegoUserInfo.formJson(item);
       userList.add(member);
@@ -110,8 +110,8 @@ class ZegoUserService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _onRoomMemberLeave(
-      String roomID, List<Map<String, dynamic>> memberList) {
+  void _onRoomMemberLeave(String roomID,
+      List<Map<String, dynamic>> memberList) {
     for (final item in memberList) {
       var member = ZegoUserInfo.formJson(item);
       userList.removeWhere((element) => element.userID == member.userID);
