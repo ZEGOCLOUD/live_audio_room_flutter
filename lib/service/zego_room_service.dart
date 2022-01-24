@@ -59,7 +59,8 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
   String localUserName = ""; // Update while user service data is updated.
 
   ZegoRoomService() {
-    ZIMPlugin.onRoomStatusUpdate = _onRoomStatusUpdate;
+    ZIMPlugin.onRoomInfoUpdate = _onRoomInfoUpdate;
+    ZIMPlugin.onRoomStateChanged = _onRoomStateChanged;
   }
 
   Future<int> createRoom(String roomID, String roomName, String token) async {
@@ -123,7 +124,21 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     return code;
   }
 
-  void _onRoomStatusUpdate(String roomID, Map<String, dynamic> roomInfoJson) {
+  Future<void> _onRoomStateChanged(int state, int event) async {
+    if(state == 2 && event == 0) {
+      var result = await ZIMPlugin.queryRoomAllAttributes(roomInfo.roomID);
+      var attributesResult = result['roomAttributes'];
+      var roomDic = attributesResult['room_info'];
+      if (roomDic == null) {
+        // room has end
+      }
+    } else if(state == 0 && event == 7) {
+      // network error leave room
+    }
+    notifyListeners();
+  }
+
+  void _onRoomInfoUpdate(String roomID, Map<String, dynamic> roomInfoJson) {
     _updateRoomInfo(RoomInfo.fromJson(roomInfoJson));
     notifyListeners();
   }

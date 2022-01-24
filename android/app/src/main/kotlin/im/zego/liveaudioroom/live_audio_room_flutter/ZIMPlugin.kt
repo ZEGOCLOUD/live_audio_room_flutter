@@ -290,6 +290,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
                     json.put("userID", customMessage.userID)
                     json.put("message", String(customMessage.message))
                     json.put("type", customMessage.type.value())
+                    json.put("timestamp", customMessage.timestamp)
                     customMessageJson.put(json)
                 } else {
                     var textMessage = it as ZIMTextMessage
@@ -297,13 +298,14 @@ class ZIMPlugin: EventChannel.StreamHandler {
                     json.put("userID", textMessage.userID)
                     json.put("message", textMessage.message)
                     json.put("type", textMessage.type.value())
+                    json.put("timestamp", textMessage.timestamp)
                     textMessageJson.put(json)
                 }
             }
             if (customMessageJson.length() > 0) {
-                eventSink.success(mapOf("method" to "receiveCustomRoomMessage", "messageList" to customMessageJson.toString()))
+                eventSink.success(mapOf("method" to "receiveCustomRoomMessage", "messageList" to customMessageJson.toString(), "roomID" to fromRoomID))
             } else {
-                eventSink.success(mapOf("method" to "receiveTextRoomMessage", "messageList" to textMessageJson.toString()))
+                eventSink.success(mapOf("method" to "receiveTextRoomMessage", "messageList" to textMessageJson.toString(), "roomID" to fromRoomID))
             }
         }
 
