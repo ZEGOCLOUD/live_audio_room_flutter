@@ -43,8 +43,7 @@ class ZegoMessageService extends ChangeNotifier {
     ZIMPlugin.onReceiveTextRoomMessage = _onReceiveTextMessage;
   }
 
-  //  todo@luolei call this api when logout room
-  void clearOnLogout() {
+  void onRoomLeave() {
     messageList.clear();
     addedUserInfo = ZegoUserInfo.empty();
     leaveUserInfo = ZegoUserInfo.empty();
