@@ -31,7 +31,7 @@ class ZegoGiftService extends ChangeNotifier {
   }
 
   Future<int> sendGift(
-      String roomID, String giftID, List<String> toUserList) async {
+      String roomID, String senderUserID, String giftID, List<String> toUserList) async {
     Map message = {
       'actionType': 2,
       'target': toUserList,
@@ -43,9 +43,13 @@ class ZegoGiftService extends ChangeNotifier {
     if (code == 0) {
       this.giftID = giftID;
       giftReceivers = toUserList;
-      giftSender = "Some One";
+      giftSender = senderUserID;
     }
+
+    _showGiftTips();
+
     notifyListeners();
+
     return code;
   }
 
@@ -62,6 +66,12 @@ class ZegoGiftService extends ChangeNotifier {
       }
     }
 
+    _showGiftTips();
+
+    notifyListeners();
+  }
+
+  void _showGiftTips() {
     if (displayTips) {
       displayTimer.cancel();
     }
@@ -70,7 +80,5 @@ class ZegoGiftService extends ChangeNotifier {
       displayTips = false; //  hide after 10 seconds
       notifyListeners();
     });
-
-    notifyListeners();
   }
 }

@@ -175,14 +175,16 @@ class RoomGiftBottomBar extends HookWidget {
       toUserList.add(selectedUser.userID);
     }
     giftService
-        .sendGift(roomService.roomInfo.roomID,
+        .sendGift(roomService.roomInfo.roomID, userService.localUserInfo.userID,
             selectedRoomGift.value.id.toString(), toUserList)
         .then((errorCode) {
-
       if (0 != errorCode) {
         Fluttertoast.showToast(
             msg: AppLocalizations.of(context)!.toastSendGiftError(errorCode),
             backgroundColor: Colors.grey);
+      } else {
+        // hide the page
+        Navigator.pop(context);
       }
     });
   }
