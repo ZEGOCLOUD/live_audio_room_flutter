@@ -61,6 +61,7 @@ class ZegoApp extends StatelessWidget {
 
                 message.onRoomMemberJoined(userService.addedUserInfo);
                 message.onRoomMemberLeave(userService.leaveUserInfo);
+                userService.clearMemberJoinLeaveData();
 
                 //  clear data
                 if(roomService.roomInfo.roomID.isEmpty) {
