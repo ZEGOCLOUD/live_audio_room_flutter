@@ -41,6 +41,8 @@ class ZegoUserService extends ChangeNotifier {
   ZegoUserInfo localUserInfo = ZegoUserInfo.empty();
   int totalUsersNum = 0;
   LoginState loginState = LoginState.loginStateLoggedOut;
+  String _preHostID = ""; // Prevent frequent updates
+  List<String> _preSpeakerList = []; //Prevent frequent updates
 
   ZegoUserService() {
     ZIMPlugin.onRoomMemberJoined = _onRoomMemberJoined;
@@ -136,6 +138,11 @@ class ZegoUserService extends ChangeNotifier {
   }
 
   void updateUserRole(String hostID, List<String> speakerList) {
+    if (_preHostID == hostID && _preSpeakerList == speakerList) {
+      return;
+    }
+    _preHostID = hostID;
+    _preSpeakerList = speakerList;
     // Leave room or init
     if (hostID.isEmpty) {
       userList.clear();
