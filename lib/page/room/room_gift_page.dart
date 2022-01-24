@@ -37,7 +37,7 @@ class RoomGiftMemberList extends HookWidget {
       ),
       child: Consumer<ZegoSpeakerSeatService>(builder: (_, seatService, child) {
         var userService = context.read<ZegoUserService>();
-        List<String> speakerIDList = [...seatService.speakerIDList];
+        List<String> speakerIDList = [...seatService.speakerIDSet];
         List<ZegoUserInfo> speakerList = [];
         for (var speakerID in speakerIDList) {
           if (!userService.userDic.containsKey(speakerID)) {
@@ -164,7 +164,7 @@ class RoomGiftBottomBar extends HookWidget {
 
     List<String> toUserList = [];
     if (userIDOfAllSpeaker == selectedUser.userID) {
-      for (var speakerID in seatService.speakerIDList) {
+      for (var speakerID in seatService.speakerIDSet) {
         if (userService.localUserInfo.userID == speakerID) {
           continue; // ignore self
         }
