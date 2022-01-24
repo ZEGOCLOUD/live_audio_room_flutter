@@ -1,23 +1,26 @@
 import 'dart:ffi';
 
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
+import 'package:zego_express_engine/zego_express_engine.dart';
+
+import 'package:live_audio_room_flutter/service/zego_message_service.dart';
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
+import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/page/room/room_setting_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_member_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_gift_page.dart';
-import 'package:live_audio_room_flutter/service/zego_message_service.dart';
-import 'package:live_audio_room_flutter/service/zego_room_service.dart';
-import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
-import 'package:provider/provider.dart';
 import 'package:live_audio_room_flutter/common/input/input_dialog.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
-import 'package:zego_express_engine/zego_express_engine.dart';
 
 class ControllerButton extends StatelessWidget {
   final VoidCallback onPressed;
@@ -176,9 +179,20 @@ class RoomControlButtonsBar extends StatelessWidget {
         return;
       }
 
-      var messageService = context.read<ZegoMessageService>();
-      var roomService = context.read<ZegoRoomService>();
       var userService = context.read<ZegoUserService>();
+      var roomService = context.read<ZegoRoomService>();
+
+      if (ZegoRoomUserRole.roomUserRoleHost !=
+              userService.localUserInfo.userRole &&
+          roomService.roomInfo.isTextMessageDisable) {
+        //  host disable message after listener pop up input dialog
+        Fluttertoast.showToast(
+            msg: AppLocalizations.of(context)!.roomPageBandsSendMessage,
+            backgroundColor: Colors.grey);
+        return;
+      }
+
+      var messageService = context.read<ZegoMessageService>();
       messageService
           .sendTextMessage(roomService.roomInfo.roomID,
               userService.localUserInfo.userID, value!)
