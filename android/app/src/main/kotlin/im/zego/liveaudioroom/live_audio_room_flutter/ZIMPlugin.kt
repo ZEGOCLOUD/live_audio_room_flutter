@@ -231,7 +231,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
             extendedData: JSONObject?
         ) {
             super.onConnectionStateChanged(zim, state, event, extendedData)
-            eventSink.success(mapOf("method" to "onConnectionStateChanged", "state" to (state?.value()
+            eventSink.success(mapOf("method" to "connectionStateChanged", "state" to (state?.value()
                 ?: 0), "event" to (event?.value() ?: 0)
             ))
         }
