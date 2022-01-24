@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
@@ -39,6 +40,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
 
     ZegoExpressEngine.onCapturedSoundLevelUpdate = _onCapturedSoundLevelUpdate;
     ZegoExpressEngine.onRemoteSoundLevelUpdate = _onRemoteSoundLevelUpdate;
+    ZegoExpressEngine.onNetworkQuality = _onNetworkQuality;
   }
 
   Future<int> removeUserFromSeat(int seatIndex) async {
@@ -227,6 +229,28 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       }
     }
     notifyListeners();
+  }
+
+  void _onNetworkQuality(String userID, ZegoStreamQualityLevel upstreamQuality, ZegoStreamQualityLevel downstreamQuality) {
+    for (final seat in seatList) {
+      if (_localUserID == seat.userID) {
+        seat.network = getNetWorkQuality(upstreamQuality);
+      } else {
+        seat.network = getNetWorkQuality(downstreamQuality);
+      }
+    }
+  }
+
+  ZegoNetworkQuality getNetWorkQuality(ZegoStreamQualityLevel streamQuality) {
+    if (streamQuality == ZegoStreamQualityLevel.Excellent || streamQuality == ZegoStreamQualityLevel.Good) {
+      return ZegoNetworkQuality.Good;
+    } else if (streamQuality == ZegoStreamQualityLevel.Medium) {
+      return ZegoNetworkQuality.Medium;
+    } else if (streamQuality == ZegoStreamQualityLevel.Unknown) {
+      return ZegoNetworkQuality.Unknow;
+    } else {
+      return ZegoNetworkQuality.Bad;
+    }
   }
 
   void updateSpeakerIDList() {
