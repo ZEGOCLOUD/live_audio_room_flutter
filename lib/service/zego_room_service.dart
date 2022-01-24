@@ -131,9 +131,15 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
       var roomDic = attributesResult['room_info'];
       if (roomDic == null) {
         // room has end
+        RoomToastContent toastContent = RoomToastContent.empty();
+        toastContent.toastType = RoomToastType.roomEndByHost;
+        notifyInfo(json.encode(toastContent.toJson()));
       }
     } else if(state == 0 && event == 7) {
       // network error leave room
+      RoomToastContent toastContent = RoomToastContent.empty();
+      toastContent.toastType = RoomToastType.roomNetworkLeave;
+      notifyInfo(json.encode(toastContent.toJson()));
     }
     notifyListeners();
   }
@@ -164,6 +170,7 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
   void _updateRoomInfo(RoomInfo updatedRoomInfo) {
     var oldRoomInfo = roomInfo.clone();
     roomInfo = updatedRoomInfo.clone();
+
     RoomToastContent toastContent = RoomToastContent.empty();
     if (oldRoomInfo.isTextMessageDisable != roomInfo.isTextMessageDisable) {
       toastContent.toastType = RoomToastType.textMessageDisable;
