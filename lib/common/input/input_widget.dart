@@ -48,7 +48,7 @@ class _InputWidgetState extends State<InputWidget> {
                       child: TextField(
                         autofocus: true,
                         inputFormatters: <TextInputFormatter>[
-                          LengthLimitingTextInputFormatter(200)
+                          LengthLimitingTextInputFormatter(100)
                         ],
                         controller: editingController,
                         decoration: InputDecoration(
