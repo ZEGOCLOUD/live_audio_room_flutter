@@ -1,5 +1,12 @@
 enum ZegoSpeakerSeatStatus { Untaken, Occupied, Closed }
 
+enum ZegoNetworkQuality {
+  Good,
+  Medium,
+  Bad,
+  Unknow
+}
+
 class ZegoSpeakerSeat {
   String userID = "";
   int seatIndex = -1;
@@ -7,7 +14,7 @@ class ZegoSpeakerSeat {
   ZegoSpeakerSeatStatus status = ZegoSpeakerSeatStatus.Untaken;
 
   double soundLevel = 0.0;
-  double network = 0.0;
+  ZegoNetworkQuality network = ZegoNetworkQuality.Good;
 
   ZegoSpeakerSeat({required this.seatIndex});
 
@@ -29,6 +36,6 @@ class ZegoSpeakerSeat {
     mic = true;
     status = ZegoSpeakerSeatStatus.Untaken;
     soundLevel = 0.0;
-    network = 0.0;
+    network = ZegoNetworkQuality.Good;
   }
 }
