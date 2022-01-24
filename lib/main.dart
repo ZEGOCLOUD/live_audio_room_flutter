@@ -2,19 +2,21 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:live_audio_room_flutter/page/room/room_main_page.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
 import 'package:live_audio_room_flutter/service/zego_message_service.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+
+import 'package:live_audio_room_flutter/page/room/room_main_page.dart';
 import 'package:live_audio_room_flutter/page/login/login_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_entrance_page.dart';
 import 'package:live_audio_room_flutter/page/settings/settings_page.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 void main() {
@@ -51,14 +53,34 @@ class ZegoApp extends StatelessWidget {
                 room.localUserName = users.localUserInfo.userName;
                 return room;
               }),
-          ChangeNotifierProxyProvider<ZegoUserService, ZegoMessageService>(
+          ChangeNotifierProxyProvider2<ZegoRoomService, ZegoUserService, ZegoMessageService>(
               create: (context) => context.read<ZegoMessageService>(),
-              update: (_, users, message) {
+              update: (_, roomService, userService, message) {
                 //  sync member online/offline message
                 if (message == null) throw ArgumentError.notNull('message');
-                message.onRoomMemberJoined(users.addedUserInfo);
-                message.onRoomMemberLeave(users.leaveUserInfo);
+
+                message.onRoomMemberJoined(userService.addedUserInfo);
+                message.onRoomMemberLeave(userService.leaveUserInfo);
+                userService.clearMemberJoinLeaveData();
+
+                //  clear data
+                if(roomService.roomInfo.roomID.isEmpty) {
+                  message.onRoomLeave();
+                }
+
                 return message;
+              }),
+          ChangeNotifierProxyProvider<ZegoRoomService, ZegoGiftService>(
+              create: (context) => context.read<ZegoGiftService>(),
+              update: (_, roomService, giftService) {
+                if (giftService == null) throw ArgumentError.notNull('gift');
+
+                //  clear data
+                if(roomService.roomInfo.roomID.isEmpty) {
+                  giftService.onRoomLeave();
+                }
+
+                return giftService;
               }),
           ChangeNotifierProxyProvider2<ZegoRoomService, ZegoUserService,
               ZegoSpeakerSeatService>(

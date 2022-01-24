@@ -14,27 +14,47 @@ class ZegoGiftService extends ChangeNotifier {
 
   bool displayTips = false;
   late Timer displayTimer;
-  
+
   ZegoGiftService() {
     ZIMPlugin.onReceiveCustomRoomMessage = _onReceiveCustomMessage;
   }
 
+  void onRoomLeave() {
+    if (displayTips) {
+      displayTimer.cancel();
+    }
+    displayTips = false;
 
-  Future<int> sendGift(String roomID, String giftID, List<String> toUserList) async {
-    Map message = {'actionType': 2, 'target': toUserList, 'content': {'giftID': giftID}};
+    giftSender = "";
+    giftID = "";
+    giftReceivers.clear();
+  }
+
+  Future<int> sendGift(
+      String roomID, String senderUserID, String giftID, List<String> toUserList) async {
+    Map message = {
+      'actionType': 2,
+      'target': toUserList,
+      'content': {'giftID': giftID}
+    };
     String json = jsonEncode(message);
     var result = await ZIMPlugin.sendRoomMessage(roomID, json, true);
     int code = result['errorCode'];
     if (code == 0) {
       this.giftID = giftID;
       giftReceivers = toUserList;
-      giftSender = "Some One";
+      giftSender = senderUserID;
     }
+
+    _showGiftTips();
+
     notifyListeners();
+
     return code;
   }
 
-  void _onReceiveCustomMessage(String roomID, List<Map<String, dynamic>> messageListJson) {
+  void _onReceiveCustomMessage(
+      String roomID, List<Map<String, dynamic>> messageListJson) {
     for (final item in messageListJson) {
       var messageJson = item['message'];
       Map<String, dynamic> messageDic = jsonDecode(messageJson);
@@ -46,6 +66,12 @@ class ZegoGiftService extends ChangeNotifier {
       }
     }
 
+    _showGiftTips();
+
+    notifyListeners();
+  }
+
+  void _showGiftTips() {
     if (displayTips) {
       displayTimer.cancel();
     }
@@ -54,7 +80,5 @@ class ZegoGiftService extends ChangeNotifier {
       displayTips = false; //  hide after 10 seconds
       notifyListeners();
     });
-
-    notifyListeners();
   }
 }

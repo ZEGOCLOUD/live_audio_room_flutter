@@ -35,8 +35,8 @@ class ZegoUserService extends ChangeNotifier {
   List<ZegoUserInfo> userList = [];
   Map<String, ZegoUserInfo> userDic = <String, ZegoUserInfo>{};
 
-  ZegoUserInfo addedUserInfo = ZegoUserInfo.empty();
-  ZegoUserInfo leaveUserInfo = ZegoUserInfo.empty();
+  List<ZegoUserInfo> addedUserInfo = [];
+  List<ZegoUserInfo> leaveUserInfo = [];
 
   ZegoUserInfo localUserInfo = ZegoUserInfo.empty();
   int totalUsersNum = 0;
@@ -103,7 +103,7 @@ class ZegoUserService extends ChangeNotifier {
       userDic[member.userID] = member;
 
       if (member.userID.isNotEmpty && localUserInfo.userID != member.userID) {
-        addedUserInfo = member.clone();
+        addedUserInfo.add(member.clone());
       }
     }
     notifyListeners();
@@ -117,10 +117,15 @@ class ZegoUserService extends ChangeNotifier {
       userDic.removeWhere((key, value) => key == member.userID);
 
       if (member.userID.isNotEmpty && localUserInfo.userID != member.userID) {
-        leaveUserInfo = member.clone();
+        leaveUserInfo.add(member.clone());
       }
     }
     notifyListeners();
+  }
+
+  void clearMemberJoinLeaveData() {
+    addedUserInfo.clear();
+    leaveUserInfo.clear();
   }
 
   void _onReceiveCustomPeerMessage(List<Map<String, dynamic>> messageListJson) {
@@ -147,6 +152,8 @@ class ZegoUserService extends ChangeNotifier {
     if (hostID.isEmpty) {
       userList.clear();
       userDic.clear();
+      addedUserInfo.clear();
+      leaveUserInfo.clear();
       // We need to reuse local user id after leave room
       localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleListener;
       totalUsersNum = 0;

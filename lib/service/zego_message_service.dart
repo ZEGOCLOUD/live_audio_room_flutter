@@ -34,8 +34,6 @@ typedef ZegoRoomCallback = Function(int);
 
 class ZegoMessageService extends ChangeNotifier {
   List<ZegoTextMessage> messageList = [];
-  ZegoUserInfo addedUserInfo = ZegoUserInfo.empty();
-  ZegoUserInfo leaveUserInfo = ZegoUserInfo.empty();
   String memberJoinedText = '';
   String memberLeaveText = '';
 
@@ -43,11 +41,8 @@ class ZegoMessageService extends ChangeNotifier {
     ZIMPlugin.onReceiveTextRoomMessage = _onReceiveTextMessage;
   }
 
-  //  todo@luolei call this api when logout room
-  void clearOnLogout() {
+  void onRoomLeave() {
     messageList.clear();
-    addedUserInfo = ZegoUserInfo.empty();
-    leaveUserInfo = ZegoUserInfo.empty();
     memberJoinedText = '';
     memberLeaveText = '';
   }
@@ -81,45 +76,38 @@ class ZegoMessageService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void onRoomMemberJoined(ZegoUserInfo member) {
+  void onRoomMemberJoined(List<ZegoUserInfo> members) {
     if (memberJoinedText.isEmpty) {
       return;
     }
 
-    if (member.userID.isEmpty || member.userName.isEmpty) {
-      return;
+    for (var member in members) {
+      if (member.userID.isEmpty || member.userName.isEmpty) {
+        return;
+      }
+
+      ZegoTextMessage message = ZegoTextMessage();
+      message.message = memberJoinedText.replaceAll('%@', member.userName);
+      messageList.add(message);
     }
 
-    if (addedUserInfo.userID.isNotEmpty &&
-        addedUserInfo.userID == member.userID) {
-      return;
-    }
-    addedUserInfo = member.clone();
-
-    ZegoTextMessage message = ZegoTextMessage();
-    message.message = memberJoinedText.replaceAll('%@', member.userName);
-    messageList.add(message);
     notifyListeners();
   }
 
-  void onRoomMemberLeave(ZegoUserInfo member) {
+  void onRoomMemberLeave(List<ZegoUserInfo> members) {
     if (memberLeaveText.isEmpty) {
       return;
     }
 
-    if (member.userID.isEmpty || member.userName.isEmpty) {
-      return;
-    }
+    for (var member in members) {
+      if (member.userID.isEmpty || member.userName.isEmpty) {
+        return;
+      }
 
-    if (leaveUserInfo.userID.isNotEmpty &&
-        leaveUserInfo.userID == member.userID) {
-      return;
+      ZegoTextMessage message = ZegoTextMessage();
+      message.message = memberLeaveText.replaceAll('%@', member.userName);
+      messageList.add(message);
     }
-    leaveUserInfo = member.clone();
-
-    ZegoTextMessage message = ZegoTextMessage();
-    message.message = memberLeaveText.replaceAll('%@', member.userName);
-    messageList.add(message);
 
     notifyListeners();
   }
