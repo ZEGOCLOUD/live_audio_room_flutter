@@ -140,7 +140,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         val json = JSONObject()
         json.put("target", userJsonArray)
         json.put("content", content)
-        json.put("action_type", actionType)
+        json.put("actionType", actionType)
 
         val jsonString = json.toString()
 
