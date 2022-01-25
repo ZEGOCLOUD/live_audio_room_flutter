@@ -134,7 +134,9 @@ class ZegoUserService extends ChangeNotifier {
       var messageJson = item['message'];
       Map<String, dynamic> messageDic = jsonDecode(messageJson);
       int actionType = messageDic['actionType'];
-      if (actionType == 1) {}
+      if (actionType == 1) {
+        // receive invitation
+      }
     }
     notifyListeners();
   }
