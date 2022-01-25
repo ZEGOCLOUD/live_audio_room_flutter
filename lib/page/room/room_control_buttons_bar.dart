@@ -1,6 +1,8 @@
 import 'dart:ffi';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
@@ -48,10 +50,172 @@ class ControllerButton extends StatelessWidget {
   }
 }
 
-class RoomControlButtonsBar extends StatelessWidget {
+class RoomControlButtonsBar extends HookWidget {
   const RoomControlButtonsBar({Key? key}) : super(key: key);
 
-  createControllerButtons(ZegoRoomUserRole userRole, bool isMute,
+  @override
+  Widget build(BuildContext context) {
+    // Check microphone permission
+    useEffect(() {
+      _checkMicPermission(context).then((isEnable) {
+        if (!isEnable) {
+          // Mic flag always reset to enable after log int room. So toggle to disable it.
+          var seatService = context.read<ZegoSpeakerSeatService>();
+          seatService.toggleMic();
+        }
+      });
+    }, const []);
+
+    return Container(
+      padding: EdgeInsets.fromLTRB(32.w, 22.h, 32.h, 22.h),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Consumer<ZegoRoomService>(
+              builder: (_, roomService, child) => ControllerButton(
+                    iconSrc: StyleIconUrls.roomBottomIm,
+                    onPressed: () {
+                      var userService = context.read<ZegoUserService>();
+                      var localUser =
+                          userService.userDic[roomService.localUserID];
+                      if (ZegoRoomUserRole.roomUserRoleHost !=
+                              localUser?.userRole &&
+                          roomService.roomInfo.isTextMessageDisable) {
+                        return;
+                      }
+                      _showMessageInput(context);
+                    },
+                  )),
+          Consumer2<ZegoUserService, ZegoSpeakerSeatService>(
+              builder: (_, users, seats, child) => Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: _createControllerButtons(
+                        users.localUserInfo.userRole, seats.isMute,
+                        micCallback: () {
+                      _checkMicPermission(context).then((isEnable) {
+                        if (isEnable) {
+                          var seatService =
+                              context.read<ZegoSpeakerSeatService>();
+                          seatService.toggleMic();
+                        }
+                      });
+                    }, memberCallback: () {
+                      showModalBottomSheet(
+                          context: context,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          elevation: 800.h,
+                          isDismissible: true,
+                          builder: (BuildContext context) {
+                            return RoomMemberPage();
+                          });
+                    }, giftCallback: () {
+                      showModalBottomSheet(
+                          context: context,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          elevation: 800.h,
+                          isDismissible: true,
+                          builder: (BuildContext context) {
+                            return RoomGiftPage();
+                          });
+                    }, settingsCallback: () {
+                      showModalBottomSheet(
+                          context: context,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                          elevation: 800.h,
+                          isDismissible: true,
+                          builder: (BuildContext context) {
+                            return RoomSettingPage();
+                          });
+                    }),
+                  ))
+        ],
+      ),
+    );
+  }
+
+  _showDialog(BuildContext context, String title, String description,
+      {String? cancelButtonText,
+      String? confirmButtonText,
+      VoidCallback? confirmCallback}) {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(title),
+        content: Text(description),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context,
+                cancelButtonText ?? AppLocalizations.of(context)!.dialogCancel),
+            child: Text(confirmButtonText ??
+                AppLocalizations.of(context)!.dialogCancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(
+                  context, AppLocalizations.of(context)!.dialogConfirm);
+
+              if (confirmCallback != null) {
+                confirmCallback();
+              }
+            },
+            child: Text(AppLocalizations.of(context)!.dialogConfirm),
+          ),
+        ],
+      ),
+    );
+  }
+
+  _showMessageInput(BuildContext context) {
+    InputDialog.show(context).then((value) {
+      if (value?.isEmpty ?? true) {
+        return;
+      }
+
+      var userService = context.read<ZegoUserService>();
+      var roomService = context.read<ZegoRoomService>();
+
+      if (ZegoRoomUserRole.roomUserRoleHost !=
+              userService.localUserInfo.userRole &&
+          roomService.roomInfo.isTextMessageDisable) {
+        //  host disable message after listener pop up input dialog
+        Fluttertoast.showToast(
+            msg: AppLocalizations.of(context)!.roomPageBandsSendMessage,
+            backgroundColor: Colors.grey);
+        return;
+      }
+
+      var messageService = context.read<ZegoMessageService>();
+      messageService
+          .sendTextMessage(roomService.roomInfo.roomID,
+              userService.localUserInfo.userID, value!)
+          .then((errorCode) {
+        if (0 != errorCode) {
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!
+                  .toastSendMessageError(errorCode),
+              backgroundColor: Colors.grey);
+        }
+      });
+    });
+  }
+
+  Future<bool> _checkMicPermission(BuildContext context) async {
+    var status = await Permission.microphone.status;
+    if (!status.isGranted) {
+      _showDialog(context, AppLocalizations.of(context)!.roomPageMicCantOpen,
+          AppLocalizations.of(context)!.roomPageGrantMicPermission,
+          confirmCallback: () => openAppSettings());
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  _createControllerButtons(ZegoRoomUserRole userRole, bool isMute,
       {required VoidCallback micCallback,
       required VoidCallback memberCallback,
       required VoidCallback giftCallback,
@@ -103,107 +267,5 @@ class RoomControlButtonsBar extends StatelessWidget {
     }
 
     return buttons;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(32.w, 22.h, 32.h, 22.h),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Consumer<ZegoRoomService>(
-              builder: (_, roomService, child) => ControllerButton(
-                    iconSrc: StyleIconUrls.roomBottomIm,
-                    onPressed: () {
-                      var userService = context.read<ZegoUserService>();
-                      var localUser =
-                          userService.userDic[roomService.localUserID];
-                      if (ZegoRoomUserRole.roomUserRoleHost !=
-                              localUser?.userRole &&
-                          roomService.roomInfo.isTextMessageDisable) {
-                        return;
-                      }
-                      showMessageInput(context);
-                    },
-                  )),
-          Consumer2<ZegoUserService, ZegoSpeakerSeatService>(
-              builder: (_, users, seats, child) => Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: createControllerButtons(
-                        users.localUserInfo.userRole, seats.isMute,
-                        micCallback: () {
-                      var seatService = context.read<ZegoSpeakerSeatService>();
-                      seatService.toggleMic();
-                    }, memberCallback: () {
-                      showModalBottomSheet(
-                          context: context,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          elevation: 800.h,
-                          isDismissible: true,
-                          builder: (BuildContext context) {
-                            return RoomMemberPage();
-                          });
-                    }, giftCallback: () {
-                      showModalBottomSheet(
-                          context: context,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          elevation: 800.h,
-                          isDismissible: true,
-                          builder: (BuildContext context) {
-                            return RoomGiftPage();
-                          });
-                    }, settingsCallback: () {
-                      showModalBottomSheet(
-                          context: context,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          elevation: 800.h,
-                          isDismissible: true,
-                          builder: (BuildContext context) {
-                            return RoomSettingPage();
-                          });
-                    }),
-                  ))
-        ],
-      ),
-    );
-  }
-
-  showMessageInput(BuildContext context) {
-    InputDialog.show(context).then((value) {
-      if (value?.isEmpty ?? true) {
-        return;
-      }
-
-      var userService = context.read<ZegoUserService>();
-      var roomService = context.read<ZegoRoomService>();
-
-      if (ZegoRoomUserRole.roomUserRoleHost !=
-              userService.localUserInfo.userRole &&
-          roomService.roomInfo.isTextMessageDisable) {
-        //  host disable message after listener pop up input dialog
-        Fluttertoast.showToast(
-            msg: AppLocalizations.of(context)!.roomPageBandsSendMessage,
-            backgroundColor: Colors.grey);
-        return;
-      }
-
-      var messageService = context.read<ZegoMessageService>();
-      messageService
-          .sendTextMessage(roomService.roomInfo.roomID,
-              userService.localUserInfo.userID, value!)
-          .then((errorCode) {
-        if (0 != errorCode) {
-          Fluttertoast.showToast(
-              msg: AppLocalizations.of(context)!
-                  .toastSendMessageError(errorCode),
-              backgroundColor: Colors.grey);
-        }
-      });
-    });
   }
 }
