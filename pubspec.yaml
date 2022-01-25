@@ -40,6 +40,7 @@ dependencies:
   device_info_plus: ^3.2.1
   zego_express_engine: ^2.7.1
   flutter_provider_utilities: ^1.0.4
+  loader_overlay: ^2.0.5
 
 
 dev_dependencies:

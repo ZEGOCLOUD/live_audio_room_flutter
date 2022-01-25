@@ -148,18 +148,6 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.roomNetworkLeave;
       notifyInfo(json.encode(toastContent.toJson()));
-    } else if (roomState == zimRoomState.zimRoomStateConnecting &&
-        roomEvent == zimRoomEvent.zimRoomEventNetworkInterrupted) {
-      //  temp network broken
-      RoomInfoContent toastContent = RoomInfoContent.empty();
-      toastContent.toastType = RoomInfoType.roomNetworkTempBroken;
-      notifyInfo(json.encode(toastContent.toJson()));
-    } else if (roomState == zimRoomState.zimRoomStateConnected &&
-        roomEvent == zimRoomEvent.zimRoomEventSuccess) {
-      //  reconnected after temp network broken
-      RoomInfoContent toastContent = RoomInfoContent.empty();
-      toastContent.toastType = RoomInfoType.roomNetworkReconnected;
-      notifyInfo(json.encode(toastContent.toJson()));
     }
 
     notifyListeners();

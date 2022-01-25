@@ -1,7 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/gestures.dart';
+import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,6 +13,8 @@ import 'package:live_audio_room_flutter/service/zego_message_service.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+import 'package:live_audio_room_flutter/service/zego_loading_service.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 
 import 'package:live_audio_room_flutter/page/room/room_main_page.dart';
 import 'package:live_audio_room_flutter/page/login/login_page.dart';
@@ -36,6 +39,7 @@ class ZegoApp extends StatelessWidget {
           ChangeNotifierProvider(create: (context) => ZegoUserService()),
           ChangeNotifierProvider(create: (context) => ZegoGiftService()),
           ChangeNotifierProvider(create: (context) => ZegoMessageService()),
+          ChangeNotifierProvider(create: (context) => ZegoLoadingService()),
           ChangeNotifierProxyProvider2<ZegoRoomService, ZegoSpeakerSeatService,
               ZegoUserService>(
             create: (context) => context.read<ZegoUserService>(),
@@ -53,7 +57,8 @@ class ZegoApp extends StatelessWidget {
                 room.localUserName = users.localUserInfo.userName;
                 return room;
               }),
-          ChangeNotifierProxyProvider2<ZegoRoomService, ZegoUserService, ZegoMessageService>(
+          ChangeNotifierProxyProvider2<ZegoRoomService, ZegoUserService,
+                  ZegoMessageService>(
               create: (context) => context.read<ZegoMessageService>(),
               update: (_, roomService, userService, message) {
                 //  sync member online/offline message
@@ -64,7 +69,7 @@ class ZegoApp extends StatelessWidget {
                 userService.clearMemberJoinLeaveData();
 
                 //  clear data
-                if(roomService.roomInfo.roomID.isEmpty) {
+                if (roomService.roomInfo.roomID.isEmpty) {
                   message.onRoomLeave();
                 }
 
@@ -76,7 +81,7 @@ class ZegoApp extends StatelessWidget {
                 if (giftService == null) throw ArgumentError.notNull('gift');
 
                 //  clear data
-                if(roomService.roomInfo.roomID.isEmpty) {
+                if (roomService.roomInfo.roomID.isEmpty) {
                   giftService.onRoomLeave();
                 }
 
@@ -117,13 +122,50 @@ class ZegoApp extends StatelessWidget {
                 ],
                 initialRoute: "/login",
                 routes: {
-                  "/login": (context) => LoginPage(),
+                  "/login": (context) => const LoginPage(),
                   "/settings": (context) => const SettingsPage(),
-                  "/room_entrance": (context) => RoomEntrancePage(),
-                  "/room_main": (context) => const RoomMainPage()
+                  "/room_entrance": (context) => const RoomEntrancePage(),
+                  "/room_main": (context) => roomMainLoadingPage(),
                 },
               ),
             )));
+  }
+
+  roomMainLoadingPage() {
+    return Consumer<ZegoLoadingService>(
+      builder: (context, loadingService, child) => LoaderOverlay(
+        child: const RoomMainPage(),
+        useDefaultLoading: false,
+        overlayColor: Colors.grey,
+        overlayOpacity: 0.8,
+        overlayWidget: SizedBox(
+          width: 750.w,
+          height: 1334.h,
+          child: Center(
+            child: Column(
+              children: [
+                const Expanded(child: Text('')),
+                const CupertinoActivityIndicator(
+                  radius: 14,
+                ),
+                SizedBox(height: 5.h),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10.0, vertical: 5.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14.0),
+                    color: Colors.grey,
+                  ),
+                  child: Text(loadingService.loadingText(),
+                      style: StyleConstant.loadingText),
+                ),
+                const Expanded(child: Text(''))
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void hideKeyboard(BuildContext context) {
