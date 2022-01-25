@@ -45,7 +45,8 @@ class ZegoApp extends StatelessWidget {
             create: (context) => context.read<ZegoUserService>(),
             update: (_, room, seats, users) {
               if (users == null) throw ArgumentError.notNull('users');
-              users.updateUserRole(room.roomInfo.hostID, seats.speakerIDList);
+              users.updateHostID(room.roomInfo.hostID);
+              users.updateSpeakerSet(seats.speakerIDSet);
               return users;
             },
           ),

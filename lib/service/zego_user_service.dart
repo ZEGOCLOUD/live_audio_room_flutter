@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-
+import 'package:flutter/material.dart';
 import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
 
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
@@ -47,7 +47,7 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
   int totalUsersNum = 0;
   LoginState loginState = LoginState.loginStateLoggedOut;
   String _preHostID = ""; // Prevent frequent updates
-  List<String> _preSpeakerList = []; //Prevent frequent updates
+  Set<String> _preSpeakerSet = {}; //Prevent frequent updates
 
   ZegoUserService() {
     ZIMPlugin.onRoomMemberJoined = _onRoomMemberJoined;
@@ -175,22 +175,38 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     notifyListeners();
   }
 
-  void updateUserRole(String hostID, List<String> speakerList) {
-    if (_preHostID == hostID && _preSpeakerList == speakerList) {
+  void _resetDataAfterLeavingRoom() {
+    _preSpeakerSet.clear();
+    userList.clear();
+    userDic.clear();
+    addedUserInfo.clear();
+    leaveUserInfo.clear();
+    // We need to reuse local user id after leave room
+    localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleListener;
+    totalUsersNum = 0;
+    loginState = LoginState.loginStateLoggedOut;
+  }
+
+  void updateHostID(String hostID) {
+    if (_preHostID == hostID) {
       return;
     }
     _preHostID = hostID;
-    _preSpeakerList = speakerList;
+    _updateUserRole(hostID, _preSpeakerSet);
+  }
+
+  void updateSpeakerSet(Set<String> speakerSet) {
+    if (setEquals(_preSpeakerSet, speakerSet)) {
+      return;
+    }
+    _preSpeakerSet = {...speakerSet};
+    _updateUserRole(_preHostID, speakerSet);
+  }
+
+  void _updateUserRole(String hostID, Set<String> speakerList) {
     // Leave room or init
     if (hostID.isEmpty) {
-      userList.clear();
-      userDic.clear();
-      addedUserInfo.clear();
-      leaveUserInfo.clear();
-      // We need to reuse local user id after leave room
-      localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleListener;
-      totalUsersNum = 0;
-      loginState = LoginState.loginStateLoggedOut;
+      _resetDataAfterLeavingRoom();
       return;
     }
     // Update local user role
