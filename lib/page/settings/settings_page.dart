@@ -91,29 +91,29 @@ class SettingsLogoutWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        height: 98.h,
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          color: StyleColors.settingsCellBackgroundColor,
-        ),
-        child: Center(
-            child: InkWell(
-          onTap: () {
-            var userService = context.read<ZegoUserService>();
-            userService.logout().then((errorCode) {
-              if (0 != errorCode) {
-                Fluttertoast.showToast(
-                    msg: AppLocalizations.of(context)!
-                        .toastLogoutFail(errorCode),
-                    backgroundColor: Colors.grey);
-              }
-            });
-            Navigator.pushReplacementNamed(context, "/login");
-          },
-          child: Text(AppLocalizations.of(context)!.settingPageLogout,
-              textAlign: TextAlign.center, style: StyleConstant.settingLogout),
-        )));
+    return GestureDetector(
+      child: Container(
+          height: 98.h,
+          width: double.infinity,
+          decoration: const BoxDecoration(
+            color: StyleColors.settingsCellBackgroundColor,
+          ),
+          child: Center(
+              child: Text(AppLocalizations.of(context)!.settingPageLogout,
+                  textAlign: TextAlign.center,
+                  style: StyleConstant.settingLogout))),
+      onTap: () {
+        var userService = context.read<ZegoUserService>();
+        userService.logout().then((errorCode) {
+          if (0 != errorCode) {
+            Fluttertoast.showToast(
+                msg: AppLocalizations.of(context)!.toastLogoutFail(errorCode),
+                backgroundColor: Colors.grey);
+          }
+        });
+        Navigator.pushReplacementNamed(context, "/login");
+      },
+    );
   }
 }
 
