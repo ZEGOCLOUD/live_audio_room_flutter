@@ -39,7 +39,10 @@ class RoomGiftMemberList extends HookWidget {
         var roomService = context.read<ZegoRoomService>();
         var userService = context.read<ZegoUserService>();
         List<String> speakerIDList = [...seatService.speakerIDSet];
-        speakerIDList.add(roomService.roomInfo.hostID); //  add host
+        if (ZegoRoomUserRole.roomUserRoleHost !=
+            userService.localUserInfo.userRole) {
+          speakerIDList.add(roomService.roomInfo.hostID); //  add host
+        }
         List<ZegoUserInfo> speakerList = [];
         for (var speakerID in speakerIDList) {
           if (!userService.userDic.containsKey(speakerID)) {

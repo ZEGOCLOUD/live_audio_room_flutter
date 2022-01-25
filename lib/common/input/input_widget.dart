@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class InputWidget extends StatefulWidget {
   const InputWidget({Key? key}) : super(key: key);
@@ -65,9 +66,9 @@ class _InputWidgetState extends State<InputWidget> {
                   GestureDetector(
                     onTap: (() {
                       var text = editingController.text.trim();
-                      if (text.isNotEmpty) {
-                        Navigator.pop(context, text);
-                      }
+                      // if (text.isNotEmpty) { //  if not allow empty input
+                      Navigator.pop(context, text);
+                      // }
                     }),
                     child: Container(
                       decoration: const BoxDecoration(
@@ -76,8 +77,8 @@ class _InputWidgetState extends State<InputWidget> {
                       padding: const EdgeInsets.only(
                           left: 10, right: 10, top: 10, bottom: 10),
                       alignment: Alignment.center,
-                      child: const Text(
-                        "发送",
+                      child: Text(
+                        AppLocalizations.of(context)!.roomPageSendMessage,
                         style: StyleConstant.roomMessageSendButtonText,
                       ),
                     ),
