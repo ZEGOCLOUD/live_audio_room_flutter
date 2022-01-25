@@ -6,7 +6,7 @@ enum RoomInfoType {
   roomNetworkTempBroken,
   roomNetworkReconnected,
   roomNetworkReconnectedTimeout,
-  roomKickOut,
+  loginUserKickOut,
 }
 
 extension RoomInfoTypeExtension on RoomInfoType {
@@ -18,7 +18,7 @@ extension RoomInfoTypeExtension on RoomInfoType {
     RoomInfoType.roomNetworkTempBroken: 3,
     RoomInfoType.roomNetworkReconnected: 4,
     RoomInfoType.roomNetworkReconnectedTimeout: 5,
-    RoomInfoType.roomKickOut: 6,
+    RoomInfoType.loginUserKickOut: 6,
   };
 
   static const Map<int, RoomInfoType> mapValue = {
@@ -29,7 +29,7 @@ extension RoomInfoTypeExtension on RoomInfoType {
     3: RoomInfoType.roomNetworkTempBroken,
     4: RoomInfoType.roomNetworkReconnected,
     5: RoomInfoType.roomNetworkReconnectedTimeout,
-    6: RoomInfoType.roomKickOut,
+    6: RoomInfoType.loginUserKickOut,
   };
 }
 

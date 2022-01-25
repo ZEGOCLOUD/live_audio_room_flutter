@@ -84,6 +84,9 @@ class RoomMainPage extends StatelessWidget {
                           _showNetworkDisconnectTimeoutDialog(
                               context, infoContent);
                           break;
+                        case RoomInfoType.loginUserKickOut:
+                          _showLoginUserKickOutTips(context, infoContent);
+                          break;
                         default:
                           break;
                       }
@@ -199,5 +202,16 @@ class RoomMainPage extends StatelessWidget {
         return alert;
       },
     );
+  }
+
+  _showLoginUserKickOutTips(BuildContext context, RoomInfoContent infoContent) {
+    if (infoContent.toastType != RoomInfoType.loginUserKickOut) {
+      return;
+    }
+
+    Fluttertoast.showToast(
+        msg: AppLocalizations.of(context)!.toastKickoutError,
+        backgroundColor: Colors.grey);
+    Navigator.pushReplacementNamed(context, "/login");
   }
 }

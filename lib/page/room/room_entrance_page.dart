@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
+import 'package:live_audio_room_flutter/common/room_info_content.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
@@ -31,9 +35,12 @@ class CreateRoomDialog extends HookWidget {
     var room = context.read<ZegoRoomService>();
     room.createRoom(roomID, roomName, "").then((code) {
       if (code != 0) {
-        Fluttertoast.showToast(
-            msg: AppLocalizations.of(context)!.toastCreateRoomFail(code),
-            backgroundColor: Colors.grey);
+        String message =
+            AppLocalizations.of(context)!.toastCreateRoomFail(code);
+        if (6000311 == code) {
+          message = AppLocalizations.of(context)!.toastRoomExisted;
+        }
+        Fluttertoast.showToast(msg: message, backgroundColor: Colors.grey);
       } else {
         Navigator.pushReplacementNamed(context, "/room_main");
       }
@@ -118,9 +125,11 @@ class RoomEntrancePage extends HookWidget {
     var room = context.read<ZegoRoomService>();
     room.joinRoom(roomID, "").then((code) {
       if (code != 0) {
-        Fluttertoast.showToast(
-            msg: AppLocalizations.of(context)!.toastJoinRoomFail(code),
-            backgroundColor: Colors.grey);
+        String message = AppLocalizations.of(context)!.toastJoinRoomFail(code);
+        if (6000301 == code) {
+          message = AppLocalizations.of(context)!.toastRoomNotExistFail;
+        }
+        Fluttertoast.showToast(msg: message, backgroundColor: Colors.grey);
       } else {
         var users = context.read<ZegoUserService>();
         if (room.roomInfo.hostID == users.localUserInfo.userID) {
@@ -204,9 +213,38 @@ class RoomEntrancePage extends HookWidget {
                       context: context,
                       builder: (BuildContext context) => CreateRoomDialog());
                 }),
+            Offstage(
+                offstage: true,
+                child: MessageListener<ZegoUserService>(
+                  child: const Text(''),
+                  showError: (error) {},
+                  showInfo: (jsonInfo) {
+                    var infoContent =
+                        RoomInfoContent.fromJson(jsonDecode(jsonInfo));
+
+                    switch (infoContent.toastType) {
+                      case RoomInfoType.loginUserKickOut:
+                        _showLoginUserKickOutTips(context, infoContent);
+                        break;
+                      default:
+                        break;
+                    }
+                  },
+                )),
           ],
         ),
       ),
     )));
+  }
+
+  _showLoginUserKickOutTips(BuildContext context, RoomInfoContent infoContent) {
+    if (infoContent.toastType != RoomInfoType.loginUserKickOut) {
+      return;
+    }
+
+    Fluttertoast.showToast(
+        msg: AppLocalizations.of(context)!.toastKickoutError,
+        backgroundColor: Colors.grey);
+    Navigator.pushReplacementNamed(context, "/login");
   }
 }
