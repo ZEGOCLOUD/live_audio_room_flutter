@@ -79,10 +79,10 @@ class RoomMemberListItem extends StatelessWidget {
                     itemBuilder: (context) {
                       return <PopupMenuEntry<RoomMemberListMenuAction>>[
                         PopupMenuItem<RoomMemberListMenuAction>(
-                          height: 98.h,
+                          height: 49.h,
                           value: RoomMemberListMenuAction.inviteToBeASpeaker,
                           child: SizedBox(
-                              width: 630.0.w,
+                              width: 180.0.w,
                               child: Text(
                                   AppLocalizations.of(context)!
                                       .roomPageInviteTakeSeat,
