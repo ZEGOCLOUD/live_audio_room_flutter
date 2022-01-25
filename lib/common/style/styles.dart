@@ -177,4 +177,9 @@ class StyleConstant {
     color: StyleColors.giftMessageTypeTextColor,
     fontSize: 12.0,
   );
+
+  static const loadingText = TextStyle(
+      color: Colors.white,
+      fontSize: 10.0,
+      decoration: TextDecoration.none);
 }

@@ -2,10 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
+
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
+import 'package:live_audio_room_flutter/constants/zego_constant.dart';
 import 'package:zego_express_engine/zego_express_engine.dart';
+import 'package:live_audio_room_flutter/common/room_info_content.dart';
 
 enum LoginState {
   loginStateLoggedOut,
@@ -31,7 +35,7 @@ enum ConnectionEvent {
 
 typedef LoginCallback = Function(int);
 
-class ZegoUserService extends ChangeNotifier {
+class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
   // TODO@oliver update userList on SDK callback and notify changed
   List<ZegoUserInfo> userList = [];
   Map<String, ZegoUserInfo> userDic = <String, ZegoUserInfo>{};
@@ -96,8 +100,8 @@ class ZegoUserService extends ChangeNotifier {
     return result['errorCode'];
   }
 
-  void _onRoomMemberJoined(String roomID,
-      List<Map<String, dynamic>> memberList) {
+  void _onRoomMemberJoined(
+      String roomID, List<Map<String, dynamic>> memberList) {
     for (final item in memberList) {
       var member = ZegoUserInfo.formJson(item);
       userList.add(member);
@@ -110,8 +114,8 @@ class ZegoUserService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _onRoomMemberLeave(String roomID,
-      List<Map<String, dynamic>> memberList) {
+  void _onRoomMemberLeave(
+      String roomID, List<Map<String, dynamic>> memberList) {
     for (final item in memberList) {
       var member = ZegoUserInfo.formJson(item);
       userList.removeWhere((element) => element.userID == member.userID);
@@ -140,6 +144,34 @@ class ZegoUserService extends ChangeNotifier {
   }
 
   void _onConnectionStateChanged(int state, int event) {
+    zimConnectionState? connectionState =
+        zimConnectionStateExtension.mapValue[state];
+    zimConnectionEvent? connectionEvent =
+        zimConnectionEventExtension.mapValue[event];
+
+    if (connectionState == zimConnectionState.zimConnectionStateReconnecting &&
+        connectionEvent ==
+            zimConnectionEvent.zimConnectionEventLoginInterrupted) {
+      //  temp network broken
+      RoomInfoContent toastContent = RoomInfoContent.empty();
+      toastContent.toastType = RoomInfoType.roomNetworkTempBroken;
+      notifyInfo(json.encode(toastContent.toJson()));
+    } else if (connectionState ==
+            zimConnectionState.zimConnectionStateConnected &&
+        connectionEvent == zimConnectionEvent.zimConnectionEventSuccess) {
+      //  reconnected after temp network broken
+      RoomInfoContent toastContent = RoomInfoContent.empty();
+      toastContent.toastType = RoomInfoType.roomNetworkReconnected;
+      notifyInfo(json.encode(toastContent.toJson()));
+    } else if (connectionState ==
+            zimConnectionState.zimConnectionStateDisconnected &&
+        connectionEvent == zimConnectionEvent.zimConnectionEventKickedOut) {
+      //  kick out
+      RoomInfoContent toastContent = RoomInfoContent.empty();
+      toastContent.toastType = RoomInfoType.roomKickOut;
+      // notifyInfo(json.encode(toastContent.toJson()));
+    }
+
     notifyListeners();
   }
 
