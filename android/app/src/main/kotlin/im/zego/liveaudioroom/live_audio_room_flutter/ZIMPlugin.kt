@@ -63,7 +63,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
 
     fun logout(call: MethodCall, result: MethodChannel.Result) {
         zim?.logout()
-        result.success(null)
+        result.success(mapOf("errorCode" to 0))
     }
 
     fun createRoom(call: MethodCall, result: MethodChannel.Result) {
