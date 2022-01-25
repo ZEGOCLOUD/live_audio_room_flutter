@@ -36,8 +36,10 @@ class RoomGiftMemberList extends HookWidget {
         borderRadius: BorderRadius.circular(17.0),
       ),
       child: Consumer<ZegoSpeakerSeatService>(builder: (_, seatService, child) {
+        var roomService = context.read<ZegoRoomService>();
         var userService = context.read<ZegoUserService>();
         List<String> speakerIDList = [...seatService.speakerIDSet];
+        speakerIDList.add(roomService.roomInfo.hostID); //  add host
         List<ZegoUserInfo> speakerList = [];
         for (var speakerID in speakerIDList) {
           if (!userService.userDic.containsKey(speakerID)) {

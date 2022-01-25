@@ -170,8 +170,15 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
         connectionEvent == zimConnectionEvent.zimConnectionEventKickedOut) {
       //  kick out
       RoomInfoContent toastContent = RoomInfoContent.empty();
-      toastContent.toastType = RoomInfoType.roomKickOut;
-      // notifyInfo(json.encode(toastContent.toJson()));
+      toastContent.toastType = RoomInfoType.loginUserKickOut;
+      notifyInfo(json.encode(toastContent.toJson()));
+    } else if (connectionState ==
+            zimConnectionState.zimConnectionStateDisconnected &&
+        connectionEvent == zimConnectionEvent.zimConnectionEventLoginTimeout) {
+      //  connect timeout
+      RoomInfoContent toastContent = RoomInfoContent.empty();
+      toastContent.toastType = RoomInfoType.roomNetworkReconnectedTimeout;
+      notifyInfo(json.encode(toastContent.toJson()));
     }
 
     notifyListeners();

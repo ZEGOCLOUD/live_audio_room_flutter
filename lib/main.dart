@@ -154,7 +154,7 @@ class ZegoApp extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 10.0, vertical: 5.0),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14.0),
+                    borderRadius: BorderRadius.circular(6.0),
                     color: Colors.grey,
                   ),
                   child: Text(loadingService.loadingText(),

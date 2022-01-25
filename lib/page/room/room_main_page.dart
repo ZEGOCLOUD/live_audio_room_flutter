@@ -80,6 +80,13 @@ class RoomMainPage extends StatelessWidget {
                         case RoomInfoType.roomNetworkReconnected:
                           _hideNetworkTempBrokenTips(context, infoContent);
                           break;
+                        case RoomInfoType.roomNetworkReconnectedTimeout:
+                          _showNetworkDisconnectTimeoutDialog(
+                              context, infoContent);
+                          break;
+                        case RoomInfoType.loginUserKickOut:
+                          _showLoginUserKickOutTips(context, infoContent);
+                          break;
                         default:
                           break;
                       }
@@ -160,5 +167,51 @@ class RoomMainPage extends StatelessWidget {
       return;
     }
     context.loaderOverlay.hide();
+  }
+
+  _showNetworkDisconnectTimeoutDialog(
+      BuildContext context, RoomInfoContent infoContent) {
+    if (infoContent.toastType != RoomInfoType.roomNetworkReconnectedTimeout) {
+      return;
+    }
+
+    var title = Text(AppLocalizations.of(context)!.networkConnectFailedTitle,
+        textAlign: TextAlign.center);
+    var content = Text(AppLocalizations.of(context)!.toastDisconnectTips,
+        textAlign: TextAlign.center);
+
+    var alert = AlertDialog(
+      title: title,
+      content: content,
+      actions: <Widget>[
+        TextButton(
+          child: Text(AppLocalizations.of(context)!.dialogConfirm,
+              textAlign: TextAlign.center),
+          onPressed: () {
+            Navigator.of(context).pop(true);
+            Navigator.pushReplacementNamed(context, "/room_entrance");
+          },
+        ),
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
+  _showLoginUserKickOutTips(BuildContext context, RoomInfoContent infoContent) {
+    if (infoContent.toastType != RoomInfoType.loginUserKickOut) {
+      return;
+    }
+
+    Fluttertoast.showToast(
+        msg: AppLocalizations.of(context)!.toastKickoutError,
+        backgroundColor: Colors.grey);
+    Navigator.pushReplacementNamed(context, "/login");
   }
 }

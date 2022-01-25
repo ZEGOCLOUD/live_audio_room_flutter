@@ -97,8 +97,10 @@ class LoginPage extends HookWidget {
           child: Column(
             children: [
               TextFormField(
+                maxLength: 20,
                 style: StyleConstant.loginTextInput,
                 decoration: InputDecoration(
+                    counterText: '',
                     focusedBorder: textFormFieldBorder,
                     border: textFormFieldBorder,
                     hintStyle: StyleConstant.loginTextInputHintStyle,
@@ -107,8 +109,10 @@ class LoginPage extends HookWidget {
               ),
               SizedBox(height: 49.h),
               TextFormField(
+                maxLength: 16,
                 style: StyleConstant.loginTextInput,
                 decoration: InputDecoration(
+                    counterText: '',
                     focusedBorder: textFormFieldBorder,
                     border: textFormFieldBorder,
                     hintStyle: StyleConstant.loginTextInputHintStyle,
