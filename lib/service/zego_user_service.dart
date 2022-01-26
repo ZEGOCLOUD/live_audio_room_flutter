@@ -8,6 +8,7 @@ import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
 import 'package:live_audio_room_flutter/constants/zego_constant.dart';
+import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:zego_express_engine/zego_express_engine.dart';
 import 'package:live_audio_room_flutter/common/room_info_content.dart';
 
@@ -47,7 +48,6 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
   ZegoUserInfo localUserInfo = ZegoUserInfo.empty();
   int totalUsersNum = 0;
   LoginState loginState = LoginState.loginStateLoggedOut;
-  String _preHostID = ""; // Prevent frequent updates
   Set<String> _preSpeakerSet = {}; //Prevent frequent updates
 
   ZegoUserService() {
@@ -67,8 +67,12 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleListener;
     totalUsersNum = 0;
     loginState = LoginState.loginStateLoggedOut;
-  } 
-  
+  }
+
+  onRoomEnter() {
+    _updateUserRole({});
+  }
+
   ZegoUserInfo getUserByID(String userID) {
     var userInfo = userDic[userID] ?? ZegoUserInfo.empty();
     return userInfo.clone();
@@ -213,23 +217,16 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     notifyListeners();
   }
 
-  void updateHostID(String hostID) {
-    if (_preHostID == hostID) {
-      return;
-    }
-    _preHostID = hostID;
-    _updateUserRole(hostID, _preSpeakerSet);
-  }
-
   void updateSpeakerSet(Set<String> speakerSet) {
     if (setEquals(_preSpeakerSet, speakerSet)) {
       return;
     }
     _preSpeakerSet = {...speakerSet};
-    _updateUserRole(_preHostID, speakerSet);
+    _updateUserRole(speakerSet);
   }
 
-  void _updateUserRole(String hostID, Set<String> speakerList) {
+  void _updateUserRole(Set<String> speakerList) {
+    var hostID = ZegoRoomManager.shared.roomService.roomInfo.hostID;
     // Leave room or init
     if (hostID.isEmpty) {
       return;

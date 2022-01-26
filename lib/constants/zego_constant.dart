@@ -91,7 +91,7 @@ enum ZimRoomState {
   zimRoomStateConnecting,
 
   /// Description: The connection is successful.
-  /// Use cases: Entering this state means that the room has been successfully entered, and the user can use the room's functions normally.
+  /// Use cases: Entering this state means that the room has been successfully reentered after network broken.
   zimRoomStateConnected,
 }
 

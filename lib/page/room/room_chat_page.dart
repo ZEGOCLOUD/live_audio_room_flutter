@@ -120,8 +120,7 @@ class ChatMessagePage extends HookWidget {
           itemBuilder: (_, index) {
             var message = messageService.messageList[index];
             ChatMessageModel messageModel = ChatMessageModel(
-                userService.userDic[message.userID] ?? ZegoUserInfo.empty(),
-                message);
+                userService.getUserByID(message.userID), message);
             return ChatMessageItem(messageModel: messageModel);
           },
         );

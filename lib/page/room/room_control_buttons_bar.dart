@@ -76,10 +76,8 @@ class RoomControlButtonsBar extends HookWidget {
                     iconSrc: StyleIconUrls.roomBottomIm,
                     onPressed: () {
                       var userService = context.read<ZegoUserService>();
-                      var localUser =
-                          userService.userDic[roomService.localUserID];
                       if (ZegoRoomUserRole.roomUserRoleHost !=
-                              localUser?.userRole &&
+                          userService.localUserInfo.userRole &&
                           roomService.roomInfo.isTextMessageDisable) {
                         return;
                       }
