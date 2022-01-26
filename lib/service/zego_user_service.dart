@@ -140,6 +140,9 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
       int actionType = messageDic['actionType'];
       if (actionType == 1) {
         // receive invitation
+        RoomInfoContent toastContent = RoomInfoContent.empty();
+        toastContent.toastType = RoomInfoType.roomHostInviteToSpeak;
+        notifyInfo(json.encode(toastContent.toJson()));
       }
     }
     notifyListeners();

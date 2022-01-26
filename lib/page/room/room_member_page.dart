@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -11,11 +14,6 @@ import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
-
-//  menu action type of member list
-enum RoomMemberListMenuAction {
-  inviteToBeASpeaker, //  Invite to be a speaker
-}
 
 class RoomMemberListItem extends StatelessWidget {
   const RoomMemberListItem({Key? key, required this.userInfo})
@@ -41,15 +39,6 @@ class RoomMemberListItem extends StatelessWidget {
     );
   }
 
-  void onMoreMenuSelected(
-      RoomMemberListMenuAction action, ZegoUserService userService) {
-    switch (action) {
-      case RoomMemberListMenuAction.inviteToBeASpeaker:
-        userService.sendInvitation(userInfo.userID);
-        break;
-    }
-  }
-
   Widget getRightWidgetByUserRole(BuildContext context) {
     switch (userInfo.userRole) {
       case ZegoRoomUserRole.roomUserRoleHost:
@@ -64,32 +53,62 @@ class RoomMemberListItem extends StatelessWidget {
         return SizedBox(
             width: 60.w,
             height: 60.h,
-            child: Consumer<ZegoUserService>(
-                builder: (_, userService, child) => PopupMenuButton(
-                    icon: Image.asset(StyleIconUrls.roomMemberMore),
-                    elevation: 5,
-                    offset: Offset(0, 0.h),
-                    padding: const EdgeInsets.all(5),
-                    shape: ContinuousRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
-                    ),
-                    color: Colors.white,
-                    onSelected: (RoomMemberListMenuAction value) =>
-                        onMoreMenuSelected(value, userService),
-                    itemBuilder: (context) {
-                      return <PopupMenuEntry<RoomMemberListMenuAction>>[
-                        PopupMenuItem<RoomMemberListMenuAction>(
-                          height: 49.h,
-                          value: RoomMemberListMenuAction.inviteToBeASpeaker,
-                          child: SizedBox(
-                              width: 180.0.w,
-                              child: Text(
-                                  AppLocalizations.of(context)!
-                                      .roomPageInviteTakeSeat,
-                                  textAlign: TextAlign.center)),
-                        ),
-                      ];
-                    })));
+            child: IconButton(
+              icon: Image.asset(StyleIconUrls.roomMemberMore),
+              onPressed: () {
+                showModalBottomSheet(
+                    context: context,
+                    isDismissible: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (BuildContext context) {
+                      return SizedBox(
+                          height: 60.h + 98.h,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: 98.h,
+                                width: 630.w,
+                                child: CupertinoButton(
+                                    color: Colors.white,
+                                    onPressed: () {
+                                      Navigator.pop(context);
+
+                                      var roomService =
+                                          context.read<ZegoRoomService>();
+                                      var seatService = context
+                                          .read<ZegoSpeakerSeatService>();
+                                      // Speaker ID Set not include host id
+                                      if (seatService.speakerIDSet.length >=
+                                              7 ||
+                                          roomService.roomInfo.isSeatClosed) {
+                                        Fluttertoast.showToast(
+                                            msg: AppLocalizations.of(context)!
+                                                .roomPageNoMoreSeatAvailable,
+                                            backgroundColor: Colors.grey);
+                                        return;
+                                      }
+
+                                      // Call SDK to send invitation
+                                      var userService =
+                                          context.read<ZegoUserService>();
+                                      userService
+                                          .sendInvitation(userInfo.userID);
+                                    },
+                                    child: Text(
+                                      AppLocalizations.of(context)!
+                                          .roomPageInviteTakeSeat,
+                                      style: TextStyle(
+                                          color: const Color(0xFF1B1B1B),
+                                          fontSize: 28.sp),
+                                    )),
+                              ),
+                            ],
+                          ));
+                    });
+              },
+            ));
     }
   }
 }
