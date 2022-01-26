@@ -13,6 +13,7 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:live_audio_room_flutter/common/user_avatar.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class RoomMemberListItem extends StatelessWidget {
@@ -22,8 +23,7 @@ class RoomMemberListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var userService = context.read<ZegoUserService>();
-    var avatarIndex = userService.getUserAvatarIndex(userInfo.userID);
+    var avatarIndex = getUserAvatarIndex(userInfo.userName);
     return Row(
       children: [
         SizedBox(
