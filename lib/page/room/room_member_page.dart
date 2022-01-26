@@ -52,66 +52,71 @@ class RoomMemberListItem extends StatelessWidget {
             textDirection: TextDirection.rtl,
             style: StyleConstant.roomMemberListRoleText);
       case ZegoRoomUserRole.roomUserRoleListener:
-        return SizedBox(
-            width: 60.w,
-            height: 60.h,
-            child: IconButton(
-              icon: Image.asset(StyleIconUrls.roomMemberMore),
-              onPressed: () {
-                showModalBottomSheet(
-                    context: context,
-                    isDismissible: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (BuildContext context) {
-                      return SizedBox(
-                          height: 60.h + 98.h,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                height: 98.h,
-                                width: 630.w,
-                                child: CupertinoButton(
-                                    color: Colors.white,
-                                    onPressed: () {
-                                      Navigator.pop(context);
-
-                                      var roomService =
-                                          context.read<ZegoRoomService>();
-                                      var seatService = context
-                                          .read<ZegoSpeakerSeatService>();
-                                      // Speaker ID Set not include host id
-                                      if (seatService.speakerIDSet.length >=
-                                              7 ||
-                                          roomService.roomInfo.isSeatClosed) {
-                                        Fluttertoast.showToast(
-                                            msg: AppLocalizations.of(context)!
-                                                .roomPageNoMoreSeatAvailable,
-                                            backgroundColor: Colors.grey);
-                                        return;
-                                      }
-
-                                      // Call SDK to send invitation
-                                      var userService =
-                                          context.read<ZegoUserService>();
-                                      userService
-                                          .sendInvitation(userInfo.userID);
-                                    },
-                                    child: Text(
-                                      AppLocalizations.of(context)!
-                                          .roomPageInviteTakeSeat,
-                                      style: TextStyle(
-                                          color: const Color(0xFF1B1B1B),
-                                          fontSize: 28.sp),
-                                    )),
-                              ),
-                            ],
-                          ));
-                    });
-              },
-            ));
+        return _getListenerMenu(context);
     }
+  }
+
+  Widget _getListenerMenu(BuildContext context) {
+    return SizedBox(
+        width: 60.w,
+        height: 60.h,
+        child: IconButton(
+          icon: Image.asset(StyleIconUrls.roomMemberMore),
+          onPressed: () {
+            showModalBottomSheet(
+                context: context,
+                isDismissible: true,
+                backgroundColor: Colors.transparent,
+                builder: (BuildContext context) {
+                  return SizedBox(
+                      height: 60.h + 98.h,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: _getMenuList(context),
+                      ));
+                });
+          },
+        ));
+  }
+
+  _getMenuList(BuildContext context) {
+    List<Widget> listItems = [];
+
+    var inviteTakeSeat = SizedBox(
+      height: 98.h,
+      width: 630.w,
+      child: CupertinoButton(
+          color: Colors.white,
+          child: Text(
+            AppLocalizations.of(context)!.roomPageInviteTakeSeat,
+            style: TextStyle(color: const Color(0xFF1B1B1B), fontSize: 28.sp),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            _onInviteTakeSeatClicked(context);
+          }),
+    );
+    listItems.add(inviteTakeSeat);
+
+    return listItems;
+  }
+
+  _onInviteTakeSeatClicked(BuildContext context) {
+    var roomService = context.read<ZegoRoomService>();
+    var seatService = context.read<ZegoSpeakerSeatService>();
+    // Speaker ID Set not include host id
+    if (seatService.speakerIDSet.length >= 7 ||
+        roomService.roomInfo.isSeatClosed) {
+      Fluttertoast.showToast(
+          msg: AppLocalizations.of(context)!.roomPageNoMoreSeatAvailable,
+          backgroundColor: Colors.grey);
+      return;
+    }
+
+    // Call SDK to send invitation
+    var userService = context.read<ZegoUserService>();
+    userService.sendInvitation(userInfo.userID);
   }
 }
 
