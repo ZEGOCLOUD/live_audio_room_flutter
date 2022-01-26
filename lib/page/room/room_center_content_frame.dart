@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:ffi';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/page/room/room_gift_tips.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+import 'package:crypto/crypto.dart';
 
 typedef SeatItemClickCallback = Function(
     int index, String userId, String? userName, ZegoSpeakerSeatStatus status);
@@ -186,6 +188,13 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
     var itemList = <SeatItem>[];
     for (var i = 0; i < 8; i++) {
       var seat = seatList[i];
+      var avatarCode = int.parse(
+          md5
+              .convert(utf8.encode((userIDNameMap[seat.userID] ?? "")))
+              .toString()
+              .substring(0, 2),
+          radix: 16);
+      var avatarIndex = avatarCode % 8;
       var item = SeatItem(
         index: i,
         userID: seat.userID,
@@ -194,7 +203,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
         status: seat.status,
         soundLevel: seat.soundLevel,
         networkQuality: seat.network,
-        avatar: "images/seat_$i.png",
+        avatar: "images/seat_$avatarIndex.png",
         callback: callback,
       );
       itemList.add(item);

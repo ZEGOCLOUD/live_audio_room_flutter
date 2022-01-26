@@ -4,6 +4,7 @@ import 'dart:ffi';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/common/room_info_content.dart';
+import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:provider/provider.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
@@ -41,7 +42,7 @@ class RoomMainPage extends StatelessWidget {
               const RoomTitleBar(),
               const Expanded(child: RoomCenterContentFrame()),
               const RoomControlButtonsBar(),
-              //  room toast tips
+              //  room toast tips notify in room service
               Offstage(
                   offstage: true,
                   child: MessageListener<ZegoRoomService>(
@@ -63,7 +64,7 @@ class RoomMainPage extends StatelessWidget {
                       }
                     },
                   )),
-              // room toast tips
+              // room toast tips notify in user service
               Offstage(
                   offstage: true,
                   child: MessageListener<ZegoUserService>(
@@ -86,6 +87,9 @@ class RoomMainPage extends StatelessWidget {
                           break;
                         case RoomInfoType.loginUserKickOut:
                           _showLoginUserKickOutTips(context, infoContent);
+                          break;
+                        case RoomInfoType.roomHostInviteToSpeak:
+                          _showHostInviteToSpeak(context);
                           break;
                         default:
                           break;
@@ -113,6 +117,69 @@ class RoomMainPage extends StatelessWidget {
     }
 
     Fluttertoast.showToast(msg: message, backgroundColor: Colors.grey);
+  }
+
+  _showDialog(BuildContext context, String title, String description,
+      {String? cancelButtonText,
+      String? confirmButtonText,
+      VoidCallback? confirmCallback}) {
+    showDialog<String>(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: Text(title),
+        content: Text(description),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.pop(context,
+                cancelButtonText ?? AppLocalizations.of(context)!.dialogCancel),
+            child: Text(confirmButtonText ??
+                AppLocalizations.of(context)!.dialogCancel),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(
+                  context, AppLocalizations.of(context)!.dialogConfirm);
+
+              if (confirmCallback != null) {
+                confirmCallback();
+              }
+            },
+            child: Text(AppLocalizations.of(context)!.dialogConfirm),
+          ),
+        ],
+      ),
+    );
+  }
+
+  _showHostInviteToSpeak(BuildContext context) {
+    _showDialog(context, AppLocalizations.of(context)!.dialogInvitionTitle,
+        AppLocalizations.of(context)!.dialogInvitionDescrip,
+        cancelButtonText: AppLocalizations.of(context)!.dialogRefuse,
+        confirmButtonText: AppLocalizations.of(context)!.dialogAccept,
+        confirmCallback: () {
+      var seatService = context.read<ZegoSpeakerSeatService>();
+      var validSpeakerIndex = -1;
+      for (final seat in seatService.seatList) {
+        if (seat.userID.isEmpty) {
+          validSpeakerIndex = seat.seatIndex;
+          break;
+        }
+      }
+      if (validSpeakerIndex == -1) {
+        Fluttertoast.showToast(
+            msg: AppLocalizations.of(context)!.roomPageNoMoreSeatAvailable,
+            backgroundColor: Colors.grey);
+        return;
+      }
+      seatService.takeSeat(validSpeakerIndex).then((errorCode) {
+        if (errorCode != 0) {
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!
+                  .toastTakeSpeakerSeatFail(errorCode),
+              backgroundColor: Colors.grey);
+        }
+      });
+    });
   }
 
   _showRoomEndByHostTips(BuildContext context, RoomInfoContent infoContent) {
