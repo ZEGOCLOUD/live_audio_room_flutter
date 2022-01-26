@@ -81,7 +81,7 @@ extension zimConnectionEventExtension on zimConnectionEvent {
 /// Description: The state machine that identifies the current connection state.
 /// Use cases: It can be used to judge whether the user enters/exit the room successfully, and handles abnormal situations such as network disconnection.
 /// Caution: Please use it with the connection event parameter.
-enum zimRoomState {
+enum ZimRoomState {
   /// Description: Disconnected state.
   /// Use cases: enter this state before entering the room and after exiting the room.
   zimRoomStateDisconnected,
@@ -95,16 +95,16 @@ enum zimRoomState {
   zimRoomStateConnected,
 }
 
-extension zimRoomStateExtension on zimRoomState {
+extension ZimRoomStateExtension on ZimRoomState {
   static const valueMap = {
-    zimRoomState.zimRoomStateDisconnected: 0,
-    zimRoomState.zimRoomStateConnecting: 1,
-    zimRoomState.zimRoomStateConnected: 2,
+    ZimRoomState.zimRoomStateDisconnected: 0,
+    ZimRoomState.zimRoomStateConnecting: 1,
+    ZimRoomState.zimRoomStateConnected: 2,
   };
   static const mapValue = {
-    0: zimRoomState.zimRoomStateDisconnected,
-    1: zimRoomState.zimRoomStateConnecting,
-    2: zimRoomState.zimRoomStateConnected,
+    0: ZimRoomState.zimRoomStateDisconnected,
+    1: ZimRoomState.zimRoomStateConnecting,
+    2: ZimRoomState.zimRoomStateConnected,
   };
 
   int get value => valueMap[this] ?? -1;
