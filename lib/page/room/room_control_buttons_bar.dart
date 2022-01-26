@@ -192,6 +192,7 @@ class RoomControlButtonsBar extends HookWidget {
       VoidCallback? confirmCallback}) {
     showDialog<String>(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) => AlertDialog(
         title: Text(title),
         content: Text(description),

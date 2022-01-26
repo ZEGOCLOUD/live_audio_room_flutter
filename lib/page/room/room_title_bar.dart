@@ -58,6 +58,7 @@ class RoomTitleBar extends StatelessWidget {
             if (isLocalHost) {
               showDialog<bool>(
                 context: context,
+                barrierDismissible: false,
                 builder: (context) => getEndRoomDialog(context),
               );
             } else {
