@@ -25,28 +25,28 @@ import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 import 'package:crypto/crypto.dart';
 
 typedef SeatItemClickCallback = Function(
-    int index, String userId, String? userName, ZegoSpeakerSeatStatus status);
+    int index, String userId, String userName, ZegoSpeakerSeatStatus status);
 
 class SeatItem extends StatelessWidget {
   final int index;
   final String userID;
-  final String? userName;
+  final String userName;
   final bool? mic;
   final ZegoSpeakerSeatStatus status;
   final double? soundLevel;
   final ZegoNetworkQuality? networkQuality;
-  final String? avatar;
+  final String avatar;
   final SeatItemClickCallback callback;
 
   const SeatItem(
       {required this.index,
       required this.userID,
-      this.userName,
+      required this.userName,
       this.mic,
       required this.status,
       this.soundLevel,
       this.networkQuality,
-      this.avatar,
+      required this.avatar,
       required this.callback,
       Key? key})
       : super(key: key);
@@ -87,14 +87,7 @@ class SeatItem extends StatelessWidget {
                     SizedBox(
                       width: 100.w,
                       height: 100.h,
-                      child: CircleAvatar(
-                        backgroundColor: const Color(0xFFE6E6E6),
-                        backgroundImage: _getSeatDefaultBackground(context),
-                        foregroundImage:
-                            (avatar ?? "").isEmpty || (userName ?? "").isEmpty
-                                ? null
-                                : AssetImage(avatar!),
-                      ),
+                      child: _getCircleAvatar(context),
                     ),
                     // Microphone muted icon
                     (mic ?? false) || userID.isEmpty
@@ -131,7 +124,7 @@ class SeatItem extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      userName ?? "",
+                      userName,
                       style: TextStyle(fontSize: 20.sp),
                     ),
                     userID.isEmpty
@@ -157,7 +150,37 @@ class SeatItem extends StatelessWidget {
     );
   }
 
-  _getSeatDefaultBackground(BuildContext context) {
+  _getCircleAvatar(BuildContext context) {
+    var userService = context.read<ZegoUserService>();
+    var isLocalUserOnSeat = userService.localUserInfo.userRole !=
+        ZegoRoomUserRole.roomUserRoleListener;
+
+    late AssetImage image;
+    switch (status) {
+      case ZegoSpeakerSeatStatus.Untaken:
+        image = isLocalUserOnSeat
+            ? const AssetImage(StyleIconUrls.roomSeatDefault)
+            : const AssetImage(StyleIconUrls.roomSeatAdd);
+        break;
+      case ZegoSpeakerSeatStatus.Occupied:
+        image = AssetImage(avatar);
+        break;
+      case ZegoSpeakerSeatStatus.Closed:
+        image = const AssetImage(StyleIconUrls.roomSeatLock);
+        break;
+    }
+
+    return CircleAvatar(
+      backgroundColor: const Color(0xFFE6E6E6),
+      foregroundImage: image,
+    );
+  }
+
+  _getSeatForegroundImage(BuildContext context) {
+    return avatar.isEmpty || userName.isEmpty ? null : AssetImage(avatar);
+  }
+
+  _getSeatBackgroundImage(BuildContext context) {
     if (ZegoSpeakerSeatStatus.Closed == status) {
       return const AssetImage(StyleIconUrls.roomSeatLock);
     }
@@ -181,24 +204,18 @@ class RoomCenterContentFrame extends StatefulWidget {
 class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
   _createSeats(List<ZegoSpeakerSeat> seatList, List<ZegoUserInfo> userInfoList,
       SeatItemClickCallback callback) {
-    var userIDNameMap = <String, String>{};
-    for (var userInfo in userInfoList) {
-      userIDNameMap[userInfo.userID] = userInfo.userName;
-    }
+    var userService = context.read<ZegoUserService>();
     var itemList = <SeatItem>[];
     for (var i = 0; i < 8; i++) {
       var seat = seatList[i];
-      var avatarCode = int.parse(
-          md5
-              .convert(utf8.encode((userIDNameMap[seat.userID] ?? "")))
-              .toString()
-              .substring(0, 2),
-          radix: 16);
-      var avatarIndex = avatarCode % 8;
+      var userInfo = userService.getUserByID(seat.userID);
+      var avatarIndex = userService.getUserAvatarIndex(seat.userID);
+      print('getUserAvatarIndex result ${seat.userID} ${avatarIndex}');
+      print("images/seat_$avatarIndex.png");
       var item = SeatItem(
         index: i,
         userID: seat.userID,
-        userName: userIDNameMap[seat.userID],
+        userName: userInfo.userName,
         mic: seat.mic,
         status: seat.status,
         soundLevel: seat.soundLevel,
@@ -276,8 +293,8 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
     );
   }
 
-  _hostItemClickCallback(int index, String userID, String? userName,
-      ZegoSpeakerSeatStatus status) {
+  _hostItemClickCallback(
+      int index, String userID, String userName, ZegoSpeakerSeatStatus status) {
     if (index == 0) {
       return;
     }
@@ -305,7 +322,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
             context,
             AppLocalizations.of(context)!.roomPageLeaveSeat,
             AppLocalizations.of(context)!
-                .roomPageLeaveSpeakerSeatDesc(userName!), callback: () {
+                .roomPageLeaveSpeakerSeatDesc(userName), callback: () {
           var seats = context.read<ZegoSpeakerSeatService>();
           seats.removeUserFromSeat(index).then((code) {
             if (code != 0) {
@@ -320,8 +337,8 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
     }
   }
 
-  _speakerItemClickCallback(int index, String userID, String? userName,
-      ZegoSpeakerSeatStatus status) {
+  _speakerItemClickCallback(
+      int index, String userID, String userName, ZegoSpeakerSeatStatus status) {
     print("Speaker click...$index, $userID");
     var users = context.read<ZegoUserService>();
     var seats = context.read<ZegoSpeakerSeatService>();
@@ -359,8 +376,8 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
     }
   }
 
-  _listenerItemClickCallback(int index, String userID, String? userName,
-      ZegoSpeakerSeatStatus status) {
+  _listenerItemClickCallback(
+      int index, String userID, String userName, ZegoSpeakerSeatStatus status) {
     print("Listener click...$index, $userID");
     var users = context.read<ZegoUserService>();
     if (userID.isNotEmpty) {
