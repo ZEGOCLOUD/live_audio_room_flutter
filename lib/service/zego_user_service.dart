@@ -34,8 +34,10 @@ enum ConnectionEvent {
 }
 
 typedef LoginCallback = Function(int);
+typedef UserOfflineCallback = VoidCallback;
 
 class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
+  UserOfflineCallback? userOfflineCallback;
   List<ZegoUserInfo> userList = [];
   Map<String, ZegoUserInfo> userDic = <String, ZegoUserInfo>{};
 
@@ -193,6 +195,9 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.loginUserKickOut;
       notifyInfo(json.encode(toastContent.toJson()));
+      if (userOfflineCallback != null) {
+        userOfflineCallback!();
+      }
     } else if (connectionState ==
             zimConnectionState.zimConnectionStateDisconnected &&
         connectionEvent == zimConnectionEvent.zimConnectionEventLoginTimeout) {
@@ -200,6 +205,9 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.roomNetworkReconnectedTimeout;
       notifyInfo(json.encode(toastContent.toJson()));
+      if (userOfflineCallback != null) {
+        userOfflineCallback!();
+      }
     }
 
     notifyListeners();

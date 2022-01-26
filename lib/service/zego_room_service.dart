@@ -53,11 +53,13 @@ enum RoomState {
 }
 
 typedef RoomCallback = Function(int);
+typedef RoomLeaveCallback = VoidCallback;
 
 class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
   RoomInfo roomInfo = RoomInfo('', '', '');
   String localUserID = ""; // Update while user service data is updated.
   String localUserName = ""; // Update while user service data is updated.
+  RoomLeaveCallback? roomLeaveCallback;
 
   ZegoRoomService() {
     ZIMPlugin.onRoomInfoUpdate = _onRoomInfoUpdate;
@@ -133,26 +135,27 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     print(
         "_onRoomStateChanged state:${state}, ${roomState}, event:${event}, ${roomEvent}");
 
-    if (roomState == ZimRoomState.zimRoomStateDisconnected &&
-        roomEvent == zimRoomEvent.zimRoomEventEnterFailed) {
-      // network error leave room
-      RoomInfoContent toastContent = RoomInfoContent.empty();
-      toastContent.toastType = RoomInfoType.roomNetworkLeave;
-      notifyInfo(json.encode(toastContent.toJson()));
-    }
-
     if (roomState == ZimRoomState.zimRoomStateDisconnected) {
-      RoomInfoContent toastContent = RoomInfoContent.empty();
-      toastContent.toastType = RoomInfoType.roomLeave;
-      notifyInfo(json.encode(toastContent.toJson()));
+      if (roomLeaveCallback != null) {
+        roomLeaveCallback!();
+      }
+      if (roomEvent == zimRoomEvent.zimRoomEventEnterFailed) {
+        // network error leave room
+        RoomInfoContent toastContent = RoomInfoContent.empty();
+        toastContent.toastType = RoomInfoType.roomNetworkLeave;
+        notifyInfo(json.encode(toastContent.toJson()));
+      }
     }
 
     notifyListeners();
   }
 
   void _onRoomInfoUpdate(String roomID, Map<String, dynamic> roomInfoJson) {
-    if (roomInfoJson.keys.isEmpty) {
       // room has end by host
+    if (roomInfoJson.keys.isEmpty) {
+      if (localUserID != roomInfo.hostID) {
+        leaveRoom();
+      }
 
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.roomEndByHost;

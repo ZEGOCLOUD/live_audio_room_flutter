@@ -44,8 +44,6 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   }
 
   onRoomLeave() {
-    leaveSeat();
-
     speakerIDSet.clear();
     for (final seat in seatList) {
       seat.clearData();
@@ -268,6 +266,14 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     for (var seat in seatList) {
       if (seat.userID.isNotEmpty && seat.userID != _hostID) {
         speakerIDSet.add(seat.userID);
+      }
+    }
+  }
+
+  void updateUserIDSet(Set<String> idSet) {
+    for (final seat in seatList) {
+      if (seat.userID.isNotEmpty && !idSet.contains(seat.userID)) {
+        removeUserFromSeat(seat.seatIndex);
       }
     }
   }
