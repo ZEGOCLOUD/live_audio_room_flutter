@@ -60,6 +60,7 @@ class StyleIconUrls {
   static const String roomSeatMicrophoneMuted =
       'images/room_seat_microphone_muted.png';
   static const String roomBottomSettings = 'images/room_bottom_settings.png';
+  static const String roomBottomMore = 'images/room_bottom_more.png';
   static const String roomGiftFingerHeart = 'images/room_gift_finger_heart.png';
   static const String roomMemberDropDownArrow =
       'images/room_member_drop_down_arrow.png';

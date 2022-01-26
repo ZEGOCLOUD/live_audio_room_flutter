@@ -120,6 +120,20 @@ class RoomControlButtonsBar extends HookWidget {
                           builder: (BuildContext context) {
                             return RoomGiftPage();
                           });
+                    }, moreCallback: () {
+                      showModalBottomSheet(
+                          context: context,
+                          isDismissible: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (BuildContext context) {
+                            return SizedBox(
+                                height: 60.h + 98.h,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: _getMoreMenu(context),
+                                ));
+                          });
                     }, settingsCallback: () {
                       showModalBottomSheet(
                           context: context,
@@ -135,6 +149,43 @@ class RoomControlButtonsBar extends HookWidget {
         ],
       ),
     );
+  }
+
+  _getMoreMenu(BuildContext context) {
+    List<Widget> listItems = [];
+
+    var inviteTakeSeat = SizedBox(
+      height: 98.h,
+      width: 630.w,
+      child: CupertinoButton(
+          color: Colors.white,
+          child: Text(
+            AppLocalizations.of(context)!.roomPageLeaveSeat,
+            style: TextStyle(color: const Color(0xFF1B1B1B), fontSize: 28.sp),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            _onLeaveSeatClicked(context);
+          }),
+    );
+    listItems.add(inviteTakeSeat);
+
+    return listItems;
+  }
+
+  _onLeaveSeatClicked(BuildContext context) {
+    var seats = context.read<ZegoSpeakerSeatService>();
+    _showDialog(context, AppLocalizations.of(context)!.roomPageLeaveSeat,
+        AppLocalizations.of(context)!.dialogSureToLeaveSeat,
+        confirmCallback: () {
+      seats.leaveSeat().then((code) {
+        if (code != 0) {
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!.toastLeaveSeatFail(code),
+              backgroundColor: Colors.grey);
+        }
+      });
+    });
   }
 
   _showDialog(BuildContext context, String title, String description,
@@ -219,6 +270,7 @@ class RoomControlButtonsBar extends HookWidget {
       {required VoidCallback micCallback,
       required VoidCallback memberCallback,
       required VoidCallback giftCallback,
+      required VoidCallback moreCallback,
       required VoidCallback settingsCallback}) {
     var buttons = <Widget>[];
     var micBtn = ControllerButton(
@@ -244,6 +296,10 @@ class RoomControlButtonsBar extends HookWidget {
     var giftBtnSpacing = SizedBox(
       width: 36.w,
     );
+    var moreBtn = ControllerButton(
+      iconSrc: StyleIconUrls.roomBottomMore,
+      onPressed: moreCallback,
+    );
     var settingsBtn = ControllerButton(
       iconSrc: StyleIconUrls.roomBottomSettings,
       onPressed: settingsCallback,
@@ -261,7 +317,7 @@ class RoomControlButtonsBar extends HookWidget {
       buttons.add(micBtnSpacing);
       buttons.add(giftBtn);
       buttons.add(giftBtnSpacing);
-      buttons.add(settingsBtn);
+      buttons.add(moreBtn);
     } else {
       buttons.add(giftBtn);
     }
