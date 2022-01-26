@@ -101,7 +101,8 @@ class ChatMessageItem extends StatelessWidget {
 }
 
 class ChatMessagePage extends HookWidget {
-  const ChatMessagePage({Key? key}) : super(key: key);
+  ChatMessagePage({Key? key}) : super(key: key);
+  final ScrollController _listviewCtrl = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -113,9 +114,13 @@ class ChatMessagePage extends HookWidget {
     return Container(
       margin: EdgeInsets.only(right: (118 - 32).w),
       child: Consumer<ZegoMessageService>(builder: (_, messageService, child) {
+        Timer(const Duration(milliseconds: 500),
+            () => _listviewCtrl.jumpTo(_listviewCtrl.position.maxScrollExtent));
+
         var userService = context.read<ZegoUserService>();
         return ListView.builder(
           shrinkWrap: true,
+          controller: _listviewCtrl,
           itemCount: messageService.messageList.length,
           itemBuilder: (_, index) {
             var message = messageService.messageList[index];

@@ -453,7 +453,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
                 minHeight: 1.h,
                 maxHeight: 570.h, //  630.h change by gift tips
               ),
-              child: const ChatMessagePage())
+              child: ChatMessagePage())
         ],
       ),
     );
