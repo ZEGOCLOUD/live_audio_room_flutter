@@ -3,12 +3,35 @@ import 'dart:ffi';
 import 'package:flutter/foundation.dart';
 import 'dart:async';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
+import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
+import 'package:live_audio_room_flutter/service/zego_loading_service.dart';
+import 'package:live_audio_room_flutter/service/zego_message_service.dart';
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
+import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:zego_express_engine/zego_express_engine.dart';
 
 typedef ZegoRoomCallback = Function(int);
 
 class ZegoRoomManager extends ChangeNotifier {
   static var shared = ZegoRoomManager();
+
+  ZegoRoomService roomService = ZegoRoomService();
+  ZegoGiftService giftService = ZegoGiftService();
+  ZegoLoadingService loadingService = ZegoLoadingService();
+  ZegoMessageService messageService = ZegoMessageService();
+  ZegoSpeakerSeatService speakerSeatService = ZegoSpeakerSeatService();
+  ZegoUserService userService = ZegoUserService();
+
+  _onRoomLeave() {
+    // Reset all service data
+    giftService.onRoomLeave();
+    loadingService.onRoomLeave();
+    messageService.onRoomLeave();
+    roomService.onRoomLeave();
+    speakerSeatService.onRoomLeave();
+    userService.onRoomLeave();
+  }
 
   Future<void> initWithAPPID(int appID, String appSign, String serverSecret,
       ZegoRoomCallback callback) async {
@@ -20,6 +43,10 @@ class ZegoRoomManager extends ChangeNotifier {
     ZegoEngineProfile profile =
         ZegoEngineProfile(appID, appSign, ZegoScenario.General);
     ZegoExpressEngine.createEngineWithProfile(profile);
+
+    // setup service
+    roomService.roomLeaveCallback = _onRoomLeave;
+    userService.userOfflineCallback = _onRoomLeave;
   }
 
   Future<int> uninit() async {

@@ -28,16 +28,6 @@ class RoomMainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    resetAllServiceData() {
-      // Reset all service data
-      context.read<ZegoGiftService>().onRoomLeave();
-      context.read<ZegoLoadingService>().onRoomLeave();
-      context.read<ZegoMessageService>().onRoomLeave();
-      context.read<ZegoRoomService>().onRoomLeave();
-      context.read<ZegoSpeakerSeatService>().onRoomLeave();
-      context.read<ZegoUserService>().onRoomLeave();
-    }
-
     return Scaffold(
         body: SafeArea(
       child: Center(
@@ -70,10 +60,8 @@ class RoomMainPage extends StatelessWidget {
                           break;
                         case RoomInfoType.roomEndByHost:
                           _showRoomEndByHostTips(context, infoContent);
-                          resetAllServiceData();
                           break;
                         case RoomInfoType.roomLeave:
-                          resetAllServiceData();
                           break;
                         default:
                           break;
@@ -100,11 +88,9 @@ class RoomMainPage extends StatelessWidget {
                         case RoomInfoType.roomNetworkReconnectedTimeout:
                           _showNetworkDisconnectTimeoutDialog(
                               context, infoContent);
-                          resetAllServiceData();
                           break;
                         case RoomInfoType.loginUserKickOut:
                           _showLoginUserKickOutTips(context, infoContent);
-                          resetAllServiceData();
                           break;
                         case RoomInfoType.roomHostInviteToSpeak:
                           _showHostInviteToSpeak(context);

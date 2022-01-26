@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -34,12 +35,18 @@ class ZegoApp extends StatelessWidget {
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
     return MultiProvider(
         providers: [
-          ChangeNotifierProvider(create: (context) => ZegoRoomService()),
-          ChangeNotifierProvider(create: (context) => ZegoSpeakerSeatService()),
-          ChangeNotifierProvider(create: (context) => ZegoUserService()),
-          ChangeNotifierProvider(create: (context) => ZegoGiftService()),
-          ChangeNotifierProvider(create: (context) => ZegoMessageService()),
-          ChangeNotifierProvider(create: (context) => ZegoLoadingService()),
+          ChangeNotifierProvider(
+              create: (context) => ZegoRoomManager.shared.roomService),
+          ChangeNotifierProvider(
+              create: (context) => ZegoRoomManager.shared.speakerSeatService),
+          ChangeNotifierProvider(
+              create: (context) => ZegoRoomManager.shared.userService),
+          ChangeNotifierProvider(
+              create: (context) => ZegoRoomManager.shared.giftService),
+          ChangeNotifierProvider(
+              create: (context) => ZegoRoomManager.shared.messageService),
+          ChangeNotifierProvider(
+              create: (context) => ZegoRoomManager.shared.loadingService),
           ChangeNotifierProxyProvider2<ZegoRoomService, ZegoSpeakerSeatService,
               ZegoUserService>(
             create: (context) => context.read<ZegoUserService>(),
@@ -77,6 +84,8 @@ class ZegoApp extends StatelessWidget {
             update: (_, room, users, seats) {
               if (seats == null) throw ArgumentError.notNull('seats');
               // Note: Update localUserID before update hostID cause we will call takeSeat() after hostID updated.
+              seats.updateUserIDSet(
+                  users.userList.map((user) => user.userID).toSet());
               seats.updateLocalUserID(users.localUserInfo.userID);
               seats.updateRoomInfo(room.roomInfo.roomID, room.roomInfo.hostID,
                   room.roomInfo.isSeatClosed);
