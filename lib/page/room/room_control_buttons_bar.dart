@@ -77,8 +77,12 @@ class RoomControlButtonsBar extends HookWidget {
                     onPressed: () {
                       var userService = context.read<ZegoUserService>();
                       if (ZegoRoomUserRole.roomUserRoleHost !=
-                          userService.localUserInfo.userRole &&
+                              userService.localUserInfo.userRole &&
                           roomService.roomInfo.isTextMessageDisable) {
+                        Fluttertoast.showToast(
+                            msg: AppLocalizations.of(context)!
+                                .roomPageBandsSendMessage,
+                            backgroundColor: Colors.grey);
                         return;
                       }
                       _showMessageInput(context);

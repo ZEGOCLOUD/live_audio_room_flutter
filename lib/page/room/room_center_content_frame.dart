@@ -377,8 +377,10 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
 
   _listenerItemClickCallback(
       int index, String userID, String userName, ZegoSpeakerSeatStatus status) {
-    var users = context.read<ZegoUserService>();
     if (userID.isNotEmpty) {
+      Fluttertoast.showToast(
+          msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed,
+          backgroundColor: Colors.grey);
       return;
     }
     if (ZegoSpeakerSeatStatus.Closed == status) {
