@@ -64,6 +64,11 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     ZIMPlugin.onRoomStateChanged = _onRoomStateChanged;
   }
 
+  onRoomLeave() {
+    roomInfo = RoomInfo('', '', '');
+    notifyListeners();
+  }
+
   Future<int> createRoom(String roomID, String roomName, String token) async {
     var result = await ZIMPlugin.createRoom(roomID, roomName, localUserID, 8);
     var code = result['errorCode'];
@@ -96,10 +101,6 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     var result = await ZIMPlugin.leaveRoom(roomInfo.roomID);
     var code = result['errorCode'];
     _logoutRtcRoom();
-    if (code == 0) {
-      roomInfo = RoomInfo('', '', '');
-      notifyListeners();
-    }
     return code;
   }
 
@@ -126,27 +127,23 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
   }
 
   Future<void> _onRoomStateChanged(int state, int event) async {
-    zimRoomState? roomState = zimRoomStateExtension.mapValue[state];
+    ZimRoomState? roomState = ZimRoomStateExtension.mapValue[state];
     zimRoomEvent? roomEvent = zimRoomEventExtension.mapValue[event];
 
-    print("_onRoomStateChanged state:${state}, ${roomState}, event:${event}, ${roomEvent}");
+    print(
+        "_onRoomStateChanged state:${state}, ${roomState}, event:${event}, ${roomEvent}");
 
-    if (roomState == zimRoomState.zimRoomStateConnected &&
-        roomEvent == zimRoomEvent.zimRoomEventSuccess) {
-      var result = await ZIMPlugin.queryRoomAllAttributes(roomInfo.roomID);
-      var attributesResult = result['roomAttributes'];
-      var roomDic = attributesResult['room_info'];
-      if (roomDic == null) {
-        // room has end
-        RoomInfoContent toastContent = RoomInfoContent.empty();
-        toastContent.toastType = RoomInfoType.roomEndByHost;
-        notifyInfo(json.encode(toastContent.toJson()));
-      }
-    } else if (roomState == zimRoomState.zimRoomStateDisconnected &&
+    if (roomState == ZimRoomState.zimRoomStateDisconnected &&
         roomEvent == zimRoomEvent.zimRoomEventEnterFailed) {
       // network error leave room
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.roomNetworkLeave;
+      notifyInfo(json.encode(toastContent.toJson()));
+    }
+
+    if (roomState == ZimRoomState.zimRoomStateDisconnected) {
+      RoomInfoContent toastContent = RoomInfoContent.empty();
+      toastContent.toastType = RoomInfoType.roomLeave;
       notifyInfo(json.encode(toastContent.toJson()));
     }
 
