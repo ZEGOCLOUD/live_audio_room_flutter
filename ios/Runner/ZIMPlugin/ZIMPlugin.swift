@@ -116,7 +116,7 @@ class ZIMPlugin: NSObject {
          user.userID = userID
          user.userName = userName
          zim?.login(user, token: token, callback: { error in
-             result(["errorCode": error.code.rawValue])
+             result(["errorCode": error.code.rawValue, "message": error.message])
          })
      }
 
@@ -140,7 +140,7 @@ class ZIMPlugin: NSObject {
          let config = ZIMRoomAdvancedConfig()
          config.roomAttributes = ["room_info": jsonString]
          zim?.createRoom(roomInfo, config: config, callback: { roomInfo, error in
-             result(["errorCode": error.code.rawValue])
+             result(["errorCode": error.code.rawValue, "message": error.message])
          })
      }
 
@@ -150,7 +150,7 @@ class ZIMPlugin: NSObject {
          let roomID = params!["roomID"] as? String ?? ""
          zim?.joinRoom(roomID, callback: { roomInfo, error in
              let dic = ["id": roomInfo.baseInfo.roomID, "name": roomInfo.baseInfo.roomName]
-             result(["errorCode": error.code.rawValue, "roomInfo": dic])
+             result(["errorCode": error.code.rawValue, "message": error.message, "roomInfo": dic])
          })
      }
 
@@ -159,13 +159,13 @@ class ZIMPlugin: NSObject {
          if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
          zim?.leaveRoom(roomID, callback: { error in
-             result(["errorCode": error.code.rawValue])
+             result(["errorCode": error.code.rawValue, "message": error.message])
          })
      }
 
      func uploadLog(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
          zim?.uploadLog({ error in
-             result(["errorCode": error.code.rawValue])
+             result(["errorCode": error.code.rawValue, "message": error.message])
          })
      }
 
@@ -174,7 +174,7 @@ class ZIMPlugin: NSObject {
          if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
          zim?.queryRoomAllAttributes(byRoomID: roomID, callback: { roomAttributes, error in
-             result(["errorCode": error.code.rawValue, "roomAttributes": roomAttributes])
+             result(["errorCode": error.code.rawValue, "message": error.message, "roomAttributes": roomAttributes])
          })
      }
 
@@ -183,7 +183,7 @@ class ZIMPlugin: NSObject {
                  if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
          zim?.queryRoomOnlineMemberCount(roomID, callback: { count, error in
-             result(["errorCode": error.code.rawValue, "count": count])
+             result(["errorCode": error.code.rawValue, "message": error.message, "count": count])
          })
      }
 
@@ -198,7 +198,7 @@ class ZIMPlugin: NSObject {
          let data = convertDictionaryToData(dict: messageDic as NSDictionary)
          let customMessage = ZIMCustomMessage(message: data)
          zim?.sendPeerMessage(customMessage, toUserID: userID, callback: { message, error in
-             result(["errorCode": error.code.rawValue])
+             result(["errorCode": error.code.rawValue, "message": error.message])
          })
      }
 
@@ -220,7 +220,7 @@ class ZIMPlugin: NSObject {
          }
 
          zim?.sendRoomMessage(message, toRoomID: roomID, callback: { message, error in
-             result(["errorCode": error.code.rawValue])
+             result(["errorCode": error.code.rawValue, "message": error.message])
          })
      }
 
@@ -235,7 +235,7 @@ class ZIMPlugin: NSObject {
          config.isForce = true
          config.isDeleteAfterOwnerLeft = isDeleteAfterOwnerLeft
          zim?.setRoomAttributes(dic, roomID: roomID, config: config, callback: { error in
-             result(["errorCode": error.code.rawValue])
+             result(["errorCode": error.code.rawValue, "message": error.message])
          })
      }
     

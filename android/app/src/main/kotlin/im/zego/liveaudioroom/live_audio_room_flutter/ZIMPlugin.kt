@@ -57,7 +57,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         user.userID = userID
         user.userName = userName
         zim?.login(user, token, ZIMLoggedInCallback {
-            result.success(mapOf("errorCode" to it.code.value()))
+            result.success(mapOf("errorCode" to it.code.value(), "message" to it.message))
         })
     }
 
@@ -88,7 +88,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
 
         config.roomAttributes = hashMapOf("room_info" to jsonString)
         zim?.createRoom(roomInfo, config) { roomInfo, errorInfo ->
-            result.success(mapOf("errorCode" to errorInfo.code.value()))
+            result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message))
         }
     }
 
@@ -96,21 +96,21 @@ class ZIMPlugin: EventChannel.StreamHandler {
         val roomID: String? = call.argument<String>("roomID")
         zim?.joinRoom(roomID) { roomInfo, errorInfo ->
             val roomInfoMap = mapOf("id" to roomInfo.baseInfo.roomID, "name" to roomInfo.baseInfo.roomName)
-            result.success(mapOf("errorCode" to errorInfo.code.value(), "roomInfo" to roomInfoMap))
+            result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message, "roomInfo" to roomInfoMap))
         }
     }
 
     fun leaveRoom(call: MethodCall, result: MethodChannel.Result) {
         val roomID: String? = call.argument<String>("roomID")
         zim?.leaveRoom(roomID) { errorInfo ->
-            result.success(mapOf("errorCode" to errorInfo.code.value()))
+            result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message))
         }
 
     }
 
     fun uploadLog(call: MethodCall, result: MethodChannel.Result) {
         zim?.uploadLog(ZIMLogUploadedCallback {
-            result.success(mapOf("errorCode" to it.code.value()))
+            result.success(mapOf("errorCode" to it.code.value(), "message" to it.message))
         })
     }
 
@@ -118,7 +118,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         val roomID: String? = call.argument<String>("roomID")
         zim?.queryRoomAllAttributes(roomID
         ) { roomAttributes, errorInfo ->
-            result.success(mapOf("errorCode" to errorInfo.code.value(), "roomAttributes" to roomAttributes))
+            result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message, "roomAttributes" to roomAttributes))
         }
     }
 
@@ -126,7 +126,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         val roomID: String? = call.argument<String>("roomID")
         zim?.queryRoomOnlineMemberCount(roomID
         ) { count, errorInfo ->
-            result.success(mapOf("errorCode" to errorInfo.code.value(), "count" to count))
+            result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message, "count" to count))
         }
     }
 
@@ -148,7 +148,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         customMessage.message = jsonString.encodeToByteArray()
         zim?.sendPeerMessage(customMessage, userID
         ) { message, errorInfo ->
-            result.success(mapOf("errorCode" to errorInfo.code.value()))
+            result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message))
         }
     }
 
@@ -167,7 +167,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         }
         zim?.sendRoomMessage(message, roomID
         ) { message, errorInfo ->
-            result.success(mapOf("errorCode" to errorInfo.code.value()))
+            result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message))
         }
     }
 
@@ -190,11 +190,11 @@ class ZIMPlugin: EventChannel.StreamHandler {
         zim?.setRoomAttributes(map, roomID, config, object : ZIMRoomAttributesBatchOperatedCallback,
             ZIMRoomAttributesOperatedCallback {
             override fun onRoomAttributesBatchOperated(errorInfo: ZIMError?) {
-                result.success(mapOf("errorCode" to (errorInfo?.code?.value() ?: 0)))
+                result.success(mapOf("errorCode" to (errorInfo?.code?.value() ?: 0), "message" to errorInfo?.message))
             }
 
             override fun onRoomAttributesOperated(errorInfo: ZIMError?) {
-                result.success(mapOf("errorCode" to (errorInfo?.code?.value() ?: 0)))
+                result.success(mapOf("errorCode" to (errorInfo?.code?.value() ?: 0), "message" to errorInfo?.message))
             }
 
         })
@@ -240,7 +240,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
 
         override fun onError(zim: ZIM?, errorInfo: ZIMError?) {
             super.onError(zim, errorInfo)
-            eventSink.success(mapOf("method" to "onError", "code" to (errorInfo?.code ?: 0)))
+            eventSink.success(mapOf("method" to "onError", "code" to (errorInfo?.code ?: 0), "message" to errorInfo?.message))
         }
 
         override fun onReceivePeerMessage(
