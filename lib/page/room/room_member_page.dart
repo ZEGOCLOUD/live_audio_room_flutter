@@ -22,13 +22,15 @@ class RoomMemberListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var userService = context.read<ZegoUserService>();
+    var avatarIndex = userService.getUserAvatarIndex(userInfo.userID);
     return Row(
       children: [
         SizedBox(
           width: 68.w,
           height: 68.h,
           child: CircleAvatar(
-            child: Text(userInfo.userID),
+            foregroundImage: AssetImage("images/seat_$avatarIndex.png"),
           ),
         ),
         const SizedBox(width: 24),

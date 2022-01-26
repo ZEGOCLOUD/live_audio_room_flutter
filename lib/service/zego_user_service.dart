@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
@@ -65,7 +66,23 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleListener;
     totalUsersNum = 0;
     loginState = LoginState.loginStateLoggedOut;
+  } 
+  
+  ZegoUserInfo getUserByID(String userID) {
+    var userInfo = userDic[userID] ?? ZegoUserInfo.empty();
+    return userInfo.clone();
   }
+
+  int getUserAvatarIndex(String userID) {
+    var userInfo = userDic[userID] ?? ZegoUserInfo.empty();
+    var avatarCode = int.parse(
+        md5.convert(utf8.encode(userInfo.userName))
+            .toString()
+            .substring(0, 2),
+        radix: 16);
+    return avatarCode % 8;
+  }
+
 
   Future<int> fetchOnlineRoomUsersNum(String roomID) async {
     var result = await ZIMPlugin.queryRoomOnlineMemberCount(roomID);

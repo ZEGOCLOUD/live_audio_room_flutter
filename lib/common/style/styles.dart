@@ -64,6 +64,7 @@ class StyleIconUrls {
   static const String roomMemberDropDownArrow =
       'images/room_member_drop_down_arrow.png';
   static const String roomSeatDefault = 'images/room_seats_default.png';
+  static const String roomSeatAdd = 'images/room_seats_add.png';
   static const String roomSeatLock = 'images/room_seats_lock.png';
   static const String roomSeatsHost = 'images/room_seats_host.png';
   static const String roomTopQuit = 'images/room_top_quit.png';
