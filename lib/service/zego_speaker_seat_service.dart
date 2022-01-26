@@ -43,6 +43,15 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     ZegoExpressEngine.onNetworkQuality = _onNetworkQuality;
   }
 
+  onRoomLeave() {
+    leaveSeat();
+
+    speakerIDSet.clear();
+    for (final seat in seatList) {
+      seat.clearData();
+    }
+  }
+
   Future<int> removeUserFromSeat(int seatIndex) async {
     var speakerSeat = seatList[seatIndex];
     var preUserID = speakerSeat.userID;
@@ -208,7 +217,6 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     notifyListeners();
   }
 
-
   void _onCapturedSoundLevelUpdate(double soundLevel) {
     for (final speaker in seatList) {
       if (speaker.userID == _localUserID) {
@@ -231,7 +239,8 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _onNetworkQuality(String userID, ZegoStreamQualityLevel upstreamQuality, ZegoStreamQualityLevel downstreamQuality) {
+  void _onNetworkQuality(String userID, ZegoStreamQualityLevel upstreamQuality,
+      ZegoStreamQualityLevel downstreamQuality) {
     for (final seat in seatList) {
       if (_localUserID == seat.userID) {
         seat.network = getNetWorkQuality(upstreamQuality);
@@ -242,7 +251,8 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   }
 
   ZegoNetworkQuality getNetWorkQuality(ZegoStreamQualityLevel streamQuality) {
-    if (streamQuality == ZegoStreamQualityLevel.Excellent || streamQuality == ZegoStreamQualityLevel.Good) {
+    if (streamQuality == ZegoStreamQualityLevel.Excellent ||
+        streamQuality == ZegoStreamQualityLevel.Good) {
       return ZegoNetworkQuality.Good;
     } else if (streamQuality == ZegoStreamQualityLevel.Medium) {
       return ZegoNetworkQuality.Medium;
@@ -272,12 +282,6 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   void updateRoomInfo(String roomID, String hostID, bool isSeatClosed) {
     if (roomID != _roomID) {
       _roomID = roomID;
-      if (roomID.isEmpty) {
-        speakerIDSet.clear();
-        for (final seat in seatList) {
-          seat.clearData();
-        }
-      }
     }
     if (isSeatClosed != _isSeatClosed) {
       _isSeatClosed = isSeatClosed;

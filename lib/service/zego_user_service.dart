@@ -36,7 +36,6 @@ enum ConnectionEvent {
 typedef LoginCallback = Function(int);
 
 class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
-  // TODO@oliver update userList on SDK callback and notify changed
   List<ZegoUserInfo> userList = [];
   Map<String, ZegoUserInfo> userDic = <String, ZegoUserInfo>{};
 
@@ -56,8 +55,16 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     ZIMPlugin.onConnectionStateChanged = _onConnectionStateChanged;
   }
 
-  void fetchOnlineRoomUsersWithPage(int page) {
-    // TODO@oliver fetch users info and update userList
+  onRoomLeave() {
+    _preSpeakerSet.clear();
+    userList.clear();
+    userDic.clear();
+    addedUserInfo.clear();
+    leaveUserInfo.clear();
+    // We need to reuse local user id after leave room
+    localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleListener;
+    totalUsersNum = 0;
+    loginState = LoginState.loginStateLoggedOut;
   }
 
   Future<int> fetchOnlineRoomUsersNum(String roomID) async {
@@ -82,9 +89,12 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     var result = await ZIMPlugin.login(info.userID, info.userName, "");
     int code = result['errorCode'];
 
-    loginState = code != 0
-        ? LoginState.loginStateLoginFailed
-        : LoginState.loginStateLoggedIn;
+    if (code != 0) {
+      localUserInfo = ZegoUserInfo.empty();
+      loginState = LoginState.loginStateLoggedIn;
+    } else {
+      loginState = LoginState.loginStateLoginFailed;
+    }
     notifyListeners();
 
     return code;
@@ -92,6 +102,9 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
 
   Future<int> logout() async {
     var result = await ZIMPlugin.logout();
+    localUserInfo = ZegoUserInfo.empty();
+    loginState = LoginState.loginStateLoggedOut;
+    notifyListeners();
     return result['errorCode'];
   }
 
@@ -187,18 +200,6 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     notifyListeners();
   }
 
-  void _resetDataAfterLeavingRoom() {
-    _preSpeakerSet.clear();
-    userList.clear();
-    userDic.clear();
-    addedUserInfo.clear();
-    leaveUserInfo.clear();
-    // We need to reuse local user id after leave room
-    localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleListener;
-    totalUsersNum = 0;
-    loginState = LoginState.loginStateLoggedOut;
-  }
-
   void updateHostID(String hostID) {
     if (_preHostID == hostID) {
       return;
@@ -218,7 +219,6 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
   void _updateUserRole(String hostID, Set<String> speakerList) {
     // Leave room or init
     if (hostID.isEmpty) {
-      _resetDataAfterLeavingRoom();
       return;
     }
     // Update local user role

@@ -69,24 +69,7 @@ class ZegoApp extends StatelessWidget {
                 message.onRoomMemberLeave(userService.leaveUserInfo);
                 userService.clearMemberJoinLeaveData();
 
-                //  clear data
-                if (roomService.roomInfo.roomID.isEmpty) {
-                  message.onRoomLeave();
-                }
-
                 return message;
-              }),
-          ChangeNotifierProxyProvider<ZegoRoomService, ZegoGiftService>(
-              create: (context) => context.read<ZegoGiftService>(),
-              update: (_, roomService, giftService) {
-                if (giftService == null) throw ArgumentError.notNull('gift');
-
-                //  clear data
-                if (roomService.roomInfo.roomID.isEmpty) {
-                  giftService.onRoomLeave();
-                }
-
-                return giftService;
               }),
           ChangeNotifierProxyProvider2<ZegoRoomService, ZegoUserService,
               ZegoSpeakerSeatService>(
