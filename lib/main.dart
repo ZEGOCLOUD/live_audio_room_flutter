@@ -55,18 +55,6 @@ class ZegoApp extends StatelessWidget {
               return users;
             },
           ),
-          ChangeNotifierProxyProvider<ZegoUserService, ZegoMessageService>(
-              create: (context) => context.read<ZegoMessageService>(),
-              update: (_, userService, message) {
-                //  sync member online/offline message
-                if (message == null) throw ArgumentError.notNull('message');
-
-                message.onRoomMemberJoined(userService.addedUserInfo);
-                message.onRoomMemberLeave(userService.leaveUserInfo);
-                userService.clearMemberJoinLeaveData();
-
-                return message;
-              }),
           ChangeNotifierProxyProvider<ZegoUserService, ZegoSpeakerSeatService>(
             create: (context) => context.read<ZegoSpeakerSeatService>(),
             update: (_, users, seats) {

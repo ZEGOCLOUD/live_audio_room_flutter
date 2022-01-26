@@ -1,6 +1,7 @@
 import 'dart:ffi';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
 import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
@@ -57,6 +58,8 @@ class ZegoRoomManager extends ChangeNotifier {
     roomService.roomEnterCallback = _onRoomEnter;
     roomService.roomLeaveCallback = _onRoomLeave;
     userService.userOfflineCallback = _onRoomLeave;
+    userService.registerMemberJoinCallback(messageService.onRoomMemberJoined);
+    userService.registerMemberLeaveCallback(messageService.onRoomMemberLeave);
   }
 
   Future<int> uninit() async {

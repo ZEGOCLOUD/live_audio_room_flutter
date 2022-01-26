@@ -35,20 +35,20 @@ enum ConnectionEvent {
 }
 
 typedef LoginCallback = Function(int);
-typedef UserOfflineCallback = VoidCallback;
+typedef MemberOfflineCallback = VoidCallback;
+typedef MemberChangeCallback = Function(List<ZegoUserInfo>);
 
 class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
-  UserOfflineCallback? userOfflineCallback;
+  MemberOfflineCallback? userOfflineCallback;
   List<ZegoUserInfo> userList = [];
   Map<String, ZegoUserInfo> userDic = <String, ZegoUserInfo>{};
-
-  List<ZegoUserInfo> addedUserInfo = [];
-  List<ZegoUserInfo> leaveUserInfo = [];
 
   ZegoUserInfo localUserInfo = ZegoUserInfo.empty();
   int totalUsersNum = 0;
   LoginState loginState = LoginState.loginStateLoggedOut;
   Set<String> _preSpeakerSet = {}; //Prevent frequent updates
+  final Set<MemberChangeCallback> _memberJoinedCallbackSet = {};
+  final Set<MemberChangeCallback> _memberLeaveCallbackSet = {};
 
   ZegoUserService() {
     ZIMPlugin.onRoomMemberJoined = _onRoomMemberJoined;
@@ -57,12 +57,26 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     ZIMPlugin.onConnectionStateChanged = _onConnectionStateChanged;
   }
 
+  registerMemberJoinCallback(MemberChangeCallback callback) {
+    _memberJoinedCallbackSet.add(callback);
+  }
+
+  unregisterMemberJoinCallback(MemberChangeCallback callback) {
+    _memberJoinedCallbackSet.remove(callback);
+  }
+
+  registerMemberLeaveCallback(MemberChangeCallback callback) {
+    _memberLeaveCallbackSet.add(callback);
+  }
+
+  unregisterMemberLeaveCallback(MemberChangeCallback callback) {
+    _memberJoinedCallbackSet.remove(callback);
+  }
+
   onRoomLeave() {
     _preSpeakerSet.clear();
     userList.clear();
     userDic.clear();
-    addedUserInfo.clear();
-    leaveUserInfo.clear();
     // We need to reuse local user id after leave room
     localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleListener;
     totalUsersNum = 0;
@@ -126,35 +140,38 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
 
   void _onRoomMemberJoined(
       String roomID, List<Map<String, dynamic>> memberList) {
+    var userInfoList = <ZegoUserInfo>[];
     for (final item in memberList) {
       var member = ZegoUserInfo.formJson(item);
       userList.add(member);
       userDic[member.userID] = member;
 
       if (member.userID.isNotEmpty && localUserInfo.userID != member.userID) {
-        addedUserInfo.add(member.clone());
+        userInfoList.add(member.clone());
       }
+    }
+    for (final callback in _memberJoinedCallbackSet) {
+      callback([...userInfoList]);
     }
     notifyListeners();
   }
 
   void _onRoomMemberLeave(
       String roomID, List<Map<String, dynamic>> memberList) {
+    var userInfoList = <ZegoUserInfo>[];
     for (final item in memberList) {
       var member = ZegoUserInfo.formJson(item);
       userList.removeWhere((element) => element.userID == member.userID);
       userDic.removeWhere((key, value) => key == member.userID);
 
       if (member.userID.isNotEmpty && localUserInfo.userID != member.userID) {
-        leaveUserInfo.add(member.clone());
+        userInfoList.add(member.clone());
+      }
+      for (final callback in _memberLeaveCallbackSet) {
+        callback([...userInfoList]);
       }
     }
     notifyListeners();
-  }
-
-  void clearMemberJoinLeaveData() {
-    addedUserInfo.clear();
-    leaveUserInfo.clear();
   }
 
   void _onReceiveCustomPeerMessage(List<Map<String, dynamic>> messageListJson) {
