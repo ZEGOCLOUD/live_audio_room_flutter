@@ -47,28 +47,17 @@ class ZegoApp extends StatelessWidget {
               create: (context) => ZegoRoomManager.shared.messageService),
           ChangeNotifierProvider(
               create: (context) => ZegoRoomManager.shared.loadingService),
-          ChangeNotifierProxyProvider2<ZegoRoomService, ZegoSpeakerSeatService,
-              ZegoUserService>(
+          ChangeNotifierProxyProvider<ZegoSpeakerSeatService, ZegoUserService>(
             create: (context) => context.read<ZegoUserService>(),
-            update: (_, room, seats, users) {
+            update: (_, seats, users) {
               if (users == null) throw ArgumentError.notNull('users');
-              users.updateHostID(room.roomInfo.hostID);
               users.updateSpeakerSet(seats.speakerIDSet);
               return users;
             },
           ),
-          ChangeNotifierProxyProvider<ZegoUserService, ZegoRoomService>(
-              create: (context) => context.read<ZegoRoomService>(),
-              update: (_, users, room) {
-                if (room == null) throw ArgumentError.notNull('room');
-                room.localUserID = users.localUserInfo.userID;
-                room.localUserName = users.localUserInfo.userName;
-                return room;
-              }),
-          ChangeNotifierProxyProvider2<ZegoRoomService, ZegoUserService,
-                  ZegoMessageService>(
+          ChangeNotifierProxyProvider<ZegoUserService, ZegoMessageService>(
               create: (context) => context.read<ZegoMessageService>(),
-              update: (_, roomService, userService, message) {
+              update: (_, userService, message) {
                 //  sync member online/offline message
                 if (message == null) throw ArgumentError.notNull('message');
 
@@ -78,17 +67,13 @@ class ZegoApp extends StatelessWidget {
 
                 return message;
               }),
-          ChangeNotifierProxyProvider2<ZegoRoomService, ZegoUserService,
-              ZegoSpeakerSeatService>(
+          ChangeNotifierProxyProvider<ZegoUserService, ZegoSpeakerSeatService>(
             create: (context) => context.read<ZegoSpeakerSeatService>(),
-            update: (_, room, users, seats) {
+            update: (_, users, seats) {
               if (seats == null) throw ArgumentError.notNull('seats');
               // Note: Update localUserID before update hostID cause we will call takeSeat() after hostID updated.
               seats.updateUserIDSet(
                   users.userList.map((user) => user.userID).toSet());
-              seats.updateLocalUserID(users.localUserInfo.userID);
-              seats.updateRoomInfo(room.roomInfo.roomID, room.roomInfo.hostID,
-                  room.roomInfo.isSeatClosed);
               return seats;
             },
           ),

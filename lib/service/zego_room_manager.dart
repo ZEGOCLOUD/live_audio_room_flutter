@@ -33,6 +33,15 @@ class ZegoRoomManager extends ChangeNotifier {
     userService.onRoomLeave();
   }
 
+  _onRoomEnter() {
+    giftService.onRoomEnter();
+    loadingService.onRoomEnter();
+    messageService.onRoomEnter();
+    roomService.onRoomEnter();
+    speakerSeatService.onRoomEnter();
+    userService.onRoomEnter();
+  }
+
   Future<void> initWithAPPID(int appID, String appSign, String serverSecret,
       ZegoRoomCallback callback) async {
     var result = await ZIMPlugin.createZIM(appID, appSign, serverSecret);
@@ -45,6 +54,7 @@ class ZegoRoomManager extends ChangeNotifier {
     ZegoExpressEngine.createEngineWithProfile(profile);
 
     // setup service
+    roomService.roomEnterCallback = _onRoomEnter;
     roomService.roomLeaveCallback = _onRoomLeave;
     userService.userOfflineCallback = _onRoomLeave;
   }

@@ -24,8 +24,13 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   Set<String> speakerIDSet = {};
   String _roomID = "";
   String _hostID = ""; // Sort host to index 0
-  String _localUserID = "";
-  bool _isSeatClosed = false;
+  bool get _isSeatClosed {
+    return ZegoRoomManager.shared.roomService.roomInfo.isSeatClosed;
+  }
+
+  String get _localUserID {
+    return ZegoRoomManager.shared.userService.localUserInfo.userID;
+  }
 
   bool get isMute {
     if (_localSpeakerSeat() == null) {
@@ -44,9 +49,25 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   }
 
   onRoomLeave() {
+    _roomID = "";
+    _hostID = "";
     speakerIDSet.clear();
     for (final seat in seatList) {
       seat.clearData();
+    }
+  }
+
+  onRoomEnter() {
+    var roomInfo = ZegoRoomManager.shared.roomService.roomInfo;
+    _roomID = roomInfo.roomID;
+    _hostID = roomInfo.hostID;
+    if (_hostID == _localUserID) {
+      takeSeat(0);
+    } else {
+      var hostSeat = seatList[0];
+      hostSeat.userID = _hostID;
+      hostSeat.status = ZegoSpeakerSeatStatus.Occupied;
+      notifyListeners();
     }
   }
 
@@ -263,7 +284,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
 
   void updateSpeakerIDList() {
     speakerIDSet.clear();
-    for (var seat in seatList) {
+    for (final seat in seatList) {
       if (seat.userID.isNotEmpty && seat.userID != _hostID) {
         speakerIDSet.add(seat.userID);
       }
@@ -274,35 +295,6 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     for (final seat in seatList) {
       if (seat.userID.isNotEmpty && !idSet.contains(seat.userID)) {
         removeUserFromSeat(seat.seatIndex);
-      }
-    }
-  }
-
-  void updateLocalUserID(String id) {
-    if (id == _localUserID) {
-      return;
-    }
-    _localUserID = id;
-  }
-
-  void updateRoomInfo(String roomID, String hostID, bool isSeatClosed) {
-    if (roomID != _roomID) {
-      _roomID = roomID;
-    }
-    if (isSeatClosed != _isSeatClosed) {
-      _isSeatClosed = isSeatClosed;
-    }
-    if (hostID != _hostID) {
-      _hostID = hostID;
-      if (hostID.isNotEmpty) {
-        if (_hostID == _localUserID) {
-          takeSeat(0);
-        } else {
-          var hostSeat = seatList[0];
-          hostSeat.userID = _hostID;
-          hostSeat.status = ZegoSpeakerSeatStatus.Occupied;
-          notifyListeners();
-        }
       }
     }
   }

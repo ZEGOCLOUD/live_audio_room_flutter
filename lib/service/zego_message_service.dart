@@ -41,11 +41,13 @@ class ZegoMessageService extends ChangeNotifier {
     ZIMPlugin.onReceiveTextRoomMessage = _onReceiveTextMessage;
   }
 
-  void onRoomLeave() {
+  onRoomLeave() {
     messageList.clear();
     memberJoinedText = '';
     memberLeaveText = '';
   }
+
+  onRoomEnter() {}
 
   Future<int> sendTextMessage(
       String roomID, String userID, String message) async {

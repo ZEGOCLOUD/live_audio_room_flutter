@@ -19,7 +19,7 @@ class ZegoGiftService extends ChangeNotifier {
     ZIMPlugin.onReceiveCustomRoomMessage = _onReceiveCustomMessage;
   }
 
-  void onRoomLeave() {
+  onRoomLeave() {
     if (displayTips) {
       displayTimer.cancel();
     }
@@ -30,8 +30,10 @@ class ZegoGiftService extends ChangeNotifier {
     giftReceivers.clear();
   }
 
-  Future<int> sendGift(
-      String roomID, String senderUserID, String giftID, List<String> toUserList) async {
+  onRoomEnter() {}
+
+  Future<int> sendGift(String roomID, String senderUserID, String giftID,
+      List<String> toUserList) async {
     Map message = {
       'actionType': 2,
       'target': toUserList,

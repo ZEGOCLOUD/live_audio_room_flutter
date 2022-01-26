@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
 
 import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
+import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:zego_express_engine/zego_express_engine.dart';
 import 'package:live_audio_room_flutter/common/room_info_content.dart';
 import 'package:live_audio_room_flutter/constants/zego_constant.dart';
@@ -54,12 +55,12 @@ enum RoomState {
 
 typedef RoomCallback = Function(int);
 typedef RoomLeaveCallback = VoidCallback;
+typedef RoomEnterCallback = VoidCallback;
 
 class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
   RoomInfo roomInfo = RoomInfo('', '', '');
-  String localUserID = ""; // Update while user service data is updated.
-  String localUserName = ""; // Update while user service data is updated.
   RoomLeaveCallback? roomLeaveCallback;
+  RoomEnterCallback? roomEnterCallback;
 
   ZegoRoomService() {
     ZIMPlugin.onRoomInfoUpdate = _onRoomInfoUpdate;
@@ -71,8 +72,18 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     notifyListeners();
   }
 
+  onRoomEnter() {}
+
+  String get _localUserID {
+    return ZegoRoomManager.shared.userService.localUserInfo.userID;
+  }
+
+  String get _localUserName {
+    return ZegoRoomManager.shared.userService.localUserInfo.userName;
+  }
+
   Future<int> createRoom(String roomID, String roomName, String token) async {
-    var result = await ZIMPlugin.createRoom(roomID, roomName, localUserID, 8);
+    var result = await ZIMPlugin.createRoom(roomID, roomName, _localUserID, 8);
     var code = result['errorCode'];
     if (code == 0) {
       var result = await ZIMPlugin.queryRoomAllAttributes(roomID);
@@ -133,7 +144,7 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     zimRoomEvent? roomEvent = zimRoomEventExtension.mapValue[event];
 
     print(
-        "_onRoomStateChanged state:${state}, ${roomState}, event:${event}, ${roomEvent}");
+        "_onRoomStateChanged state:$state, $roomState, event:$event, $roomEvent");
 
     if (roomState == ZimRoomState.zimRoomStateDisconnected) {
       if (roomLeaveCallback != null) {
@@ -145,15 +156,31 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
         toastContent.toastType = RoomInfoType.roomNetworkLeave;
         notifyInfo(json.encode(toastContent.toJson()));
       }
+    } else if (roomState == ZimRoomState.zimRoomStateConnected &&
+        roomEvent == zimRoomEvent.zimRoomEventSuccess) {
+      var result = await ZIMPlugin.queryRoomAllAttributes(roomInfo.roomID);
+      var attributesResult = result['roomAttributes'];
+      var roomDic = attributesResult['room_info'];
+      if (roomDic == null) {
+        // room has end
+        RoomInfoContent toastContent = RoomInfoContent.empty();
+        toastContent.toastType = RoomInfoType.roomEndByHost;
+        notifyInfo(json.encode(toastContent.toJson()));
+      } else {
+        _updateRoomInfo(RoomInfo.fromJson(jsonDecode(roomDic)));
+        if (roomEnterCallback != null) {
+          roomEnterCallback!();
+        }
+      }
     }
 
     notifyListeners();
   }
 
   void _onRoomInfoUpdate(String roomID, Map<String, dynamic> roomInfoJson) {
-      // room has end by host
+    // room has end by host
     if (roomInfoJson.keys.isEmpty) {
-      if (localUserID != roomInfo.hostID) {
+      if (_localUserID != roomInfo.hostID) {
         leaveRoom();
       }
 
@@ -162,18 +189,19 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
       notifyInfo(json.encode(toastContent.toJson()));
 
       return;
+    } else {
+      _updateRoomInfo(RoomInfo.fromJson(roomInfoJson));
+      if (roomEnterCallback != null) {
+        roomEnterCallback!();
+      }
+      notifyListeners();
     }
-    _updateRoomInfo(RoomInfo.fromJson(roomInfoJson));
-    notifyListeners();
   }
 
   Future<void> _loginRtcRoom() async {
-    if (roomInfo.roomID == null || localUserID == null) {
-      return;
-    }
-    var user = ZegoUser(localUserID, localUserName);
+    var user = ZegoUser(_localUserID, _localUserName);
     var config = ZegoRoomConfig.defaultConfig();
-    var result = await ZIMPlugin.getRTCToken(roomInfo.roomID, localUserID);
+    var result = await ZIMPlugin.getRTCToken(roomInfo.roomID, _localUserID);
     config.token = result["token"];
     config.maxMemberCount = 0;
     ZegoExpressEngine.instance.loginRoom(roomInfo.roomID, user, config: config);
