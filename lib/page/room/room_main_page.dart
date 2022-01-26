@@ -129,6 +129,7 @@ class RoomMainPage extends StatelessWidget {
       VoidCallback? confirmCallback}) {
     showDialog<String>(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) => AlertDialog(
         title: Text(title),
         content: Text(description),
@@ -214,6 +215,7 @@ class RoomMainPage extends StatelessWidget {
     // show the dialog
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return alert;
       },
@@ -269,6 +271,7 @@ class RoomMainPage extends StatelessWidget {
     // show the dialog
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return alert;
       },

@@ -266,6 +266,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
       VoidCallback? callback}) {
     showDialog<String>(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) => AlertDialog(
         title: Text(title),
         content: Text(description),
