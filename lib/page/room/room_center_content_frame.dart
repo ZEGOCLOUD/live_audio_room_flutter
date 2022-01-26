@@ -87,10 +87,7 @@ class SeatItem extends StatelessWidget {
                       height: 100.h,
                       child: CircleAvatar(
                         backgroundColor: const Color(0xFFE6E6E6),
-                        backgroundImage: (ZegoSpeakerSeatStatus.Closed ==
-                                status)
-                            ? const AssetImage(StyleIconUrls.roomSeatLock)
-                            : const AssetImage(StyleIconUrls.roomSeatDefault),
+                        backgroundImage: _getSeatDefaultBackground(context),
                         foregroundImage:
                             (avatar ?? "").isEmpty || (userName ?? "").isEmpty
                                 ? null
@@ -156,6 +153,19 @@ class SeatItem extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  _getSeatDefaultBackground(BuildContext context) {
+    if (ZegoSpeakerSeatStatus.Closed == status) {
+      return const AssetImage(StyleIconUrls.roomSeatLock);
+    }
+
+    var userService = context.read<ZegoUserService>();
+    if (userService.localUserInfo.userRole ==
+        ZegoRoomUserRole.roomUserRoleListener) {
+      return const AssetImage(StyleIconUrls.roomSeatAdd);
+    }
+    return const AssetImage(StyleIconUrls.roomSeatDefault);
   }
 }
 
