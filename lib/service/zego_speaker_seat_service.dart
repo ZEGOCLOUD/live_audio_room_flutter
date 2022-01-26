@@ -292,6 +292,9 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   }
 
   void updateUserIDSet(Set<String> idSet) {
+    if (_hostID.isEmpty || _hostID != _localUserID) {
+      return;
+    }
     for (final seat in seatList) {
       if (seat.userID.isNotEmpty && !idSet.contains(seat.userID)) {
         removeUserFromSeat(seat.seatIndex);
