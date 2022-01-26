@@ -210,8 +210,6 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
       var seat = seatList[i];
       var userInfo = userService.getUserByID(seat.userID);
       var avatarIndex = userService.getUserAvatarIndex(seat.userID);
-      print('getUserAvatarIndex result ${seat.userID} ${avatarIndex}');
-      print("images/seat_$avatarIndex.png");
       var item = SeatItem(
         index: i,
         userID: seat.userID,
@@ -339,7 +337,6 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
 
   _speakerItemClickCallback(
       int index, String userID, String userName, ZegoSpeakerSeatStatus status) {
-    print("Speaker click...$index, $userID");
     var users = context.read<ZegoUserService>();
     var seats = context.read<ZegoSpeakerSeatService>();
 
@@ -378,7 +375,6 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
 
   _listenerItemClickCallback(
       int index, String userID, String userName, ZegoSpeakerSeatStatus status) {
-    print("Listener click...$index, $userID");
     var users = context.read<ZegoUserService>();
     if (userID.isNotEmpty) {
       return;
