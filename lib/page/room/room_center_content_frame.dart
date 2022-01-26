@@ -19,6 +19,7 @@ import 'package:live_audio_room_flutter/page/room/room_chat_page.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
+import 'package:live_audio_room_flutter/common/user_avatar.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/page/room/room_gift_tips.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
@@ -209,7 +210,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
     for (var i = 0; i < 8; i++) {
       var seat = seatList[i];
       var userInfo = userService.getUserByID(seat.userID);
-      var avatarIndex = userService.getUserAvatarIndex(seat.userID);
+      var avatarIndex = getUserAvatarIndex(userInfo.userName);
       var item = SeatItem(
         index: i,
         userID: seat.userID,
