@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
+import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
 import 'package:live_audio_room_flutter/constants/zego_custom_command_constant.dart';
 
 typedef ZegoRoomCallback = Function(int);
@@ -65,7 +66,7 @@ class ZegoGiftService extends ChangeNotifier {
     String json = jsonEncode(message);
     var result = await ZIMPlugin.sendRoomMessage(roomID, json, true);
     int code = result['errorCode'];
-    if (code == 0) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] == code) {
       this.giftID = giftID;
       giftReceivers = toUserList;
       giftSender = senderUserID;

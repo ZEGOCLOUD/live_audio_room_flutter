@@ -1,35 +1,15 @@
 import 'package:flutter/foundation.dart';
 
 import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
+
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
-
-class ZegoTextMessage {
-  String userID = "";
-  String message = "";
-  int timestamp = 0;
-  int messageID = 0;
-  int type = 0;
-
-  ZegoTextMessage();
-
-  ZegoTextMessage.formJson(Map<String, dynamic> json)
-      : userID = json['userID'],
-        message = json['message'],
-        timestamp = json['timestamp'],
-        messageID = json['messageID'],
-        type = json['type'];
-
-  Map<String, dynamic> toJson() => {
-        'messageID': messageID,
-        'userID': userID,
-        'message': message,
-        'timestamp': timestamp,
-        'type': type
-      };
-}
+import 'package:live_audio_room_flutter/model/zego_text_message.dart';
+import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
 
 typedef ZegoRoomCallback = Function(int);
 
+/// Class IM message management.
+/// <p>Description: This class contains the logics of the IM messages management, such as send or receive messages.</>
 class ZegoMessageService extends ChangeNotifier {
   List<ZegoTextMessage> messageList = [];
   String memberJoinedText = '';
@@ -47,11 +27,19 @@ class ZegoMessageService extends ChangeNotifier {
 
   onRoomEnter() {}
 
+  /// Send IM text message.
+  /// <p>Description: This method can be used to send IM text message, and all users in the room will receive the
+  /// message notification.</>
+  /// <p>Call this method at:  After joining the room</>
+  ///
+  /// @param text     refers to the text message content, which is limited to 1kb.
+  /// @param userID
+  /// @param message
   Future<int> sendTextMessage(
       String roomID, String userID, String message) async {
     var result = await ZIMPlugin.sendRoomMessage(roomID, message, false);
     int code = result['errorCode'];
-    if (code == 0) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] == code) {
       var msg = ZegoTextMessage();
       msg.message = message;
       msg.userID = userID;

@@ -15,8 +15,8 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/page/room/room_setting_page.dart';
-import 'package:live_audio_room_flutter/page/room/room_member_page.dart';
-import 'package:live_audio_room_flutter/page/room/room_gift_page.dart';
+import 'package:live_audio_room_flutter/page/room/member/room_member_page.dart';
+import 'package:live_audio_room_flutter/page/room/gift/room_gift_page.dart';
 import 'package:live_audio_room_flutter/common/input/input_dialog.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 

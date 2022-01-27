@@ -11,6 +11,7 @@ import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:live_audio_room_flutter/common/room_info_content.dart';
+import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
 
 enum LoginState {
   loginStateLoggedOut,
@@ -88,7 +89,7 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
   Future<int> fetchOnlineRoomUsersNum(String roomID) async {
     var result = await ZIMPlugin.queryRoomOnlineMemberCount(roomID);
     int code = result['errorCode'];
-    if (code == 0) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] == code) {
       totalUsersNum = result['count'];
       notifyListeners();
     }
@@ -114,7 +115,7 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     var result = await ZIMPlugin.login(info.userID, info.userName, "");
     int code = result['errorCode'];
 
-    if (code != 0) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] != code) {
       localUserInfo = ZegoUserInfo.empty();
       loginState = LoginState.loginStateLoggedIn;
     } else {

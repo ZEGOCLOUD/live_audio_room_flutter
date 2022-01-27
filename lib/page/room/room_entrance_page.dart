@@ -10,106 +10,11 @@ import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
+import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
 import 'package:live_audio_room_flutter/common/room_info_content.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
+import 'package:live_audio_room_flutter/page/room/create_room_dialog.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
-
-typedef RoomOperationCallback = Function(int);
-
-class CreateRoomDialog extends HookWidget {
-  const CreateRoomDialog({Key? key}) : super(key: key);
-
-  void tryCreateRoom(BuildContext context, String roomID, String roomName) {
-    if (roomID.isEmpty) {
-      Fluttertoast.showToast(
-          msg: AppLocalizations.of(context)!.toastRoomIdEnterError,
-          backgroundColor: Colors.grey);
-      return;
-    }
-    if (roomName.isEmpty) {
-      Fluttertoast.showToast(
-          msg: AppLocalizations.of(context)!.toastRoomNameError,
-          backgroundColor: Colors.grey);
-      return;
-    }
-    var room = context.read<ZegoRoomService>();
-    room.createRoom(roomID, roomName, "").then((code) {
-      if (code != 0) {
-        String message =
-            AppLocalizations.of(context)!.toastCreateRoomFail(code);
-        if (6000311 == code) {
-          message = AppLocalizations.of(context)!.toastRoomExisted;
-        }
-        Fluttertoast.showToast(msg: message, backgroundColor: Colors.grey);
-      } else {
-        Navigator.pushReplacementNamed(context, "/room_main");
-      }
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final dialogRoomIDInputController = useTextEditingController();
-    final dialogRoomNameInputController = useTextEditingController();
-
-    // TODO: implement build
-    return CupertinoAlertDialog(
-      title: Text(AppLocalizations.of(context)!.createPageCreateRoom),
-      content: FractionallySizedBox(
-        widthFactor: 0.95,
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 30,
-            ),
-            SizedBox(
-              height: 50,
-              child: CupertinoTextField(
-                expands: true,
-                maxLines: null,
-                maxLength: 20,
-                placeholder: AppLocalizations.of(context)!.createPageRoomId,
-                controller: dialogRoomIDInputController,
-              ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            SizedBox(
-              height: 50,
-              child: CupertinoTextField(
-                expands: true,
-                maxLines: null,
-                maxLength: 16,
-                placeholder: AppLocalizations.of(context)!.createPageRoomName,
-                controller: dialogRoomNameInputController,
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            )
-          ],
-        ),
-      ),
-      actions: [
-        CupertinoDialogAction(
-          child: Text(AppLocalizations.of(context)!.createPageCancel),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        CupertinoDialogAction(
-          child: Text(AppLocalizations.of(context)!.createPageCreate),
-          isDestructiveAction: true,
-          onPressed: () {
-            tryCreateRoom(context, dialogRoomIDInputController.text,
-                dialogRoomNameInputController.text);
-          },
-        )
-      ],
-    );
-  }
-}
 
 class RoomEntrancePage extends HookWidget {
   const RoomEntrancePage({Key? key}) : super(key: key);
@@ -126,7 +31,7 @@ class RoomEntrancePage extends HookWidget {
     room.joinRoom(roomID, "").then((code) {
       if (code != 0) {
         String message = AppLocalizations.of(context)!.toastJoinRoomFail(code);
-        if (6000301 == code) {
+        if(code == ZIMErrorCodeExtension.valueMap[zimErrorCode.roomNotExist]) {
           message = AppLocalizations.of(context)!.toastRoomNotExistFail;
         }
         Fluttertoast.showToast(msg: message, backgroundColor: Colors.grey);
@@ -211,7 +116,8 @@ class RoomEntrancePage extends HookWidget {
                 onPressed: () {
                   showCupertinoDialog<void>(
                       context: context,
-                      builder: (BuildContext context) => const CreateRoomDialog());
+                      builder: (BuildContext context) =>
+                          const CreateRoomDialog());
                 }),
             Offstage(
                 offstage: true,
