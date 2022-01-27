@@ -162,7 +162,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     } else {
       var userStreamID = _roomID + "_" + _localUserID + "_main";
       ZegoExpressEngine.instance.startPublishingStream(userStreamID);
-      ZegoExpressEngine.instance.muteMicrophone(speakerSeat.mic == false);
+      ZegoExpressEngine.instance.muteMicrophone(!speakerSeat.mic);
     }
     updateSpeakerIDList();
     notifyListeners();

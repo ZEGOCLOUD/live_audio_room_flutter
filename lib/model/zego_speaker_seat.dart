@@ -10,7 +10,7 @@ enum ZegoNetworkQuality {
 class ZegoSpeakerSeat {
   String userID = "";
   int seatIndex = -1;
-  bool mic = false;
+  bool mic = true;
   ZegoSpeakerSeatStatus status = ZegoSpeakerSeatStatus.Untaken;
 
   double soundLevel = 0.0;
@@ -33,7 +33,7 @@ class ZegoSpeakerSeat {
 
   void clearData() {
     userID = "";
-    mic = false;
+    mic = true;
     status = ZegoSpeakerSeatStatus.Untaken;
     soundLevel = 0.0;
     network = ZegoNetworkQuality.Good;
