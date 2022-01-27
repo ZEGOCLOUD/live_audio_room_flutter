@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:provider/provider.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
@@ -17,7 +15,6 @@ import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/model/zego_room_gift.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
-import 'package:zego_express_engine/zego_express_engine.dart';
 
 const userIDOfNoSpeakerUser = '-1000';
 const userIDOfAllSpeaker = '-1001';

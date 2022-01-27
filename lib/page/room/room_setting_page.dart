@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
@@ -12,6 +11,8 @@ import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class RoomSettingPage extends HookWidget {
+  const RoomSettingPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Container(

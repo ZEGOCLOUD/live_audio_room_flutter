@@ -1,14 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:provider/provider.dart';
-
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 
+import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
+
+import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
@@ -62,16 +61,19 @@ class RoomTitleBar extends StatelessWidget {
                 builder: (context) => getEndRoomDialog(context),
               );
             } else {
-              var roomService = context.read<ZegoRoomService>();
-              roomService.leaveRoom().then((errorCode) {
-                if (0 != errorCode) {
-                  Fluttertoast.showToast(
-                      msg: AppLocalizations.of(context)!
-                          .toastRoomLeaveFailTip(errorCode),
-                      backgroundColor: Colors.grey);
-                } else {
-                  Navigator.pushReplacementNamed(context, "/room_entrance");
-                }
+              var seatService = context.read<ZegoSpeakerSeatService>();
+              seatService.leaveSeat().then((value) {
+                var roomService = context.read<ZegoRoomService>();
+                roomService.leaveRoom().then((errorCode) {
+                  if (0 != errorCode) {
+                    Fluttertoast.showToast(
+                        msg: AppLocalizations.of(context)!
+                            .toastRoomLeaveFailTip(errorCode),
+                        backgroundColor: Colors.grey);
+                  } else {
+                    Navigator.pushReplacementNamed(context, "/room_entrance");
+                  }
+                });
               });
             }
           },
@@ -95,18 +97,20 @@ class RoomTitleBar extends StatelessWidget {
         TextButton(
           child: Text(AppLocalizations.of(context)!.dialogConfirm),
           onPressed: () {
-            var roomService = context.read<ZegoRoomService>();
-            roomService.leaveRoom().then((errorCode) {
-              if (0 != errorCode) {
-                Fluttertoast.showToast(
-                    msg: AppLocalizations.of(context)!
-                        .toastRoomEndFailTip(errorCode),
-                    backgroundColor: Colors.grey);
-              }
-            });
+            context.read<ZegoSpeakerSeatService>().leaveSeat().then((value) {
+              var roomService = context.read<ZegoRoomService>();
+              roomService.leaveRoom().then((errorCode) {
+                if (0 != errorCode) {
+                  Fluttertoast.showToast(
+                      msg: AppLocalizations.of(context)!
+                          .toastRoomEndFailTip(errorCode),
+                      backgroundColor: Colors.grey);
+                }
+              });
 
-            Navigator.of(context).pop(true);
-            Navigator.pushReplacementNamed(context, "/room_entrance");
+              Navigator.of(context).pop(true);
+              Navigator.pushReplacementNamed(context, "/room_entrance");
+            });
           },
         ),
       ],

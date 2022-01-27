@@ -9,12 +9,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:live_audio_room_flutter/service/zego_message_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
-import 'package:live_audio_room_flutter/page/room/room_gift_tips.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
-import 'package:zego_express_engine/zego_express_engine.dart';
 
 class ChatMessageModel {
   ZegoUserInfo sender = ZegoUserInfo.empty();

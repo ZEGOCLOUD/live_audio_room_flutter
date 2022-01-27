@@ -1,29 +1,24 @@
-import 'dart:async';
-import 'dart:ffi';
-import 'dart:convert';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+import 'package:live_audio_room_flutter/model/zego_user_info.dart';
+import 'package:live_audio_room_flutter/common/user_avatar.dart';
+
 import 'package:live_audio_room_flutter/page/room/room_chat_page.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
-import 'package:live_audio_room_flutter/model/zego_user_info.dart';
-import 'package:live_audio_room_flutter/common/user_avatar.dart';
-import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/page/room/room_gift_tips.dart';
-import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
-import 'package:crypto/crypto.dart';
+import 'package:live_audio_room_flutter/constants/zego_room_constant.dart';
 
 typedef SeatItemClickCallback = Function(
     int index, String userId, String userName, ZegoSpeakerSeatStatus status);
@@ -55,13 +50,13 @@ class SeatItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String getNetworkQualityIconName() {
-      switch ((networkQuality ?? ZegoNetworkQuality.Bad)) {
-        case ZegoNetworkQuality.Good:
+      switch ((networkQuality ?? ZegoNetworkQuality.badQuality)) {
+        case ZegoNetworkQuality.goodQuality:
           return StyleIconUrls.roomNetworkStatusGood;
-        case ZegoNetworkQuality.Medium:
+        case ZegoNetworkQuality.mediumQuality:
           return StyleIconUrls.roomNetworkStatusNormal;
-        case ZegoNetworkQuality.Bad:
-        case ZegoNetworkQuality.Unknow:
+        case ZegoNetworkQuality.badQuality:
+        case ZegoNetworkQuality.unknownQuality:
           return StyleIconUrls.roomNetworkStatusBad;
       }
     }
@@ -158,15 +153,15 @@ class SeatItem extends StatelessWidget {
 
     late AssetImage image;
     switch (status) {
-      case ZegoSpeakerSeatStatus.Untaken:
+      case ZegoSpeakerSeatStatus.unTaken:
         image = isLocalUserOnSeat
             ? const AssetImage(StyleIconUrls.roomSeatDefault)
             : const AssetImage(StyleIconUrls.roomSeatAdd);
         break;
-      case ZegoSpeakerSeatStatus.Occupied:
+      case ZegoSpeakerSeatStatus.occupied:
         image = AssetImage(avatar);
         break;
-      case ZegoSpeakerSeatStatus.Closed:
+      case ZegoSpeakerSeatStatus.closed:
         image = const AssetImage(StyleIconUrls.roomSeatLock);
         break;
     }
@@ -175,23 +170,6 @@ class SeatItem extends StatelessWidget {
       backgroundColor: const Color(0xFFE6E6E6),
       foregroundImage: image,
     );
-  }
-
-  _getSeatForegroundImage(BuildContext context) {
-    return avatar.isEmpty || userName.isEmpty ? null : AssetImage(avatar);
-  }
-
-  _getSeatBackgroundImage(BuildContext context) {
-    if (ZegoSpeakerSeatStatus.Closed == status) {
-      return const AssetImage(StyleIconUrls.roomSeatLock);
-    }
-
-    var userService = context.read<ZegoUserService>();
-    if (userService.localUserInfo.userRole ==
-        ZegoRoomUserRole.roomUserRoleListener) {
-      return const AssetImage(StyleIconUrls.roomSeatAdd);
-    }
-    return const AssetImage(StyleIconUrls.roomSeatDefault);
   }
 }
 
@@ -300,7 +278,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
     }
     if (userID.isEmpty) {
       // Close or Unclose Seat
-      var setToClose = ZegoSpeakerSeatStatus.Closed != status;
+      var setToClose = ZegoSpeakerSeatStatus.closed != status;
       var buttonText = setToClose
           ? AppLocalizations.of(context)!.roomPageLockSeat
           : AppLocalizations.of(context)!.roomPageUnlockSeat;
@@ -343,7 +321,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
     var seats = context.read<ZegoSpeakerSeatService>();
 
     if (userID.isEmpty) {
-      if (ZegoSpeakerSeatStatus.Closed == status) {
+      if (ZegoSpeakerSeatStatus.closed == status) {
         Fluttertoast.showToast(
             msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed,
             backgroundColor: Colors.grey);
@@ -383,7 +361,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
           backgroundColor: Colors.grey);
       return;
     }
-    if (ZegoSpeakerSeatStatus.Closed == status) {
+    if (ZegoSpeakerSeatStatus.closed == status) {
       Fluttertoast.showToast(
           msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed,
           backgroundColor: Colors.grey);

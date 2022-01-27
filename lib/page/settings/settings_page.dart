@@ -5,12 +5,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'package:live_audio_room_flutter/common/style/styles.dart';
-import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+import 'package:zego_express_engine/zego_express_engine.dart';
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+
+import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
-import 'package:zego_express_engine/zego_express_engine.dart';
 
 class SettingSDKVersionWidget extends StatelessWidget {
   final String title;

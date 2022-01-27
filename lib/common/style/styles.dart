@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 /// colors
 class StyleColors {
   static const Color dark = Color(0xff1B1B1B);

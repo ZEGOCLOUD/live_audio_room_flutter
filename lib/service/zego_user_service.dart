@@ -1,15 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
 
+import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
+
+import 'package:live_audio_room_flutter/constants/zego_connection_constant.dart';
+import 'package:live_audio_room_flutter/constants/zego_custom_command_constant.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
-import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
-import 'package:live_audio_room_flutter/constants/zego_constant.dart';
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
-import 'package:zego_express_engine/zego_express_engine.dart';
 import 'package:live_audio_room_flutter/common/room_info_content.dart';
 
 enum LoginState {
@@ -19,30 +19,23 @@ enum LoginState {
   loginStateLoginFailed,
 }
 
-enum ConnectionState {
-  disconnected,
-  connecting,
-  connected,
-  reconnecting,
-}
-
-enum ConnectionEvent {
-  success,
-  activeLogin,
-  loginTimeout,
-  loginInterrupted,
-  kickedOut,
-}
-
 typedef LoginCallback = Function(int);
 typedef MemberOfflineCallback = VoidCallback;
 typedef MemberChangeCallback = Function(List<ZegoUserInfo>);
 
+/// Class user information management.
+/// <p>Description: This class contains the user information management logics, such as the logic of log in, log out,
+/// get the logged-in user info, get the in-room user list, and add co-hosts, etc. </>
 class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
   MemberOfflineCallback? userOfflineCallback;
+
+  /// In-room user list, can be used when displaying the user list in the room.
   List<ZegoUserInfo> userList = [];
+
+  /// In-room user dictionary,  can be used to update user information.¬
   Map<String, ZegoUserInfo> userDic = <String, ZegoUserInfo>{};
 
+  /// The local logged-in user information.
   ZegoUserInfo localUserInfo = ZegoUserInfo.empty();
   int totalUsersNum = 0;
   LoginState loginState = LoginState.loginStateLoggedOut;
@@ -102,6 +95,13 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     return code;
   }
 
+  /// User to log in.
+  /// <p>Description: Call this method with user ID and username to log in to the LiveAudioRoom service.</>
+  /// <p>Call this method at: After the SDK initialization</>
+  ///
+  /// @param userInfo refers to the user information. You only need to enter the user ID and username.
+  /// @param token    refers to the authentication token. To get this, refer to the documentation:
+  ///                 https://doc-en.zego.im/article/11648
   Future<int> login(ZegoUserInfo info, String token) async {
     localUserInfo = info;
     if (info.userName.isEmpty) {
@@ -125,6 +125,9 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     return code;
   }
 
+  /// User to log out.
+  /// <p>Description: This method can be used to log out from the current user account.</>
+  /// <p>Call this method at: After the user login</>
   Future<int> logout() async {
     var result = await ZIMPlugin.logout();
     localUserInfo = ZegoUserInfo.empty();
@@ -133,6 +136,12 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     return result['errorCode'];
   }
 
+  /// Invite users to speak .
+  /// <p>Description: This method can be called to invite users to take a speaker seat to speak, and the invitee will
+  /// receive an invitation.</>
+  /// <p>Call this method at:  After joining a room</>
+  ///
+  /// @param userID   refers to the ID of the user that you want to invite
   Future<int> sendInvitation(String userID) async {
     var result = await ZIMPlugin.sendPeerMessage(userID, "", 1);
     return result['errorCode'];
@@ -179,7 +188,8 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
       var messageJson = item['message'];
       Map<String, dynamic> messageDic = jsonDecode(messageJson);
       int actionType = messageDic['actionType'];
-      if (actionType == 1) {
+      if (zegoCustomCommandType.invitation ==
+          ZegoCustomCommandTypeExtension.mapValue[actionType]) {
         // receive invitation
         RoomInfoContent toastContent = RoomInfoContent.empty();
         toastContent.toastType = RoomInfoType.roomHostInviteToSpeak;
@@ -191,9 +201,9 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
 
   void _onConnectionStateChanged(int state, int event) {
     zimConnectionState? connectionState =
-        zimConnectionStateExtension.mapValue[state];
+        ZIMConnectionStateExtension.mapValue[state];
     zimConnectionEvent? connectionEvent =
-        zimConnectionEventExtension.mapValue[event];
+        ZIMConnectionEventExtension.mapValue[event];
 
     if (connectionState == zimConnectionState.zimConnectionStateReconnecting &&
         connectionEvent ==

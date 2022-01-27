@@ -5,59 +5,23 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
 
-import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
+import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:zego_express_engine/zego_express_engine.dart';
 import 'package:live_audio_room_flutter/common/room_info_content.dart';
-import 'package:live_audio_room_flutter/constants/zego_constant.dart';
-
-class RoomInfo {
-  String roomID = "";
-  String roomName = "";
-  String hostID = "";
-  int seatNum = 0;
-  bool isTextMessageDisable = false;
-  bool isSeatClosed = false;
-
-  RoomInfo(this.roomID, this.roomName, this.hostID);
-
-  RoomInfo clone() {
-    var cloneObject = RoomInfo(roomID, roomName, hostID);
-    cloneObject.seatNum = seatNum;
-    cloneObject.isTextMessageDisable = isTextMessageDisable;
-    cloneObject.isSeatClosed = isSeatClosed;
-    return cloneObject;
-  }
-
-  RoomInfo.fromJson(Map<String, dynamic> json)
-      : roomID = json['id'],
-        roomName = json['name'],
-        hostID = json['host_id'],
-        seatNum = json['num'],
-        isTextMessageDisable = json['disable'],
-        isSeatClosed = json['close'];
-
-  Map<String, dynamic> toJson() => {
-        'id': roomID,
-        'name': roomName,
-        'host_id': hostID,
-        'num': seatNum,
-        'disable': isTextMessageDisable,
-        'close': isSeatClosed
-      };
-}
-
-enum RoomState {
-  disconnected,
-  connecting,
-  connected,
-}
+import 'package:live_audio_room_flutter/constants/zego_room_constant.dart';
+import 'package:live_audio_room_flutter/model/zego_room_info.dart';
 
 typedef RoomCallback = Function(int);
 typedef RoomLeaveCallback = VoidCallback;
 typedef RoomEnterCallback = VoidCallback;
 
+/// Class LiveAudioRoom information management.
+/// <p>Description: This class contains the room information management logics, such as the logic of create a room, join
+/// a room, leave a room, disable the text chat in room, etc.</>
 class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
+  /// Room information, it will be assigned after join the room successfully. And it will be updated synchronously when
+  /// the room status updates.
   RoomInfo roomInfo = RoomInfo('', '', '');
   RoomLeaveCallback? roomLeaveCallback;
   RoomEnterCallback? roomEnterCallback;
@@ -82,6 +46,16 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     return ZegoRoomManager.shared.userService.localUserInfo.userName;
   }
 
+  /// Create a room.
+  /// <p>Description: This method can be used to create a room. The room creator will be the Host by default when the
+  /// room is created successfully.</>
+  /// <p>Call this method at: After user logs in </>
+  ///
+  /// @param roomID   roomID refers to the room ID, the unique identifier of the room. This is required to join a room
+  ///                 and cannot be null.
+  /// @param roomName roomName refers to the room name. This is used for display in the room and cannot be null.
+  /// @param token    token refers to the authentication token. To get this, see the documentation:
+  ///                 https://doc-en.zego.im/article/11648
   Future<int> createRoom(String roomID, String roomName, String token) async {
     var result = await ZIMPlugin.createRoom(roomID, roomName, _localUserID, 8);
     var code = result['errorCode'];
@@ -96,6 +70,13 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     return code;
   }
 
+  /// Join a room.
+  /// <p>Description: This method can be used to join a room, the room must be an existing room.</>
+  /// <p>Call this method at: After user logs in</>
+  ///
+  /// @param roomID   refers to the ID of the room you want to join, and cannot be null.
+  /// @param token    token refers to the authentication token. To get this, see the documentation:
+  ///                 https://doc-en.zego.im/article/11648
   Future<int> joinRoom(String roomID, String token) async {
     var joinResult = await ZIMPlugin.joinRoom(roomID);
     var code = joinResult['errorCode'];
@@ -110,13 +91,24 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     return code;
   }
 
+  /// Leave the room.
+  /// <p>Description: This method can be used to leave the room you joined. The room will be ended when the Host
+  /// leaves, and all users in the room will be forced to leave the room.</>
+  /// <p>Call this method at: After joining a room</>
   Future<int> leaveRoom() async {
+    _logoutRtcRoom();
+
     var result = await ZIMPlugin.leaveRoom(roomInfo.roomID);
     var code = result['errorCode'];
-    _logoutRtcRoom();
     return code;
   }
 
+  /// Disable text chat in the room.
+  /// <p>Description: This method can be used to disable the text chat in the room.</>
+  /// <p>Call this method at: After joining a room</>
+  ///
+  /// @param disable  refers to the parameter that whether to disable the text chat. To disable the text chat, set it
+  ///                 to [true]; To allow the text chat, set it to [false].
   Future<int> disableTextMessage(bool disable) async {
     var targetRoomInfo = roomInfo.clone();
     targetRoomInfo.isTextMessageDisable = disable;
@@ -141,10 +133,7 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
 
   Future<void> _onRoomStateChanged(int state, int event) async {
     ZimRoomState? roomState = ZimRoomStateExtension.mapValue[state];
-    zimRoomEvent? roomEvent = zimRoomEventExtension.mapValue[event];
-
-    print(
-        "_onRoomStateChanged state:$state, $roomState, event:$event, $roomEvent");
+    zimRoomEvent? roomEvent = ZIMRoomEventExtension.mapValue[event];
 
     if (roomState == ZimRoomState.zimRoomStateDisconnected) {
       if (roomLeaveCallback != null) {

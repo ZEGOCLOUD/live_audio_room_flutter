@@ -1,12 +1,7 @@
-// ignore_for_file: avoid_print
-
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:flutter/services.dart';
-import 'package:flutter/material.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
 class ZIMPlugin {
   static const MethodChannel channel = MethodChannel('ZIMPlugin');
@@ -32,7 +27,7 @@ class ZIMPlugin {
   static Future<void> createZIM(int appID, String appSign, String serverSecret) async {
     return await channel.invokeMethod("createZIM", {"appID": appID, "appSign": appSign, "serverSecret": serverSecret});
   }
-  
+
   static Future<Map> destroyZIM() async {
     return await channel.invokeMethod("destroyZIM");
   }
@@ -130,11 +125,11 @@ class ZIMPlugin {
         var updateInfo = Map<String, dynamic>.from(jsonDecode(map['updateInfo']));
         if (updateInfo.containsKey('room_info')) {
           String jsonString = updateInfo['room_info'];
-          if (jsonString.length > 0) {
+          if (jsonString.isNotEmpty) {
             var roomInfoJson = Map<String, dynamic>.from(jsonDecode(jsonString));
             onRoomInfoUpdate!(roomID, roomInfoJson);
           } else {
-            onRoomInfoUpdate!(roomID, Map());
+            onRoomInfoUpdate!(roomID, {});
           }
         }
         updateInfo.removeWhere((key, value) => key == "room_info");

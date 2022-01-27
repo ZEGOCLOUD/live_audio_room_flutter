@@ -1,20 +1,12 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
-
 import 'package:live_audio_room_flutter/common/style/styles.dart';
-import 'package:live_audio_room_flutter/model/zego_user_info.dart';
-import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 import 'package:live_audio_room_flutter/model/zego_room_gift.dart';
-import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class GiftMessageModel {
   String sender = '';
@@ -26,7 +18,7 @@ class GiftMessageModel {
 }
 
 class RoomGiftTips extends HookWidget {
-  RoomGiftTips({Key? key, required this.gift}) : super(key: key);
+  const RoomGiftTips({Key? key, required this.gift}) : super(key: key);
 
   final GiftMessageModel gift;
 
