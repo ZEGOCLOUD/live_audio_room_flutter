@@ -83,10 +83,16 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     var code = joinResult['errorCode'];
     if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] == code) {
       var result = await ZIMPlugin.queryRoomAllAttributes(roomID);
+
       var attributesResult = result['roomAttributes'];
       var roomDic = attributesResult['room_info'];
-      _updateRoomInfo(RoomInfo.fromJson(jsonDecode(roomDic)));
+
+      var roomInfoJson = Map<String, dynamic>.from(jsonDecode(roomDic));
+      var roomInfoObj = RoomInfo.fromJson(jsonDecode(roomDic));
+      _onRoomInfoUpdate(roomInfoObj.roomID, roomInfoJson);
+
       _loginRtcRoom();
+
       notifyListeners();
     }
     return code;
