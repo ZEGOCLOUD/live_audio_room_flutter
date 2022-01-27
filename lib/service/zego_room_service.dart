@@ -111,9 +111,10 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
   }
 
   Future<int> leaveRoom() async {
+    _logoutRtcRoom();
+
     var result = await ZIMPlugin.leaveRoom(roomInfo.roomID);
     var code = result['errorCode'];
-    _logoutRtcRoom();
     return code;
   }
 
