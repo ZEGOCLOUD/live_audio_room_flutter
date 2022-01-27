@@ -1,20 +1,20 @@
-enum ZegoSpeakerSeatStatus { Untaken, Occupied, Closed }
+import 'package:live_audio_room_flutter/constants/zego_room_constant.dart';
 
-enum ZegoNetworkQuality {
-  Good,
-  Medium,
-  Bad,
-  Unknow
-}
-
+/// Class speaker seat status information.
+/// <p>Description: This class contains the speaker seat status information.</>
 class ZegoSpeakerSeat {
+  /// User ID, null indicates the current speaker seat is available/untaken.
   String userID = "";
+  /// The seat index.
   int seatIndex = -1;
+  /// The speaker seat mic status.
   bool mic = true;
-  ZegoSpeakerSeatStatus status = ZegoSpeakerSeatStatus.Untaken;
-
+  /// The speaker seat status, it is untaken by default.
+  ZegoSpeakerSeatStatus status = ZegoSpeakerSeatStatus.unTaken;
+  /// Volume value, a local record attribute, used for displaying the sound level.
   double soundLevel = 0.0;
-  ZegoNetworkQuality network = ZegoNetworkQuality.Good;
+  /// status, a local record attributes. It is calculated based on stream quality, can be used for displaying the network status.
+  ZegoNetworkQuality network = ZegoNetworkQuality.goodQuality;
 
   ZegoSpeakerSeat({required this.seatIndex});
 
@@ -34,8 +34,8 @@ class ZegoSpeakerSeat {
   void clearData() {
     userID = "";
     mic = true;
-    status = ZegoSpeakerSeatStatus.Untaken;
+    status = ZegoSpeakerSeatStatus.unTaken;
     soundLevel = 0.0;
-    network = ZegoNetworkQuality.Good;
+    network = ZegoNetworkQuality.goodQuality;
   }
 }

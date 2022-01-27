@@ -1,9 +1,8 @@
-import 'dart:ffi';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
+
+import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
 import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
 import 'package:live_audio_room_flutter/service/zego_loading_service.dart';
 import 'package:live_audio_room_flutter/service/zego_message_service.dart';
@@ -45,7 +44,7 @@ class ZegoRoomManager extends ChangeNotifier {
 
   Future<void> initWithAPPID(int appID, String appSign, String serverSecret,
       ZegoRoomCallback callback) async {
-    var result = await ZIMPlugin.createZIM(appID, appSign, serverSecret);
+    await ZIMPlugin.createZIM(appID, appSign, serverSecret);
     ZIMPlugin.registerEventHandler();
 
     ZegoExpressEngine.onRoomStreamUpdate = _onRoomStreamUpdate;
@@ -96,6 +95,9 @@ class ZegoRoomManager extends ChangeNotifier {
   }
 
   void _onApiCalledResult(int errorCode, String funcName, String info) {
-    print("=========$funcName: $errorCode");
+    if(0 != errorCode) {
+      print(
+          "_onApiCalledResult funcName:$funcName, errorCode:$errorCode, info:$info");
+    }
   }
 }

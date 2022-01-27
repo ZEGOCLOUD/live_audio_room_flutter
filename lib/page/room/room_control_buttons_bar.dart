@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -8,8 +6,6 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
-import 'package:zego_express_engine/zego_express_engine.dart';
 
 import 'package:live_audio_room_flutter/service/zego_message_service.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
@@ -28,7 +24,7 @@ class ControllerButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String iconSrc;
 
-  ControllerButton({Key? key, required this.onPressed, required this.iconSrc})
+  const ControllerButton({Key? key, required this.onPressed, required this.iconSrc})
       : super(key: key);
 
   @override
@@ -110,7 +106,7 @@ class RoomControlButtonsBar extends HookWidget {
                           elevation: 800.h,
                           isDismissible: true,
                           builder: (BuildContext context) {
-                            return RoomMemberPage();
+                            return const RoomMemberPage();
                           });
                     }, giftCallback: () {
                       showModalBottomSheet(
@@ -120,7 +116,7 @@ class RoomControlButtonsBar extends HookWidget {
                           elevation: 800.h,
                           isDismissible: true,
                           builder: (BuildContext context) {
-                            return RoomGiftPage();
+                            return const RoomGiftPage();
                           });
                     }, moreCallback: () {
                       showModalBottomSheet(
@@ -144,7 +140,7 @@ class RoomControlButtonsBar extends HookWidget {
                           elevation: 800.h,
                           isDismissible: true,
                           builder: (BuildContext context) {
-                            return RoomSettingPage();
+                            return const RoomSettingPage();
                           });
                     }),
                   ))

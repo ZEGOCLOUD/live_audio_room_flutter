@@ -2,15 +2,22 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
-import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
-import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
-import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+
 import 'package:zego_express_engine/zego_express_engine.dart';
+import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
+import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
+
+import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
+import 'package:live_audio_room_flutter/model/zego_room_info.dart';
+import 'package:live_audio_room_flutter/constants/zego_room_constant.dart';
 
 typedef ZegoRoomCallback = Function(int);
 
+/// Class speaker seat management.
+/// <p>Description: This class contains the logics related to speaker seat management, such as take/leave a speaker
+/// seat,close a speaker seat, remove user from seat, change speaker seats, etc.</>
 class ZegoSpeakerSeatService extends ChangeNotifier {
+  /// The speaker seat list.
   final List<ZegoSpeakerSeat> seatList = <ZegoSpeakerSeat>[
     ZegoSpeakerSeat(seatIndex: 0),
     ZegoSpeakerSeat(seatIndex: 1),
@@ -66,17 +73,21 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     } else {
       var hostSeat = seatList[0];
       hostSeat.userID = _hostID;
-      hostSeat.status = ZegoSpeakerSeatStatus.Occupied;
+      hostSeat.status = ZegoSpeakerSeatStatus.occupied;
       notifyListeners();
     }
   }
 
+  /// Remove a user from speaker seat.
+  /// <p>Description: This method can be used to remove a specified user (except the host) from the speaker seat. </>
+  ///
+  /// @param seatIndex refers to the seat index of the user you want to remove.
   Future<int> removeUserFromSeat(int seatIndex) async {
     var speakerSeat = seatList[seatIndex];
     var preUserID = speakerSeat.userID;
     var preStatus = speakerSeat.status;
     speakerSeat.userID = "";
-    speakerSeat.status = ZegoSpeakerSeatStatus.Untaken;
+    speakerSeat.status = ZegoSpeakerSeatStatus.unTaken;
     String speakerSeatJson = jsonEncode(speakerSeat);
     Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
@@ -90,17 +101,24 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return code;
   }
 
+  /// Close all untaken speaker seat/Open all closed speaker seat.
+  /// <p>Description: This method can be used to close all untaken seats or open all closed seats. And the status of
+  /// the isSeatClosed will also be updated automatically.</>
+  /// <p>Call this method at: After joining the room</>
+  ///
+  /// @param isClose  isClose can be used to close all untaken speaker seats.
+  /// @param roomInfo
   Future<int> closeAllSeat(bool isClose, RoomInfo roomInfo) async {
     // Ignore host
     var map = {};
     for (var i = 0; i < seatList.length; i++) {
       var speakerSeat = seatList[i];
-      if (speakerSeat.status == ZegoSpeakerSeatStatus.Occupied) {
+      if (speakerSeat.status == ZegoSpeakerSeatStatus.occupied) {
         continue;
       }
       speakerSeat.status = isClose
-          ? ZegoSpeakerSeatStatus.Closed
-          : ZegoSpeakerSeatStatus.Untaken;
+          ? ZegoSpeakerSeatStatus.closed
+          : ZegoSpeakerSeatStatus.unTaken;
       map[i.toString()] = jsonEncode(speakerSeat);
     }
 
@@ -113,11 +131,18 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return result['errorCode'];
   }
 
+  /// lose specified untaken speaker seat/Open specified closed speaker seat.
+  /// <p>Description: You can call this method to close untaken speaker seats, and the status of the specified speaker
+  /// seat will change to closed or unused.</>
+  /// <p>Call this method at: After joining the room</>
+  ///
+  /// @param isClose   can be used to close specified untaken speaker seats.
+  /// @param seatIndex refers to the seat index of the seat that you want to close/open.
   Future<int> closeSeat(bool isClose, int seatIndex) async {
     var speakerSeat = seatList[seatIndex];
     var preStatus = speakerSeat.status;
     speakerSeat.status =
-        isClose ? ZegoSpeakerSeatStatus.Closed : ZegoSpeakerSeatStatus.Untaken;
+        isClose ? ZegoSpeakerSeatStatus.closed : ZegoSpeakerSeatStatus.unTaken;
 
     String speakerSeatJson = jsonEncode(speakerSeat);
     Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
@@ -131,6 +156,12 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return code;
   }
 
+  /// Mute/Unmute your own microphone.
+  /// <p>Description: This method can be used to mute/unmute your own microphone.</>
+  /// <p>Call this method at:  After the host enters the room/listener takes a speaker seat</>
+  ///
+  /// @param isMuted  isMuted can be set to [true] to mute the microphone; or set it to [false] to unmute the
+  ///                 microphone.
   Future<int> toggleMic() async {
     if (_localSpeakerSeat() == null) {
       return -1;
@@ -145,12 +176,18 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return result['errorCode'];
   }
 
+  /// Take the speaker seat.
+  /// <p>Description: This method can be used to help a listener to take a speaker seat to speak. And at the same
+  /// time,the microphone will be enabled, the audio streams will be published.</>
+  /// <p>Call this method at:  After joining the room</>
+  ///
+  /// @param seatIndex seatIndex to take
   Future<int> takeSeat(int seatIndex) async {
     var speakerSeat = seatList[seatIndex];
     var preUserID = speakerSeat.userID;
     var preStatus = speakerSeat.status;
     speakerSeat.userID = _localUserID;
-    speakerSeat.status = ZegoSpeakerSeatStatus.Occupied;
+    speakerSeat.status = ZegoSpeakerSeatStatus.occupied;
     String speakerSeatJson = jsonEncode(speakerSeat);
     Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
@@ -169,6 +206,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return code;
   }
 
+  /// leave the speaker seat.
+  /// <p>Description: This method can be used to help a speaker to leave the speaker seat to become a listener again.
+  /// And at the same time, the microphone will be disabled, the audio stream publishing will be stopped.</>
+  /// <p>Call this method at:  After the listener takes a speaker seat</>
   Future<int> leaveSeat() async {
     var speakerSeat = _localSpeakerSeat();
     if (speakerSeat == null) {
@@ -178,8 +219,8 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     var preStatus = speakerSeat.status;
     speakerSeat.userID = '';
     speakerSeat.status = _isSeatClosed
-        ? ZegoSpeakerSeatStatus.Closed
-        : ZegoSpeakerSeatStatus.Untaken;
+        ? ZegoSpeakerSeatStatus.closed
+        : ZegoSpeakerSeatStatus.unTaken;
     String speakerSeatJson = jsonEncode(speakerSeat);
     Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
@@ -196,6 +237,13 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return code;
   }
 
+  /// Change the speaker seats.
+  /// <p>Description: This method can be used for users to change from the current speaker seat to another speaker
+  /// seat, and make the current seat available.</>
+  /// <p>Call this method at: After the listener takes a speaker seat</>
+  ///
+  /// @param toSeatIndex refers to the seat index of the seat that you want to switch to, you can only change to the
+  ///                    open and untaken speaker seats.
   Future<int> switchSeat(int toSeatIndex) async {
     var fromSeat = _localSpeakerSeat();
     if (fromSeat == null) {
@@ -203,10 +251,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     }
     var toSeat = seatList[toSeatIndex];
     toSeat.userID = fromSeat.userID;
-    toSeat.status = ZegoSpeakerSeatStatus.Occupied;
+    toSeat.status = ZegoSpeakerSeatStatus.occupied;
     toSeat.mic = fromSeat.mic;
     fromSeat.userID = "";
-    fromSeat.status = ZegoSpeakerSeatStatus.Untaken;
+    fromSeat.status = ZegoSpeakerSeatStatus.unTaken;
     fromSeat.mic = false;
     String fromSeatJson = jsonEncode(fromSeat);
     String toSeatJson = jsonEncode(toSeat);
@@ -272,13 +320,13 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   ZegoNetworkQuality getNetWorkQuality(ZegoStreamQualityLevel streamQuality) {
     if (streamQuality == ZegoStreamQualityLevel.Excellent ||
         streamQuality == ZegoStreamQualityLevel.Good) {
-      return ZegoNetworkQuality.Good;
+      return ZegoNetworkQuality.goodQuality;
     } else if (streamQuality == ZegoStreamQualityLevel.Medium) {
-      return ZegoNetworkQuality.Medium;
+      return ZegoNetworkQuality.mediumQuality;
     } else if (streamQuality == ZegoStreamQualityLevel.Unknown) {
-      return ZegoNetworkQuality.Unknow;
+      return ZegoNetworkQuality.unknownQuality;
     } else {
-      return ZegoNetworkQuality.Bad;
+      return ZegoNetworkQuality.badQuality;
     }
   }
 

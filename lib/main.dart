@@ -1,27 +1,24 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:live_audio_room_flutter/common/style/styles.dart';
-import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:provider/provider.dart';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 
-import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
-import 'package:live_audio_room_flutter/service/zego_message_service.dart';
-import 'package:live_audio_room_flutter/service/zego_room_service.dart';
+import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/service/zego_loading_service.dart';
-import 'package:loader_overlay/loader_overlay.dart';
+
+import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 import 'package:live_audio_room_flutter/page/room/room_main_page.dart';
 import 'package:live_audio_room_flutter/page/login/login_page.dart';
 import 'package:live_audio_room_flutter/page/room/room_entrance_page.dart';
 import 'package:live_audio_room_flutter/page/settings/settings_page.dart';
-import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 void main() {
   runApp(const ZegoApp());

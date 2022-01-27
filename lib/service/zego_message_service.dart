@@ -1,11 +1,9 @@
 import 'package:flutter/foundation.dart';
 
-import 'package:live_audio_room_flutter/plugin/ZIMPlugin.dart';
-import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
+import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 
 class ZegoTextMessage {
-  // TODO@larry Add the member here.
   String userID = "";
   String message = "";
   int timestamp = 0;
