@@ -1,31 +1,25 @@
-import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:live_audio_room_flutter/service/zego_message_service.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
+import 'package:live_audio_room_flutter/model/zego_text_message.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
-class ChatMessageModel {
+class ZegoMessageListItemModel {
   ZegoUserInfo sender = ZegoUserInfo.empty();
   ZegoTextMessage message = ZegoTextMessage();
 
-  ChatMessageModel(this.sender, this.message);
+  ZegoMessageListItemModel(this.sender, this.message);
 }
 
-class ChatMessageItem extends StatelessWidget {
-  const ChatMessageItem({Key? key, required this.messageModel})
+class ZegoMessageListItem extends StatelessWidget {
+  const ZegoMessageListItem({Key? key, required this.itemModel})
       : super(key: key);
-  final ChatMessageModel messageModel;
+  final ZegoMessageListItemModel itemModel;
 
   @override
   Widget build(BuildContext context) {
@@ -51,31 +45,31 @@ class ChatMessageItem extends StatelessWidget {
 
   List<TextSpan> getMessageWidgets(BuildContext context) {
     List<TextSpan> spans = [];
-    spans.add(getRoleWidget(context, messageModel.sender));
-    spans.add(getSpacerWidgetByRole(messageModel.sender));
-    if (messageModel.sender.userName.isNotEmpty) {
+    spans.add(getRoleWidget(context, itemModel.sender));
+    spans.add(getSpacerWidgetByRole(itemModel.sender));
+    if (itemModel.sender.userName.isNotEmpty) {
       spans.add(TextSpan(
-          text: messageModel.sender.userName + ": ",
+          text: itemModel.sender.userName + ": ",
           style: StyleConstant.roomChatUserNameText));
     }
 
-    var isMemberJoinedMessage = messageModel.message.message.contains(
+    var isMemberJoinedMessage = itemModel.message.message.contains(
         AppLocalizations.of(context)!
             .roomPageJoinedTheRoom
             .replaceAll('%@', '')
             .trim());
-    var isMemberLeaveMessage = messageModel.message.message.contains(
+    var isMemberLeaveMessage = itemModel.message.message.contains(
         AppLocalizations.of(context)!
             .roomPageHasLeftTheRoom
             .replaceAll('%@', '')
             .trim());
     if (isMemberJoinedMessage || isMemberLeaveMessage) {
       spans.add(TextSpan(
-          text: messageModel.message.message,
+          text: itemModel.message.message,
           style: StyleConstant.roomChatUserNameText));
     } else {
       spans.add(TextSpan(
-          text: messageModel.message.message,
+          text: itemModel.message.message,
           style: StyleConstant.roomChatMessageText));
     }
 
@@ -96,39 +90,5 @@ class ChatMessageItem extends StatelessWidget {
       return const TextSpan(text: " ");
     }
     return const TextSpan(text: '');
-  }
-}
-
-class ChatMessagePage extends HookWidget {
-  ChatMessagePage({Key? key}) : super(key: key);
-  final ScrollController _listviewCtrl = ScrollController();
-
-  @override
-  Widget build(BuildContext context) {
-    var messageService = context.read<ZegoMessageService>();
-    messageService.setTranslateTexts(
-        AppLocalizations.of(context)!.roomPageJoinedTheRoom,
-        AppLocalizations.of(context)!.roomPageHasLeftTheRoom);
-
-    return Container(
-      margin: EdgeInsets.only(right: (118 - 32).w),
-      child: Consumer<ZegoMessageService>(builder: (_, messageService, child) {
-        Timer(const Duration(milliseconds: 500),
-            () => _listviewCtrl.jumpTo(_listviewCtrl.position.maxScrollExtent));
-
-        var userService = context.read<ZegoUserService>();
-        return ListView.builder(
-          shrinkWrap: true,
-          controller: _listviewCtrl,
-          itemCount: messageService.messageList.length,
-          itemBuilder: (_, index) {
-            var message = messageService.messageList[index];
-            ChatMessageModel messageModel = ChatMessageModel(
-                userService.getUserByID(message.userID), message);
-            return ChatMessageItem(messageModel: messageModel);
-          },
-        );
-      }),
-    );
   }
 }
