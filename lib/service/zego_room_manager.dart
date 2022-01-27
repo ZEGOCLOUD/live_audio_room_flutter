@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:zego_express_engine/zego_express_engine.dart';
+
 import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
 import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
 import 'package:live_audio_room_flutter/service/zego_loading_service.dart';
@@ -9,7 +11,7 @@ import 'package:live_audio_room_flutter/service/zego_message_service.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
-import 'package:zego_express_engine/zego_express_engine.dart';
+import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
 
 typedef ZegoRoomCallback = Function(int);
 
@@ -50,7 +52,7 @@ class ZegoRoomManager extends ChangeNotifier {
     ZegoExpressEngine.onRoomStreamUpdate = _onRoomStreamUpdate;
     ZegoExpressEngine.onApiCalledResult = _onApiCalledResult;
     ZegoEngineProfile profile =
-        ZegoEngineProfile(appID, appSign, ZegoScenario.General);
+    ZegoEngineProfile(appID, appSign, ZegoScenario.General);
     ZegoExpressEngine.createEngineWithProfile(profile);
 
     // setup service
@@ -76,7 +78,7 @@ class ZegoRoomManager extends ChangeNotifier {
   Future<String> getZimVersion() async {
     var result = await ZIMPlugin.getZIMVersion();
     var errorCode = result['errorCode'];
-    if (0 == errorCode) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] == errorCode) {
       return result["version"].toString();
     }
 
@@ -95,7 +97,7 @@ class ZegoRoomManager extends ChangeNotifier {
   }
 
   void _onApiCalledResult(int errorCode, String funcName, String info) {
-    if(0 != errorCode) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] != errorCode) {
       print(
           "_onApiCalledResult funcName:$funcName, errorCode:$errorCode, info:$info");
     }

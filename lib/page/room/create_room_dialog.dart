@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 
+import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class CreateRoomDialog extends HookWidget {
@@ -29,7 +30,7 @@ class CreateRoomDialog extends HookWidget {
       if (code != 0) {
         String message =
             AppLocalizations.of(context)!.toastCreateRoomFail(code);
-        if (6000311 == code) {
+        if(code == ZIMErrorCodeExtension.valueMap[zimErrorCode.createExistRoom]) {
           message = AppLocalizations.of(context)!.toastRoomExisted;
         }
         Fluttertoast.showToast(msg: message, backgroundColor: Colors.grey);

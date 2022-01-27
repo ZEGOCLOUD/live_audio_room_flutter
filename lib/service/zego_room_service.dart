@@ -6,11 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
 
 import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
-import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:zego_express_engine/zego_express_engine.dart';
+import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:live_audio_room_flutter/common/room_info_content.dart';
 import 'package:live_audio_room_flutter/constants/zego_room_constant.dart';
 import 'package:live_audio_room_flutter/model/zego_room_info.dart';
+import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
 
 typedef RoomCallback = Function(int);
 typedef RoomLeaveCallback = VoidCallback;
@@ -59,7 +60,7 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
   Future<int> createRoom(String roomID, String roomName, String token) async {
     var result = await ZIMPlugin.createRoom(roomID, roomName, _localUserID, 8);
     var code = result['errorCode'];
-    if (code == 0) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] == code) {
       var result = await ZIMPlugin.queryRoomAllAttributes(roomID);
       var attributesResult = result['roomAttributes'];
       var roomDic = attributesResult['room_info'];
@@ -80,7 +81,7 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
   Future<int> joinRoom(String roomID, String token) async {
     var joinResult = await ZIMPlugin.joinRoom(roomID);
     var code = joinResult['errorCode'];
-    if (code == 0) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] == code) {
       var result = await ZIMPlugin.queryRoomAllAttributes(roomID);
       var attributesResult = result['roomAttributes'];
       var roomDic = attributesResult['room_info'];
@@ -120,7 +121,7 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     var result =
         await ZIMPlugin.setRoomAttributes(roomInfo.roomID, mapJson, true);
     int code = result['errorCode'];
-    if (code != 0) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] != code) {
       //  restore value
       var targetRoomInfo = roomInfo.clone();
       targetRoomInfo.isTextMessageDisable = !disable;

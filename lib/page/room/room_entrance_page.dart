@@ -10,6 +10,7 @@ import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
+import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
 import 'package:live_audio_room_flutter/common/room_info_content.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/page/room/create_room_dialog.dart';
@@ -30,7 +31,7 @@ class RoomEntrancePage extends HookWidget {
     room.joinRoom(roomID, "").then((code) {
       if (code != 0) {
         String message = AppLocalizations.of(context)!.toastJoinRoomFail(code);
-        if (6000301 == code) {
+        if(code == ZIMErrorCodeExtension.valueMap[zimErrorCode.roomNotExist]) {
           message = AppLocalizations.of(context)!.toastRoomNotExistFail;
         }
         Fluttertoast.showToast(msg: message, backgroundColor: Colors.grey);

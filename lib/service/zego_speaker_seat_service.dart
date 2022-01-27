@@ -10,6 +10,7 @@ import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
 import 'package:live_audio_room_flutter/model/zego_room_info.dart';
 import 'package:live_audio_room_flutter/constants/zego_room_constant.dart';
+import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
 
 typedef ZegoRoomCallback = Function(int);
 
@@ -93,7 +94,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     int code = result['errorCode'];
-    if (code != 0) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] != code) {
       speakerSeat.userID = preUserID;
       speakerSeat.status = preStatus;
     }
@@ -149,7 +150,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     int code = result['errorCode'];
-    if (code != 0) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] != code) {
       speakerSeat.status = preStatus;
     }
     notifyListeners();
@@ -193,7 +194,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     int code = result['errorCode'];
-    if (code != 0) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] != code) {
       speakerSeat.userID = preUserID;
       speakerSeat.status = preStatus;
     } else {
@@ -226,7 +227,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     int code = result['errorCode'];
-    if (code != 0) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success]  != code) {
       speakerSeat.userID = preUserID;
       speakerSeat.status = preStatus;
     } else {
