@@ -14,9 +14,9 @@ Before you begin, contact us to activate the Live Audio Room (RTC + IM) service 
 
 #### Basic requirements
 
-* [Android Studio 2020.3.1 or later\|_blank](https://developer.android.com/studio)
+* [Android Studio 2020.3.1 or later](https://developer.android.com/studio)
 * [Flutter SDK](https://docs.flutter.dev/get-started/install)
-* Create a project in [ZEGOCLOUD Admin Console\|_blank](https://zegocloud.com/). For details, see [Admin Console - Project management\|_blank](https://docs.zegocloud.com/article/1271).
+* Create a project in [ZEGOCLOUD Admin Console](https://zegocloud.com/). For details, see [Admin Console - Project management](https://docs.zegocloud.com/article/1271).
 
 The platform-specific requirements are as follows:
 
@@ -27,8 +27,8 @@ The platform-specific requirements are as follows:
 
 #### To build an iOS app:
 
-* [Xcode 7.0 or later\|_blank](https://developer.apple.com/xcode/download)
-* [CocoaPods\|_blank](https://guides.cocoapods.org/using/getting-started.html#installation)
+* [Xcode 7.0 or later](https://developer.apple.com/xcode/download)
+* [CocoaPods](https://guides.cocoapods.org/using/getting-started.html#installation)
 * An iOS device or Simulator that is running on iOS 13.0 or later and supports audio and video. We recommend you use a real device.
 
 #### Check the development environment
@@ -47,7 +47,7 @@ $ flutter doctor
 
 1. Clone the Live Audio Room Github repository.
 2. Open Terminal, navigate to the cloned project repository.
-3. Run the configuration script with the `./configure.sh` command. And fill in the AppID, AppSign, and ServerSecret, which can be obtained in the [ZEGO Admin Console\|_blank](https://console.zego.im/).  
+3. Run the configuration script with the `./configure.sh` command. And fill in the AppID, AppSign, and ServerSecret, which can be obtained in the [ZEGO Admin Console](https://console.zego.im/).  
 **Note**: If you are using Windows system, double-click the `configure.bat` to run the configuration script. 
 <img width="700px" src="docs/images/configure_script.png"/>
 
