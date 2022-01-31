@@ -64,34 +64,37 @@ class ZegoApp extends StatelessWidget {
           ),
         ],
         child: GestureDetector(
-            onTap: () {
-              //  for hide keyboard when click on empty place of all pages
-              hideKeyboard(context);
-            },
-            child: ScreenUtilInit(
-              designSize: const Size(750, 1334),
-              minTextAdapt: true,
-              builder: () => MaterialApp(
-                title: "ZegoLiveAudio",
-                localizationsDelegates: const [
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                supportedLocales: const [
-                  Locale('en', ''), // English, no country code
-                  Locale('zh', ''),
-                ],
-                initialRoute: "/login",
-                routes: {
-                  "/login": (context) => const LoginPage(),
-                  "/settings": (context) => const SettingsPage(),
-                  "/room_entrance": (context) => const RoomEntrancePage(),
-                  "/room_main": (context) => roomMainLoadingPage(),
-                },
-              ),
-            )));
+          onTap: () {
+            //  for hide keyboard when click on empty place of all pages
+            hideKeyboard(context);
+          },
+          child: MediaQuery(
+              data: MediaQueryData.fromWindow(WidgetsBinding.instance!.window),
+              child: ScreenUtilInit(
+                designSize: const Size(750, 1334),
+                minTextAdapt: true,
+                builder: () => MaterialApp(
+                  title: "ZegoLiveAudio",
+                  localizationsDelegates: const [
+                    AppLocalizations.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  supportedLocales: const [
+                    Locale('en', ''), // English, no country code
+                    Locale('zh', ''),
+                  ],
+                  initialRoute: "/login",
+                  routes: {
+                    "/login": (context) => const LoginPage(),
+                    "/settings": (context) => const SettingsPage(),
+                    "/room_entrance": (context) => const RoomEntrancePage(),
+                    "/room_main": (context) => roomMainLoadingPage(),
+                  },
+                ),
+              )),
+        ));
   }
 
   roomMainLoadingPage() {
