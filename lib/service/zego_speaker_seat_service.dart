@@ -276,11 +276,15 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       String roomID, Map<String, dynamic> speakerSeat) {
     for (final seatJson in speakerSeat.values) {
       var speakerSeat = ZegoSpeakerSeat.fromJson(jsonDecode(seatJson));
+      var preSpeakerSeat = seatList[speakerSeat.seatIndex];
       seatList[speakerSeat.seatIndex] = speakerSeat;
       if (speakerSeat.userID == _localUserID) {
+        ZegoExpressEngine.instance.muteMicrophone(! speakerSeat.mic);
         var userStreamID = _roomID + "_" + _localUserID + "_main";
         ZegoExpressEngine.instance.startPublishingStream(userStreamID);
-        ZegoExpressEngine.instance.muteMicrophone(speakerSeat.mic == false);
+      } else if (preSpeakerSeat.userID == _localUserID){
+        ZegoExpressEngine.instance.muteMicrophone(true);
+        ZegoExpressEngine.instance.stopPublishingStream();
       }
     }
     updateSpeakerIDList();
