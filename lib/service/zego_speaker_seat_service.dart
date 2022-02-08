@@ -85,22 +85,30 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   /// @param seatIndex refers to the seat index of the user you want to remove.
   Future<int> removeUserFromSeat(int seatIndex) async {
     var speakerSeat = seatList[seatIndex];
+
     var preUserID = speakerSeat.userID;
+    var preMic = speakerSeat.mic;
     var preStatus = speakerSeat.status;
+
     speakerSeat.userID = "";
+    speakerSeat.mic = true; // restore to default value
     speakerSeat.status = _isSeatClosed
         ? ZegoSpeakerSeatStatus.closed
         : ZegoSpeakerSeatStatus.unTaken;
     String speakerSeatJson = jsonEncode(speakerSeat);
     Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
+
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     int code = result['errorCode'];
     if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] != code) {
       speakerSeat.userID = preUserID;
+      speakerSeat.mic = preMic;
       speakerSeat.status = preStatus;
     }
+
     notifyListeners();
+
     return code;
   }
 
@@ -194,6 +202,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     String speakerSeatJson = jsonEncode(speakerSeat);
     Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
+
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     int code = result['errorCode'];
     if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] != code) {
@@ -204,8 +213,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       ZegoExpressEngine.instance.startPublishingStream(userStreamID);
       ZegoExpressEngine.instance.muteMicrophone(!speakerSeat.mic);
     }
+
     updateSpeakerIDList();
     notifyListeners();
+
     return code;
   }
 
@@ -218,15 +229,18 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     if (speakerSeat == null) {
       return -1;
     }
+
     var preUserID = speakerSeat.userID;
     var preStatus = speakerSeat.status;
     speakerSeat.userID = '';
+    speakerSeat.mic = true; //  restore to default value
     speakerSeat.status = _isSeatClosed
         ? ZegoSpeakerSeatStatus.closed
         : ZegoSpeakerSeatStatus.unTaken;
     String speakerSeatJson = jsonEncode(speakerSeat);
     Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
+
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     int code = result['errorCode'];
     if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] != code) {
@@ -235,8 +249,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     } else {
       ZegoExpressEngine.instance.stopPublishingStream();
     }
+
     updateSpeakerIDList();
     notifyListeners();
+
     return code;
   }
 
@@ -252,23 +268,28 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     if (fromSeat == null) {
       return -1;
     }
+
     var toSeat = seatList[toSeatIndex];
     toSeat.userID = fromSeat.userID;
     toSeat.status = ZegoSpeakerSeatStatus.occupied;
     toSeat.mic = fromSeat.mic;
+    String toSeatJson = jsonEncode(toSeat);
+
     fromSeat.userID = "";
     fromSeat.status = ZegoSpeakerSeatStatus.unTaken;
-    fromSeat.mic = false;
+    fromSeat.mic = true;  // restore to default value
     String fromSeatJson = jsonEncode(fromSeat);
-    String toSeatJson = jsonEncode(toSeat);
+
     Map speakerSeatMap = {
       "${fromSeat.seatIndex}": fromSeatJson,
       "${toSeat.seatIndex}": toSeatJson
     };
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
+
     updateSpeakerIDList();
     notifyListeners();
+
     return result['errorCode'];
   }
 
