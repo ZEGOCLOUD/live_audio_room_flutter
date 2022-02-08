@@ -31,13 +31,14 @@ class RoomTitleBar extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     color: const Color(0xFF1B1B1B),
+                    fontWeight: FontWeight.bold,
                     fontSize: 32.sp,
                   ),
                 ),
               ),
               Consumer<ZegoRoomService>(
                 builder: (context, roomService, child) => Text(
-                  roomService.roomInfo.roomID,
+                  "ID:" + roomService.roomInfo.roomID,
                   style: TextStyle(
                     color: const Color(0xFF606060),
                     fontSize: 20.sp,

@@ -78,7 +78,7 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
   }
 
   onRoomEnter() {
-    _updateUserRole({});
+    _updateUserRole(_preSpeakerSet);
   }
 
   ZegoUserInfo getUserByID(String userID) {
