@@ -88,7 +88,9 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     var preUserID = speakerSeat.userID;
     var preStatus = speakerSeat.status;
     speakerSeat.userID = "";
-    speakerSeat.status = ZegoSpeakerSeatStatus.unTaken;
+    speakerSeat.status = _isSeatClosed
+        ? ZegoSpeakerSeatStatus.closed
+        : ZegoSpeakerSeatStatus.unTaken;
     String speakerSeatJson = jsonEncode(speakerSeat);
     Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
     String attributes = jsonEncode(speakerSeatMap);
@@ -227,7 +229,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     String attributes = jsonEncode(speakerSeatMap);
     var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
     int code = result['errorCode'];
-    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success]  != code) {
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] != code) {
       speakerSeat.userID = preUserID;
       speakerSeat.status = preStatus;
     } else {
