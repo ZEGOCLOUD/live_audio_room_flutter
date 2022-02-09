@@ -10,6 +10,7 @@ import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
+import 'package:live_audio_room_flutter/constants/zego_page_constant.dart';
 import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
 import 'package:live_audio_room_flutter/common/room_info_content.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
@@ -41,7 +42,7 @@ class RoomEntrancePage extends HookWidget {
           users.localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleHost;
         }
 
-        Navigator.pushReplacementNamed(context, "/room_main");
+        Navigator.pushReplacementNamed(context, PageRouteNames.roomMain);
       }
     });
   }
@@ -63,7 +64,7 @@ class RoomEntrancePage extends HookWidget {
               children: [
                 TextButton(
                   onPressed: () =>
-                      Navigator.pushReplacementNamed(context, "/settings"),
+                      Navigator.pushReplacementNamed(context, PageRouteNames.settings),
                   child:
                       Text(AppLocalizations.of(context)!.settingPageSettings),
                 )
@@ -151,6 +152,6 @@ class RoomEntrancePage extends HookWidget {
     Fluttertoast.showToast(
         msg: AppLocalizations.of(context)!.toastKickoutError,
         backgroundColor: Colors.grey);
-    Navigator.pushReplacementNamed(context, "/login");
+    Navigator.pushReplacementNamed(context, PageRouteNames.login);
   }
 }

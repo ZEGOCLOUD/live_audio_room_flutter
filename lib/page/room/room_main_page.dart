@@ -13,6 +13,7 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/service/zego_loading_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 
+import 'package:live_audio_room_flutter/constants/zego_page_constant.dart';
 import 'package:live_audio_room_flutter/common/room_info_content.dart';
 import 'package:live_audio_room_flutter/page/room/room_center_content_frame.dart';
 import 'package:live_audio_room_flutter/page/room/room_control_buttons_bar.dart';
@@ -202,7 +203,7 @@ class RoomMainPage extends StatelessWidget {
               textAlign: TextAlign.center),
           onPressed: () {
             Navigator.of(context).pop(true);
-            Navigator.pushReplacementNamed(context, "/room_entrance");
+            Navigator.pushReplacementNamed(context, PageRouteNames.roomEntrance);
           },
         ),
       ],
@@ -258,7 +259,7 @@ class RoomMainPage extends StatelessWidget {
               textAlign: TextAlign.center),
           onPressed: () {
             Navigator.of(context).pop(true);
-            Navigator.pushReplacementNamed(context, "/login");
+            Navigator.pushReplacementNamed(context, PageRouteNames.login);
           },
         ),
       ],
@@ -282,6 +283,6 @@ class RoomMainPage extends StatelessWidget {
     Fluttertoast.showToast(
         msg: AppLocalizations.of(context)!.toastKickoutError,
         backgroundColor: Colors.grey);
-    Navigator.pushReplacementNamed(context, "/login");
+    Navigator.pushReplacementNamed(context, PageRouteNames.login);
   }
 }

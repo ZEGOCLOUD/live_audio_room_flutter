@@ -13,6 +13,7 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/service/zego_loading_service.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:live_audio_room_flutter/constants/zego_page_constant.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 import 'package:live_audio_room_flutter/page/room/room_main_page.dart';
@@ -85,12 +86,13 @@ class ZegoApp extends StatelessWidget {
                     Locale('en', ''), // English, no country code
                     Locale('zh', ''),
                   ],
-                  initialRoute: "/login",
+                  initialRoute: PageRouteNames.login,
                   routes: {
-                    "/login": (context) => const LoginPage(),
-                    "/settings": (context) => const SettingsPage(),
-                    "/room_entrance": (context) => const RoomEntrancePage(),
-                    "/room_main": (context) => roomMainLoadingPage(),
+                    PageRouteNames.login: (context) => const LoginPage(),
+                    PageRouteNames.settings: (context) => const SettingsPage(),
+                    PageRouteNames.roomEntrance: (context) =>
+                        const RoomEntrancePage(),
+                    PageRouteNames.roomMain: (context) => roomMainLoadingPage(),
                   },
                 ),
               )),

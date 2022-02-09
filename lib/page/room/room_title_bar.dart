@@ -9,6 +9,7 @@ import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:live_audio_room_flutter/constants/zego_page_constant.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class RoomTitleBar extends StatelessWidget {
@@ -72,7 +73,7 @@ class RoomTitleBar extends StatelessWidget {
                             .toastRoomLeaveFailTip(errorCode),
                         backgroundColor: Colors.grey);
                   } else {
-                    Navigator.pushReplacementNamed(context, "/room_entrance");
+                    Navigator.pushReplacementNamed(context, PageRouteNames.roomEntrance);
                   }
                 });
               });
@@ -110,7 +111,7 @@ class RoomTitleBar extends StatelessWidget {
               });
 
               Navigator.of(context).pop(true);
-              Navigator.pushReplacementNamed(context, "/room_entrance");
+              Navigator.pushReplacementNamed(context, PageRouteNames.roomEntrance);
             });
           },
         ),

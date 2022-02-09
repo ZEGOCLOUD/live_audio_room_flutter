@@ -9,6 +9,7 @@ import 'package:zego_express_engine/zego_express_engine.dart';
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
+import 'package:live_audio_room_flutter/constants/zego_page_constant.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
@@ -111,7 +112,7 @@ class SettingsLogoutWidget extends StatelessWidget {
                 backgroundColor: Colors.grey);
           }
         });
-        Navigator.pushReplacementNamed(context, "/login");
+        Navigator.pushReplacementNamed(context, PageRouteNames.login);
       },
     );
   }
@@ -135,7 +136,7 @@ class SettingsPage extends HookWidget {
           leading: IconButton(
               icon: Image.asset(StyleIconUrls.navigatorBack),
               onPressed: () =>
-                  Navigator.pushReplacementNamed(context, "/room_entrance")),
+                  Navigator.pushReplacementNamed(context, PageRouteNames.roomEntrance)),
           title: Text(AppLocalizations.of(context)!.settingPageSettings,
               style: StyleConstant.settingAppBar,
               textDirection: TextDirection.ltr),
