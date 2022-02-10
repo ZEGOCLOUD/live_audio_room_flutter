@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
+import 'package:live_audio_room_flutter/constants/zego_room_constant.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
@@ -111,11 +112,7 @@ class RoomMemberListItem extends StatelessWidget {
   }
 
   _onInviteTakeSeatClicked(BuildContext context) {
-    var roomService = context.read<ZegoRoomService>();
-    var seatService = context.read<ZegoSpeakerSeatService>();
-    // Speaker ID Set not include host id
-    if (seatService.speakerIDSet.length >= 7 ||
-        roomService.roomInfo.isSeatClosed) {
+    if (! _hasMoreSeat(context)) {
       Fluttertoast.showToast(
           msg: AppLocalizations.of(context)!.roomPageNoMoreSeatAvailable,
           backgroundColor: Colors.grey);
@@ -125,5 +122,26 @@ class RoomMemberListItem extends StatelessWidget {
     // Call SDK to send invitation
     var userService = context.read<ZegoUserService>();
     userService.sendInvitation(userInfo.userID);
+  }
+
+  bool _hasMoreSeat(BuildContext context) {
+    // Speaker ID Set not include host id
+    var seatService = context.read<ZegoSpeakerSeatService>();
+    if(seatService.speakerIDSet.length >= 7) {
+      return false;
+    }
+
+    var roomService = context.read<ZegoRoomService>();
+    if(! roomService.roomInfo.isSeatClosed) {
+      return true;
+    }
+
+    for (var speakerSeat in seatService.seatList) {
+      if (ZegoSpeakerSeatStatus.unTaken == speakerSeat.status) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
