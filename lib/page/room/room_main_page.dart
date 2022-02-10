@@ -134,19 +134,22 @@ class RoomMainPage extends StatelessWidget {
           TextButton(
             onPressed: () => Navigator.pop(context,
                 cancelButtonText ?? AppLocalizations.of(context)!.dialogCancel),
-            child: Text(confirmButtonText ??
-                AppLocalizations.of(context)!.dialogCancel),
+            child: Text(
+                cancelButtonText ?? AppLocalizations.of(context)!.dialogCancel),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(
-                  context, AppLocalizations.of(context)!.dialogConfirm);
+                  context,
+                  confirmButtonText ??
+                      AppLocalizations.of(context)!.dialogConfirm);
 
               if (confirmCallback != null) {
                 confirmCallback();
               }
             },
-            child: Text(AppLocalizations.of(context)!.dialogConfirm),
+            child: Text(confirmButtonText ??
+                AppLocalizations.of(context)!.dialogConfirm),
           ),
         ],
       ),
@@ -203,7 +206,8 @@ class RoomMainPage extends StatelessWidget {
               textAlign: TextAlign.center),
           onPressed: () {
             Navigator.of(context).pop(true);
-            Navigator.pushReplacementNamed(context, PageRouteNames.roomEntrance);
+            Navigator.pushReplacementNamed(
+                context, PageRouteNames.roomEntrance);
           },
         ),
       ],
