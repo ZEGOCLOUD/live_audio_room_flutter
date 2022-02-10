@@ -164,9 +164,13 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
         userInfoList.add(member.clone());
       }
     }
+
+    _updateUserRole(_preSpeakerSet);  //  memberList hasn't role attribute
+
     for (final callback in _memberJoinedCallbackSet) {
       callback([...userInfoList]);
     }
+
     notifyListeners();
   }
 
