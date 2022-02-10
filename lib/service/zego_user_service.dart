@@ -153,6 +153,10 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     var userInfoList = <ZegoUserInfo>[];
     for (final item in memberList) {
       var member = ZegoUserInfo.formJson(item);
+      if(userDic.containsKey(member.userID)) {
+        continue; //  duplicate user
+      }
+
       userList.add(member);
       userDic[member.userID] = member;
 
