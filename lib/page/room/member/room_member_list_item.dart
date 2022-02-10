@@ -33,7 +33,16 @@ class RoomMemberListItem extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 24),
-        Text(userInfo.userName, style: StyleConstant.roomMemberListNameText),
+        SizedBox(
+          width: 347.w,
+          child: Text(
+            userInfo.userName,
+            textAlign: TextAlign.left,
+            softWrap: true,
+            overflow: TextOverflow.ellipsis,
+            style: StyleConstant.roomMemberListNameText,
+          ),
+        ),
         const Expanded(child: Text('')),
         getRightWidgetByUserRole(context)
       ],

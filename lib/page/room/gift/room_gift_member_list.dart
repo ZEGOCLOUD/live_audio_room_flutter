@@ -75,10 +75,15 @@ class RoomGiftMemberList extends HookWidget {
                     child: Center(
                       child: Row(
                         children: [
-                          Text(
-                            user.userName,
-                            textAlign: TextAlign.left,
-                            style: StyleConstant.roomGiftMemberListText,
+                          SizedBox(
+                            width: 322.w,
+                            child: Text(
+                              user.userName,
+                              textAlign: TextAlign.left,
+                              softWrap: true,
+                              overflow: TextOverflow.ellipsis,
+                              style: StyleConstant.roomGiftMemberListText,
+                            ),
                           ),
                           const Expanded(child: Text(''))
                         ],

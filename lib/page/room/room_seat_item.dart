@@ -108,9 +108,15 @@ class SeatItem extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
-                      userName,
-                      style: TextStyle(fontSize: 20.sp),
+                    SizedBox(
+                      width: 108.w,
+                      child: Text(
+                        userName,
+                        textAlign: TextAlign.center,
+                        softWrap: true,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 20.sp),
+                      ),
                     ),
                     userID.isEmpty
                         ? Container(
