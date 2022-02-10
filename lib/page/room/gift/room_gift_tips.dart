@@ -9,12 +9,12 @@ import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 import 'package:live_audio_room_flutter/model/zego_room_gift.dart';
 
 class GiftMessageModel {
-  String sender = '';
-  List<String> receivers = [];
+  String senderName = '';
+  List<String> receiverNames = [];
   String id = '';
   int count = 1;
 
-  GiftMessageModel(this.sender, this.receivers, this.id);
+  GiftMessageModel(this.senderName, this.receiverNames, this.id);
 }
 
 class RoomGiftTips extends HookWidget {
@@ -26,12 +26,12 @@ class RoomGiftTips extends HookWidget {
     var giftName = getGiftNameByID(context, int.parse(gift.id));
 
     String targetUserNames = '';
-    for (var receiver in gift.receivers) {
+    for (var receiver in gift.receiverNames) {
       targetUserNames += receiver + ",";
     }
     targetUserNames = targetUserNames.substring(0, targetUserNames.length - 1);
     var tipsText = AppLocalizations.of(context)!
-        .roomPageReceivedGiftTips(targetUserNames, giftName, gift.sender);
+        .roomPageReceivedGiftTips(targetUserNames, giftName, gift.senderName);
     List<InlineSpan> spans = [];
     tipsText.split(' ').forEach((text) {
       if (text == giftName) {

@@ -269,10 +269,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
           Consumer<ZegoGiftService>(
               builder: (_, giftService, child) => Visibility(
                   visible: giftService.displayTips,
-                  child: RoomGiftTips(
-                    gift: GiftMessageModel(giftService.giftSender,
-                        giftService.giftReceivers, giftService.giftID),
-                  ))),
+                  child: _getRoomGiftTips(context, giftService))),
           SizedBox(height: 18.h),
           ConstrainedBox(
               constraints: BoxConstraints(
@@ -284,6 +281,19 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
               child: ChatMessagePage())
         ],
       ),
+    );
+  }
+
+  Widget _getRoomGiftTips(BuildContext context, ZegoGiftService giftService) {
+    var userService = context.read<ZegoUserService>();
+    String senderName =
+        userService.getUserByID(giftService.giftSender).userName;
+    List<String> receiverNames = [];
+    for (var userID in giftService.giftReceivers) {
+      receiverNames.add(userService.getUserByID(userID).userName);
+    }
+    return RoomGiftTips(
+      gift: GiftMessageModel(senderName, receiverNames, giftService.giftID),
     );
   }
 }
