@@ -88,7 +88,9 @@ class RoomGiftBottomBar extends HookWidget {
         }
         toUserList.add(speakerID);
       }
-      toUserList.add(roomService.roomInfo.hostID); //  host must be a speaker
+      if (userService.localUserInfo.userID != roomService.roomInfo.hostID) {
+        toUserList.add(roomService.roomInfo.hostID); //  host must be a speaker
+      }
     } else {
       toUserList.add(selectedUser.userID);
     }

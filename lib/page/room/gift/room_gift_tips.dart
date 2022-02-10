@@ -31,7 +31,8 @@ class RoomGiftTips extends HookWidget {
     }
     targetUserNames = targetUserNames.substring(0, targetUserNames.length - 1);
     var tipsText = AppLocalizations.of(context)!
-        .roomPageReceivedGiftTips(targetUserNames, giftName, gift.senderName);
+        .roomPageReceivedGiftTips(targetUserNames + " ", giftName, " " + gift
+        .senderName + " ");
     List<InlineSpan> spans = [];
     tipsText.split(' ').forEach((text) {
       if (text == giftName) {
