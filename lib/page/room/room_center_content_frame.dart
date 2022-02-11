@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -217,15 +216,15 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
     }
     _showBottomModalButton(
         context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
-      var roomService = context.read<ZegoRoomService>();
-      if (roomService.roomInfo.isSeatClosed) {
+      var seats = context.read<ZegoSpeakerSeatService>();
+
+      if (ZegoSpeakerSeatStatus.closed == seats.seatList[index].status) {
         Fluttertoast.showToast(
             msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed,
             backgroundColor: Colors.grey);
         return;
       }
 
-      var seats = context.read<ZegoSpeakerSeatService>();
       seats.takeSeat(index).then((code) {
         if (code != 0) {
           Fluttertoast.showToast(
