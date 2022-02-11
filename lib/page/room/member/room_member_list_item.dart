@@ -121,7 +121,13 @@ class RoomMemberListItem extends StatelessWidget {
 
     // Call SDK to send invitation
     var userService = context.read<ZegoUserService>();
-    userService.sendInvitation(userInfo.userID);
+    userService.sendInvitation(userInfo.userID).then((errorCode) {
+      if(0 == errorCode) {
+        Fluttertoast.showToast(
+            msg: AppLocalizations.of(context)!.roomPageInvitationHasSent,
+            backgroundColor: Colors.grey);
+      }
+    });
   }
 
   bool _hasMoreSeat(BuildContext context) {
