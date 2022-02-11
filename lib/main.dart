@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:wakelock/wakelock.dart';
 
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
@@ -30,7 +31,9 @@ class ZegoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Wakelock.enable(); //  always bright
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(

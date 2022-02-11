@@ -43,6 +43,7 @@ dependencies:
   loader_overlay: ^2.0.5
   permission_handler: ^8.3.0
   crypto: ^3.0.1
+  wakelock: ^0.6.1+1
 
 dev_dependencies:
   flutter_test:

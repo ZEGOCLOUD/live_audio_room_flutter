@@ -53,12 +53,10 @@ class RoomControlButtonsBar extends HookWidget {
   Widget build(BuildContext context) {
     // Check microphone permission
     useEffect(() {
-      _checkMicPermission(context).then((isEnable) {
-        if (!isEnable) {
-          // Mic flag always reset to enable after log int room. So toggle to disable it.
-          var seatService = context.read<ZegoSpeakerSeatService>();
-          seatService.toggleMic();
-        }
+      _checkMicPermission(context).then((hasPermission) {
+        //  sync microphone default status after check permission
+        var seatService = context.read<ZegoSpeakerSeatService>();
+        seatService.setMicrophoneDefaultMute(! hasPermission);
       });
     }, const []);
 
@@ -91,8 +89,8 @@ class RoomControlButtonsBar extends HookWidget {
                     children: _createControllerButtons(
                         users.localUserInfo.userRole, seats.isMute,
                         micCallback: () {
-                      _checkMicPermission(context).then((isEnable) {
-                        if (isEnable) {
+                      _checkMicPermission(context).then((hasPermission) {
+                        if (hasPermission) {
                           var seatService =
                               context.read<ZegoSpeakerSeatService>();
                           seatService.toggleMic();
