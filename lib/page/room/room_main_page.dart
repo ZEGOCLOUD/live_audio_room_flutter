@@ -13,6 +13,7 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/service/zego_loading_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 
+import 'package:live_audio_room_flutter/constants/zego_room_constant.dart';
 import 'package:live_audio_room_flutter/constants/zego_page_constant.dart';
 import 'package:live_audio_room_flutter/common/room_info_content.dart';
 import 'package:live_audio_room_flutter/page/room/room_center_content_frame.dart';
@@ -166,7 +167,8 @@ class RoomMainPage extends StatelessWidget {
       var seatService = context.read<ZegoSpeakerSeatService>();
       var validSpeakerIndex = -1;
       for (final seat in seatService.seatList) {
-        if (seat.userID.isEmpty) {
+        if (seat.userID.isEmpty &&
+            ZegoSpeakerSeatStatus.unTaken == seat.status) {
           validSpeakerIndex = seat.seatIndex;
           break;
         }
