@@ -131,10 +131,10 @@ class RoomMemberListItem extends StatelessWidget {
       return false;
     }
 
-    var roomService = context.read<ZegoRoomService>();
-    if(! roomService.roomInfo.isSeatClosed) {
-      return true;
-    }
+    // var roomService = context.read<ZegoRoomService>();
+    // if(! roomService.roomInfo.isSeatClosed) {
+    //   return true;
+    // }
 
     for (var speakerSeat in seatService.seatList) {
       if (ZegoSpeakerSeatStatus.unTaken == speakerSeat.status) {
