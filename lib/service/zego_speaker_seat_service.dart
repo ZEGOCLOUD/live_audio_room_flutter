@@ -40,6 +40,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return ZegoRoomManager.shared.userService.localUserInfo.userID;
   }
 
+  bool _microphoneDefaultMute = false;  //  microphone default status
   bool get isMute {
     if (_localSpeakerSeat() == null) {
       return true;
@@ -212,6 +213,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     var preUserID = speakerSeat.userID;
     var preStatus = speakerSeat.status;
     speakerSeat.userID = _localUserID;
+    speakerSeat.mic = ! _microphoneDefaultMute;
     speakerSeat.status = ZegoSpeakerSeatStatus.occupied;
     String speakerSeatJson = jsonEncode(speakerSeat);
     Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
@@ -324,6 +326,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     }
     updateSpeakerIDList();
     notifyListeners();
+  }
+
+  void setMicrophoneDefaultMute(bool value) {
+    _microphoneDefaultMute = value;
   }
 
   void _onCapturedSoundLevelUpdate(double soundLevel) {
