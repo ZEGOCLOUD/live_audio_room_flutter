@@ -24,6 +24,8 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>We need to use your camera to help you join the voice interaction.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>We need to use your mic to help you join the voice interaction.</string>
 	<key>UILaunchStoryboardName</key>
