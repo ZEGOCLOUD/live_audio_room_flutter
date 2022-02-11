@@ -19,7 +19,7 @@
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
    <application
-        android:label="ZegoLiveAudio"
+        android:label="ZegoLiveAudio-Flutter"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
