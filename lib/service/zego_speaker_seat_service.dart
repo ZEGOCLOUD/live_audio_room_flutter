@@ -77,6 +77,20 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       hostSeat.status = ZegoSpeakerSeatStatus.occupied;
       notifyListeners();
     }
+
+    updateSpeakerSeat();
+  }
+
+  void updateSpeakerSeat() async {
+    var roomInfo = ZegoRoomManager.shared.roomService.roomInfo;
+
+    var result = await ZIMPlugin.queryRoomAllAttributes(roomInfo.roomID);
+    var attributesResult = Map<String, dynamic>.from(result['roomAttributes']);
+    attributesResult.removeWhere((key, value) => key == "room_info");
+    if (attributesResult.keys.isNotEmpty) {
+      //  update seat's info proactively
+      _onRoomSpeakerSeatUpdate(roomInfo.roomID, attributesResult);
+    }
   }
 
   /// Remove a user from speaker seat.
@@ -277,7 +291,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
 
     fromSeat.userID = "";
     fromSeat.status = ZegoSpeakerSeatStatus.unTaken;
-    fromSeat.mic = true;  // restore to default value
+    fromSeat.mic = true; // restore to default value
     String fromSeatJson = jsonEncode(fromSeat);
 
     Map speakerSeatMap = {
@@ -300,10 +314,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       var preSpeakerSeat = seatList[speakerSeat.seatIndex];
       seatList[speakerSeat.seatIndex] = speakerSeat;
       if (speakerSeat.userID == _localUserID) {
-        ZegoExpressEngine.instance.muteMicrophone(! speakerSeat.mic);
+        ZegoExpressEngine.instance.muteMicrophone(!speakerSeat.mic);
         var userStreamID = _roomID + "_" + _localUserID + "_main";
         ZegoExpressEngine.instance.startPublishingStream(userStreamID);
-      } else if (preSpeakerSeat.userID == _localUserID){
+      } else if (preSpeakerSeat.userID == _localUserID) {
         ZegoExpressEngine.instance.muteMicrophone(true);
         ZegoExpressEngine.instance.stopPublishingStream();
       }
