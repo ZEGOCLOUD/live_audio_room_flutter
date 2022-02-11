@@ -56,7 +56,8 @@ class RoomMainPage extends StatelessWidget {
                           _showTextMessageTips(context, infoContent);
                           break;
                         case RoomInfoType.roomEndByHost:
-                          _showRoomEndByHostTips(context, infoContent);
+                        case RoomInfoType.roomNetworkLeave:
+                          _showRoomEndTips(context, infoContent);
                           break;
                         case RoomInfoType.roomLeave:
                           break;
@@ -187,8 +188,9 @@ class RoomMainPage extends StatelessWidget {
     });
   }
 
-  _showRoomEndByHostTips(BuildContext context, RoomInfoContent infoContent) {
-    if (infoContent.toastType != RoomInfoType.roomEndByHost) {
+  _showRoomEndTips(BuildContext context, RoomInfoContent infoContent) {
+    if (infoContent.toastType != RoomInfoType.roomEndByHost &&
+        infoContent.toastType != RoomInfoType.roomNetworkLeave) {
       return;
     }
 
