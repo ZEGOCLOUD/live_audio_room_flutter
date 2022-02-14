@@ -332,6 +332,16 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     _microphoneDefaultMute = value;
   }
 
+  bool isUserInSeat(String useID) {
+    for (final seat in seatList) {
+      if (ZegoSpeakerSeatStatus.occupied == seat.status &&
+          seat.userID == useID) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   void _onCapturedSoundLevelUpdate(double soundLevel) {
     for (final speaker in seatList) {
       if (speaker.userID == _localUserID) {

@@ -165,6 +165,12 @@ class RoomMainPage extends StatelessWidget {
         confirmButtonText: AppLocalizations.of(context)!.dialogAccept,
         confirmCallback: () {
       var seatService = context.read<ZegoSpeakerSeatService>();
+
+      var userService = context.read<ZegoUserService>();
+      if (seatService.isUserInSeat(userService.localUserInfo.userID)) {
+        return;
+      }
+
       var validSpeakerIndex = -1;
       for (final seat in seatService.seatList) {
         if (seat.userID.isEmpty &&
