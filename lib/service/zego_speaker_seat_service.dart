@@ -153,7 +153,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     var json = jsonEncode(roomInfo);
     map['room_info'] = json;
     String attributes = jsonEncode(map);
-    var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
+    var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, true);
     return result['errorCode'];
   }
 
