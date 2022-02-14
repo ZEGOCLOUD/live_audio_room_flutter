@@ -40,7 +40,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return ZegoRoomManager.shared.userService.localUserInfo.userID;
   }
 
-  bool _microphoneDefaultMute = false;  //  microphone default status
+  bool _microphoneDefaultMute = false; //  microphone default status
   bool get isMute {
     if (_localSpeakerSeat() == null) {
       return true;
@@ -71,7 +71,8 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     _roomID = roomInfo.roomID;
     _hostID = roomInfo.hostID;
     if (_hostID == _localUserID) {
-      if(seatList[0].userID.isEmpty) {  // take is first enter
+      if (seatList[0].userID.isEmpty) {
+        // take if first room enter
         takeSeat(0);
       }
     } else {
@@ -215,7 +216,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     var preUserID = speakerSeat.userID;
     var preStatus = speakerSeat.status;
     speakerSeat.userID = _localUserID;
-    speakerSeat.mic = ! _microphoneDefaultMute;
+    speakerSeat.mic = !_microphoneDefaultMute;
     speakerSeat.status = ZegoSpeakerSeatStatus.occupied;
     String speakerSeatJson = jsonEncode(speakerSeat);
     Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
@@ -332,6 +333,14 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
 
   void setMicrophoneDefaultMute(bool value) {
     _microphoneDefaultMute = value;
+
+    if (_hostID == _localUserID &&
+        seatList[0].userID.isNotEmpty &&
+        seatList[0].mic == _microphoneDefaultMute) {
+      //  takeSeat(0) is call, _microphoneDefaultMute assign after
+      //  sync host's mic status
+      toggleMic();
+    }
   }
 
   bool isUserInSeat(String useID) {
