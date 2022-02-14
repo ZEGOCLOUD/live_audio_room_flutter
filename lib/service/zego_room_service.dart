@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
-
 import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
 import 'package:zego_express_engine/zego_express_engine.dart';
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
@@ -20,12 +18,20 @@ typedef RoomEnterCallback = VoidCallback;
 /// Class LiveAudioRoom information management.
 /// <p>Description: This class contains the room information management logics, such as the logic of create a room, join
 /// a room, leave a room, disable the text chat in room, etc.</>
-class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
+class ZegoRoomService extends ChangeNotifier {
   /// Room information, it will be assigned after join the room successfully. And it will be updated synchronously when
   /// the room status updates.
   RoomInfo roomInfo = RoomInfo('', '', '');
   RoomLeaveCallback? roomLeaveCallback;
   RoomEnterCallback? roomEnterCallback;
+
+  String notifyInfo = '';
+
+  void _clearNotifyInfo() {
+    Future.delayed(const Duration(milliseconds: 500), () async {
+      notifyInfo = '';
+    });
+  }
 
   ZegoRoomService() {
     ZIMPlugin.onRoomInfoUpdate = _onRoomInfoUpdate;
@@ -150,7 +156,7 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
         // network error leave room
         RoomInfoContent toastContent = RoomInfoContent.empty();
         toastContent.toastType = RoomInfoType.roomNetworkLeave;
-        notifyInfo(json.encode(toastContent.toJson()));
+        notifyInfo = json.encode(toastContent.toJson());
       }
     } else if (roomState == ZimRoomState.zimRoomStateConnected &&
         roomEvent == zimRoomEvent.zimRoomEventSuccess) {
@@ -161,7 +167,7 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
         // room has end
         RoomInfoContent toastContent = RoomInfoContent.empty();
         toastContent.toastType = RoomInfoType.roomEndByHost;
-        notifyInfo(json.encode(toastContent.toJson()));
+        notifyInfo = json.encode(toastContent.toJson());
       } else {
         _updateRoomInfo(RoomInfo.fromJson(jsonDecode(roomDic)));
         if (roomEnterCallback != null) {
@@ -171,6 +177,7 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     }
 
     notifyListeners();
+    _clearNotifyInfo();
   }
 
   void _onRoomInfoUpdate(String roomID, Map<String, dynamic> roomInfoJson) {
@@ -182,16 +189,16 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
 
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.roomEndByHost;
-      notifyInfo(json.encode(toastContent.toJson()));
-
-      return;
+      notifyInfo = json.encode(toastContent.toJson());
     } else {
       _updateRoomInfo(RoomInfo.fromJson(roomInfoJson));
       if (roomEnterCallback != null) {
         roomEnterCallback!();
       }
-      notifyListeners();
     }
+
+    notifyListeners();
+    _clearNotifyInfo();
   }
 
   Future<void> _loginRtcRoom() async {
@@ -217,7 +224,10 @@ class ZegoRoomService extends ChangeNotifier with MessageNotifierMixin {
     if (oldRoomInfo.isTextMessageDisable != roomInfo.isTextMessageDisable) {
       toastContent.toastType = RoomInfoType.textMessageDisable;
       toastContent.message = roomInfo.isTextMessageDisable.toString();
+
+      notifyInfo = json.encode(toastContent.toJson());
+      notifyListeners();
+      _clearNotifyInfo();
     }
-    notifyInfo(json.encode(toastContent.toJson()));
   }
 }

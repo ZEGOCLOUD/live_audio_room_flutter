@@ -32,7 +32,7 @@ class RoomEntrancePage extends HookWidget {
     room.joinRoom(roomID, "").then((code) {
       if (code != 0) {
         String message = AppLocalizations.of(context)!.toastJoinRoomFail(code);
-        if(code == ZIMErrorCodeExtension.valueMap[zimErrorCode.roomNotExist]) {
+        if (code == ZIMErrorCodeExtension.valueMap[zimErrorCode.roomNotExist]) {
           message = AppLocalizations.of(context)!.toastRoomNotExistFail;
         }
         Fluttertoast.showToast(msg: message, backgroundColor: Colors.grey);
@@ -63,8 +63,8 @@ class RoomEntrancePage extends HookWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  onPressed: () =>
-                      Navigator.pushReplacementNamed(context, PageRouteNames.settings),
+                  onPressed: () => Navigator.pushReplacementNamed(
+                      context, PageRouteNames.settings),
                   child:
                       Text(AppLocalizations.of(context)!.settingPageSettings),
                 )
@@ -120,24 +120,25 @@ class RoomEntrancePage extends HookWidget {
                       builder: (BuildContext context) =>
                           const CreateRoomDialog());
                 }),
-            Offstage(
-                offstage: true,
-                child: MessageListener<ZegoUserService>(
-                  child: const Text(''),
-                  showError: (error) {},
-                  showInfo: (jsonInfo) {
-                    var infoContent =
-                        RoomInfoContent.fromJson(jsonDecode(jsonInfo));
+            Consumer<ZegoUserService>(builder: (_, userService, child) {
+              if (userService.notifyInfo.isEmpty) {
+                return const Offstage(offstage: true, child: Text(''));
+              }
+              Future.delayed(Duration.zero, () async {
+                var infoContent = RoomInfoContent.fromJson(
+                    jsonDecode(userService.notifyInfo));
 
-                    switch (infoContent.toastType) {
-                      case RoomInfoType.loginUserKickOut:
-                        _showLoginUserKickOutTips(context, infoContent);
-                        break;
-                      default:
-                        break;
-                    }
-                  },
-                )),
+                switch (infoContent.toastType) {
+                  case RoomInfoType.loginUserKickOut:
+                    _showLoginUserKickOutTips(context, infoContent);
+                    break;
+                  default:
+                    break;
+                }
+              });
+
+              return const Offstage(offstage: true, child: Text(''));
+            }),
           ],
         ),
       ),

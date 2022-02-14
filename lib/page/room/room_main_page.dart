@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
@@ -21,7 +22,7 @@ import 'package:live_audio_room_flutter/page/room/room_control_buttons_bar.dart'
 import 'package:live_audio_room_flutter/page/room/room_title_bar.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
-class RoomMainPage extends StatelessWidget {
+class RoomMainPage extends HookWidget {
   const RoomMainPage({Key? key}) : super(key: key);
 
   @override
@@ -43,62 +44,62 @@ class RoomMainPage extends StatelessWidget {
               const Expanded(child: RoomCenterContentFrame()),
               RoomControlButtonsBar(),
               //  room toast tips notify in room service
-              Offstage(
-                  offstage: true,
-                  child: MessageListener<ZegoRoomService>(
-                    child: const Text(''),
-                    showError: (error) {},
-                    showInfo: (jsonInfo) {
-                      var infoContent =
-                          RoomInfoContent.fromJson(jsonDecode(jsonInfo));
+              Consumer<ZegoRoomService>(builder: (_, roomService, child) {
+                if (roomService.notifyInfo.isEmpty) {
+                  return const Offstage(offstage: true, child: Text(''));
+                }
+                Future.delayed(Duration.zero, () async {
+                  var infoContent = RoomInfoContent.fromJson(
+                      jsonDecode(roomService.notifyInfo));
 
-                      switch (infoContent.toastType) {
-                        case RoomInfoType.textMessageDisable:
-                          _showTextMessageTips(context, infoContent);
-                          break;
-                        case RoomInfoType.roomEndByHost:
-                        case RoomInfoType.roomNetworkLeave:
-                          _showRoomEndTips(context, infoContent);
-                          break;
-                        case RoomInfoType.roomLeave:
-                          break;
-                        default:
-                          break;
-                      }
-                    },
-                  )),
+                  switch (infoContent.toastType) {
+                    case RoomInfoType.textMessageDisable:
+                      _showTextMessageTips(context, infoContent);
+                      break;
+                    case RoomInfoType.roomEndByHost:
+                    case RoomInfoType.roomNetworkLeave:
+                      _showRoomEndTips(context, infoContent);
+                      break;
+                    case RoomInfoType.roomLeave:
+                      break;
+                    default:
+                      break;
+                  }
+                });
+                return const Offstage(offstage: true, child: Text(''));
+              }),
               // room toast tips notify in user service
-              Offstage(
-                  offstage: true,
-                  child: MessageListener<ZegoUserService>(
-                    child: const Text(''),
-                    showError: (error) {},
-                    showInfo: (jsonInfo) {
-                      var infoContent =
-                          RoomInfoContent.fromJson(jsonDecode(jsonInfo));
+              Consumer<ZegoUserService>(builder: (_, userService, child) {
+                if (userService.notifyInfo.isEmpty) {
+                  return const Offstage(offstage: true, child: Text(''));
+                }
+                Future.delayed(Duration.zero, () async {
+                  var infoContent = RoomInfoContent.fromJson(
+                      jsonDecode(userService.notifyInfo));
 
-                      switch (infoContent.toastType) {
-                        case RoomInfoType.roomNetworkTempBroken:
-                          _showNetworkTempBrokenTips(context, infoContent);
-                          break;
-                        case RoomInfoType.roomNetworkReconnected:
-                          _hideNetworkTempBrokenTips(context, infoContent);
-                          break;
-                        case RoomInfoType.roomNetworkReconnectedTimeout:
-                          _showNetworkDisconnectTimeoutDialog(
-                              context, infoContent);
-                          break;
-                        case RoomInfoType.loginUserKickOut:
-                          _showLoginUserKickOutTips(context, infoContent);
-                          break;
-                        case RoomInfoType.roomHostInviteToSpeak:
-                          _showHostInviteToSpeak(context);
-                          break;
-                        default:
-                          break;
-                      }
-                    },
-                  )),
+                  switch (infoContent.toastType) {
+                    case RoomInfoType.roomNetworkTempBroken:
+                      _showNetworkTempBrokenTips(context, infoContent);
+                      break;
+                    case RoomInfoType.roomNetworkReconnected:
+                      _hideNetworkTempBrokenTips(context, infoContent);
+                      break;
+                    case RoomInfoType.roomNetworkReconnectedTimeout:
+                      _showNetworkDisconnectTimeoutDialog(context, infoContent);
+                      break;
+                    case RoomInfoType.loginUserKickOut:
+                      _showLoginUserKickOutTips(context, infoContent);
+                      break;
+                    case RoomInfoType.roomHostInviteToSpeak:
+                      _showHostInviteToSpeak(context);
+                      break;
+                    default:
+                      break;
+                  }
+                });
+
+                return const Offstage(offstage: true, child: Text(''));
+              }),
             ],
           ),
         ),
@@ -241,7 +242,7 @@ class RoomMainPage extends StatelessWidget {
 
     context
         .read<ZegoLoadingService>()
-        .uploadLoadingText(AppLocalizations.of(context)!.networkReconnect);
+        .updateLoadingText(AppLocalizations.of(context)!.networkReconnect);
     context.loaderOverlay.show();
   }
 

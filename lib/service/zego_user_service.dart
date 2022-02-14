@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
 
 import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
 
@@ -27,7 +26,7 @@ typedef MemberChangeCallback = Function(List<ZegoUserInfo>);
 /// Class user information management.
 /// <p>Description: This class contains the user information management logics, such as the logic of log in, log out,
 /// get the logged-in user info, get the in-room user list, and add co-hosts, etc. </>
-class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
+class ZegoUserService extends ChangeNotifier {
   MemberOfflineCallback? userOfflineCallback;
 
   /// In-room user list, can be used when displaying the user list in the room.
@@ -43,6 +42,14 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
   Set<String> _preSpeakerSet = {}; //Prevent frequent updates
   final Set<MemberChangeCallback> _memberJoinedCallbackSet = {};
   final Set<MemberChangeCallback> _memberLeaveCallbackSet = {};
+
+  String notifyInfo = '';
+
+  void _clearNotifyInfo() {
+    Future.delayed(const Duration(milliseconds: 500), () async {
+      notifyInfo = '';
+    });
+  }
 
   ZegoUserService() {
     ZIMPlugin.onRoomMemberJoined = _onRoomMemberJoined;
@@ -153,7 +160,7 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
     var userInfoList = <ZegoUserInfo>[];
     for (final item in memberList) {
       var member = ZegoUserInfo.formJson(item);
-      if(userDic.containsKey(member.userID)) {
+      if (userDic.containsKey(member.userID)) {
         continue; //  duplicate user
       }
 
@@ -165,7 +172,7 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
       }
     }
 
-    _updateUserRole(_preSpeakerSet);  //  memberList hasn't role attribute
+    _updateUserRole(_preSpeakerSet); //  memberList hasn't role attribute
 
     for (final callback in _memberJoinedCallbackSet) {
       callback([...userInfoList]);
@@ -202,10 +209,11 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
         // receive invitation
         RoomInfoContent toastContent = RoomInfoContent.empty();
         toastContent.toastType = RoomInfoType.roomHostInviteToSpeak;
-        notifyInfo(json.encode(toastContent.toJson()));
+        notifyInfo = json.encode(toastContent.toJson());
       }
     }
     notifyListeners();
+    _clearNotifyInfo();
   }
 
   void _onConnectionStateChanged(int state, int event) {
@@ -220,21 +228,21 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
       //  temp network broken
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.roomNetworkTempBroken;
-      notifyInfo(json.encode(toastContent.toJson()));
+      notifyInfo = json.encode(toastContent.toJson());
     } else if (connectionState ==
             zimConnectionState.zimConnectionStateConnected &&
         connectionEvent == zimConnectionEvent.zimConnectionEventSuccess) {
       //  reconnected after temp network broken
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.roomNetworkReconnected;
-      notifyInfo(json.encode(toastContent.toJson()));
+      notifyInfo = json.encode(toastContent.toJson());
     } else if (connectionState ==
             zimConnectionState.zimConnectionStateDisconnected &&
         connectionEvent == zimConnectionEvent.zimConnectionEventKickedOut) {
       //  kick out
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.loginUserKickOut;
-      notifyInfo(json.encode(toastContent.toJson()));
+      notifyInfo = json.encode(toastContent.toJson());
       if (userOfflineCallback != null) {
         userOfflineCallback!();
       }
@@ -244,13 +252,14 @@ class ZegoUserService extends ChangeNotifier with MessageNotifierMixin {
       //  connect timeout
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.roomNetworkReconnectedTimeout;
-      notifyInfo(json.encode(toastContent.toJson()));
+      notifyInfo = json.encode(toastContent.toJson());
       if (userOfflineCallback != null) {
         userOfflineCallback!();
       }
     }
 
     notifyListeners();
+    _clearNotifyInfo();
   }
 
   void updateSpeakerSet(Set<String> speakerSet) {
