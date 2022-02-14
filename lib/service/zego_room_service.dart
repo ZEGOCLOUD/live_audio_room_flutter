@@ -92,12 +92,18 @@ class ZegoRoomService extends ChangeNotifier {
 
       var attributesResult = result['roomAttributes'];
       var roomDic = attributesResult['room_info'];
+      if (roomDic == null) {
+        // room has end
+        RoomInfoContent toastContent = RoomInfoContent.empty();
+        toastContent.toastType = RoomInfoType.roomEndByHost;
+        notifyInfo = json.encode(toastContent.toJson());
+      } else {
+        var roomInfoJson = Map<String, dynamic>.from(jsonDecode(roomDic));
+        var roomInfoObj = RoomInfo.fromJson(jsonDecode(roomDic));
+        _onRoomInfoUpdate(roomInfoObj.roomID, roomInfoJson);
 
-      var roomInfoJson = Map<String, dynamic>.from(jsonDecode(roomDic));
-      var roomInfoObj = RoomInfo.fromJson(jsonDecode(roomDic));
-      _onRoomInfoUpdate(roomInfoObj.roomID, roomInfoJson);
-
-      _loginRtcRoom();
+        _loginRtcRoom();
+      }
 
       notifyListeners();
     }
@@ -163,12 +169,7 @@ class ZegoRoomService extends ChangeNotifier {
       var result = await ZIMPlugin.queryRoomAllAttributes(roomInfo.roomID);
       var attributesResult = result['roomAttributes'];
       var roomDic = attributesResult['room_info'];
-      if (roomDic == null) {
-        // room has end
-        RoomInfoContent toastContent = RoomInfoContent.empty();
-        toastContent.toastType = RoomInfoType.roomEndByHost;
-        notifyInfo = json.encode(toastContent.toJson());
-      } else {
+      if (roomDic != null) {
         _updateRoomInfo(RoomInfo.fromJson(jsonDecode(roomDic)));
         if (roomEnterCallback != null) {
           roomEnterCallback!();
