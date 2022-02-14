@@ -27,6 +27,15 @@ class RoomMainPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: _mainWidget(context),
+    );
+  }
+
+  Widget _mainWidget(BuildContext context) {
     return Scaffold(
         body: SafeArea(
       child: Center(
