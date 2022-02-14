@@ -24,7 +24,8 @@ class ControllerButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String iconSrc;
 
-  const ControllerButton({Key? key, required this.onPressed, required this.iconSrc})
+  const ControllerButton(
+      {Key? key, required this.onPressed, required this.iconSrc})
       : super(key: key);
 
   @override
@@ -53,10 +54,10 @@ class RoomControlButtonsBar extends HookWidget {
   Widget build(BuildContext context) {
     // Check microphone permission
     useEffect(() {
-      _checkMicPermission(context).then((hasPermission) {
+      _checkMicPermission(context, false).then((hasPermission) {
         //  sync microphone default status after check permission
         var seatService = context.read<ZegoSpeakerSeatService>();
-        seatService.setMicrophoneDefaultMute(! hasPermission);
+        seatService.setMicrophoneDefaultMute(!hasPermission);
       });
     }, const []);
 
@@ -89,7 +90,7 @@ class RoomControlButtonsBar extends HookWidget {
                     children: _createControllerButtons(
                         users.localUserInfo.userRole, seats.isMute,
                         micCallback: () {
-                      _checkMicPermission(context).then((hasPermission) {
+                      _checkMicPermission(context, true).then((hasPermission) {
                         if (hasPermission) {
                           var seatService =
                               context.read<ZegoSpeakerSeatService>();
@@ -251,12 +252,15 @@ class RoomControlButtonsBar extends HookWidget {
     });
   }
 
-  Future<bool> _checkMicPermission(BuildContext context) async {
+  Future<bool> _checkMicPermission(
+      BuildContext context, bool showDialog) async {
     var status = await Permission.microphone.status;
     if (!status.isGranted) {
-      _showDialog(context, AppLocalizations.of(context)!.roomPageMicCantOpen,
-          AppLocalizations.of(context)!.roomPageGrantMicPermission,
-          confirmCallback: () => openAppSettings());
+      if(showDialog) {
+        _showDialog(context, AppLocalizations.of(context)!.roomPageMicCantOpen,
+            AppLocalizations.of(context)!.roomPageGrantMicPermission,
+            confirmCallback: () => openAppSettings());
+      }
       return false;
     } else {
       return true;
