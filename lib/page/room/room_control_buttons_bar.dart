@@ -70,7 +70,7 @@ class RoomControlButtonsBar extends HookWidget {
         children: [
           Consumer<ZegoRoomService>(
               builder: (_, roomService, child) => ControllerButton(
-                    iconSrc: StyleIconUrls.roomBottomIm,
+                    iconSrc: _getImIcon(context, roomService),
                     onPressed: () {
                       var userService = context.read<ZegoUserService>();
                       if (ZegoRoomUserRole.roomUserRoleHost !=
@@ -148,6 +148,17 @@ class RoomControlButtonsBar extends HookWidget {
         ],
       ),
     );
+  }
+
+  _getImIcon(BuildContext context, ZegoRoomService roomService) {
+    var userService = context.read<ZegoUserService>();
+    if (ZegoRoomUserRole.roomUserRoleHost ==
+        userService.localUserInfo.userRole) {
+      return StyleIconUrls.roomBottomIm;
+    }
+    return roomService.roomInfo.isTextMessageDisable
+        ? StyleIconUrls.roomBottomImDisable
+        : StyleIconUrls.roomBottomIm;
   }
 
   _getMoreMenu(BuildContext context) {
