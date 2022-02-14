@@ -71,7 +71,9 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     _roomID = roomInfo.roomID;
     _hostID = roomInfo.hostID;
     if (_hostID == _localUserID) {
-      takeSeat(0);
+      if(seatList[0].userID.isEmpty) {  // take is first enter
+        takeSeat(0);
+      }
     } else {
       var hostSeat = seatList[0];
       hostSeat.userID = _hostID;
