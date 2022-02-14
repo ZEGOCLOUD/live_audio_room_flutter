@@ -271,7 +271,7 @@ class RoomMainPage extends HookWidget {
 
     var title = Text(AppLocalizations.of(context)!.networkConnectFailedTitle,
         textAlign: TextAlign.center);
-    var content = Text(AppLocalizations.of(context)!.toastDisconnectTips,
+    var content = Text(AppLocalizations.of(context)!.networkConnectFailed,
         textAlign: TextAlign.center);
 
     var alert = AlertDialog(

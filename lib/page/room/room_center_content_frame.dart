@@ -142,7 +142,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
     } else {
       // Remove user from seat
       _showBottomModalButton(
-          context, AppLocalizations.of(context)!.roomPageLeaveSpeakerSeat, () {
+          context, AppLocalizations.of(context)!.roomPageLeaveSeat, () {
         _showDialog(
             context,
             AppLocalizations.of(context)!.roomPageLeaveSeat,

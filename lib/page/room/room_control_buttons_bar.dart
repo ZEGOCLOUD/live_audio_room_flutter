@@ -212,19 +212,22 @@ class RoomControlButtonsBar extends HookWidget {
           TextButton(
             onPressed: () => Navigator.pop(context,
                 cancelButtonText ?? AppLocalizations.of(context)!.dialogCancel),
-            child: Text(confirmButtonText ??
-                AppLocalizations.of(context)!.dialogCancel),
+            child: Text(
+                cancelButtonText ?? AppLocalizations.of(context)!.dialogCancel),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(
-                  context, AppLocalizations.of(context)!.dialogConfirm);
+                  context,
+                  confirmButtonText ??
+                      AppLocalizations.of(context)!.dialogConfirm);
 
               if (confirmCallback != null) {
                 confirmCallback();
               }
             },
-            child: Text(AppLocalizations.of(context)!.dialogConfirm),
+            child: Text(confirmButtonText ??
+                AppLocalizations.of(context)!.dialogConfirm),
           ),
         ],
       ),
@@ -274,6 +277,9 @@ class RoomControlButtonsBar extends HookWidget {
       if (showDialog) {
         _showDialog(context, AppLocalizations.of(context)!.roomPageMicCantOpen,
             AppLocalizations.of(context)!.roomPageGrantMicPermission,
+            cancelButtonText: AppLocalizations.of(context)!.dialogCancel,
+            confirmButtonText:
+                AppLocalizations.of(context)!.roomPageGoToSettings,
             confirmCallback: () => openAppSettings());
       }
       return false;

@@ -53,7 +53,7 @@ class RoomMemberListItem extends StatelessWidget {
   Widget getRightWidgetByUserRole(BuildContext context) {
     switch (userInfo.userRole) {
       case ZegoRoomUserRole.roomUserRoleHost:
-        return Text(AppLocalizations.of(context)!.roomPageRoleOwner,
+        return Text(AppLocalizations.of(context)!.roomPageHost,
             textDirection: TextDirection.rtl,
             style: StyleConstant.roomMemberListRoleText);
       case ZegoRoomUserRole.roomUserRoleSpeaker:
