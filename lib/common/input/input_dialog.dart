@@ -4,12 +4,16 @@ import 'package:flutter/material.dart';
 import 'input_widget.dart';
 
 class InputDialog {
-  static Future<String?> show(BuildContext context) async {
-    return Navigator.of(context).push(InputOverlay());
+  static Future<String?> show(BuildContext context, TextEditingController editingController) async {
+    return Navigator.of(context).push(InputOverlay(editingController));
   }
 }
 
 class InputOverlay extends ModalRoute<String> {
+  InputOverlay(this.editingController) : super();
+
+  TextEditingController editingController;
+
   @override
   Duration get transitionDuration => const Duration(milliseconds: 200);
 
@@ -34,7 +38,7 @@ class InputOverlay extends ModalRoute<String> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    return const InputWidget();
+    return InputWidget(editingController: editingController);
   }
 
   @override

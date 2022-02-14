@@ -48,7 +48,9 @@ class ControllerButton extends StatelessWidget {
 }
 
 class RoomControlButtonsBar extends HookWidget {
-  const RoomControlButtonsBar({Key? key}) : super(key: key);
+  RoomControlButtonsBar({Key? key}) : super(key: key);
+
+  TextEditingController msgInputEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -219,7 +221,7 @@ class RoomControlButtonsBar extends HookWidget {
   }
 
   _showMessageInput(BuildContext context) {
-    InputDialog.show(context).then((value) {
+    InputDialog.show(context, msgInputEditingController).then((value) {
       if (value?.isEmpty ?? true) {
         return;
       }
@@ -247,6 +249,8 @@ class RoomControlButtonsBar extends HookWidget {
               msg: AppLocalizations.of(context)!
                   .toastSendMessageError(errorCode),
               backgroundColor: Colors.grey);
+        } else {
+          msgInputEditingController.text = ''; // clear if send
         }
       });
     });
@@ -256,7 +260,7 @@ class RoomControlButtonsBar extends HookWidget {
       BuildContext context, bool showDialog) async {
     var status = await Permission.microphone.status;
     if (!status.isGranted) {
-      if(showDialog) {
+      if (showDialog) {
         _showDialog(context, AppLocalizations.of(context)!.roomPageMicCantOpen,
             AppLocalizations.of(context)!.roomPageGrantMicPermission,
             confirmCallback: () => openAppSettings());

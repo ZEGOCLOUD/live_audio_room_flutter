@@ -6,7 +6,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class InputWidget extends StatefulWidget {
-  const InputWidget({Key? key}) : super(key: key);
+  InputWidget({required this.editingController, Key? key}) :
+        super(key: key);
+  TextEditingController editingController;
 
   @override
   _InputWidgetState createState() => _InputWidgetState();
@@ -15,8 +17,6 @@ class InputWidget extends StatefulWidget {
 class _InputWidgetState extends State<InputWidget> {
   @override
   Widget build(BuildContext context) {
-    TextEditingController editingController = TextEditingController();
-
     return Scaffold(
       backgroundColor: Colors.transparent,
 //      resizeToAvoidBottomInset: false,
@@ -51,7 +51,7 @@ class _InputWidgetState extends State<InputWidget> {
                         inputFormatters: <TextInputFormatter>[
                           LengthLimitingTextInputFormatter(100)
                         ],
-                        controller: editingController,
+                        controller: widget.editingController,
                         decoration: InputDecoration(
                           isDense: true,
                           contentPadding: EdgeInsets.only(
@@ -65,7 +65,7 @@ class _InputWidgetState extends State<InputWidget> {
                   ),
                   GestureDetector(
                     onTap: (() {
-                      var text = editingController.text.trim();
+                      var text = widget.editingController.text.trim();
                       // if (text.isNotEmpty) { //  if not allow empty input
                       Navigator.pop(context, text);
                       // }

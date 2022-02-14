@@ -41,7 +41,7 @@ class RoomMainPage extends StatelessWidget {
               ),
               const RoomTitleBar(),
               const Expanded(child: RoomCenterContentFrame()),
-              const RoomControlButtonsBar(),
+              RoomControlButtonsBar(),
               //  room toast tips notify in room service
               Offstage(
                   offstage: true,
