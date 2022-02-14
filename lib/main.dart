@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -23,7 +24,11 @@ import 'package:live_audio_room_flutter/page/room/room_entrance_page.dart';
 import 'package:live_audio_room_flutter/page/settings/settings_page.dart';
 
 void main() {
-  runApp(const ZegoApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) {
+    runApp(const ZegoApp());
+  });
 }
 
 class ZegoApp extends StatelessWidget {
