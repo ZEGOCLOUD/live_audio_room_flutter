@@ -23,6 +23,15 @@ class SettingSDKVersionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: _mainWidget(context),
+    );
+  }
+
+  Widget _mainWidget(BuildContext context) {
     return Container(
         decoration: const BoxDecoration(
           color: StyleColors.settingsCellBackgroundColor,

@@ -60,7 +60,7 @@ class RoomTitleBar extends StatelessWidget {
               showDialog<bool>(
                 context: context,
                 barrierDismissible: false,
-                builder: (context) => getEndRoomDialog(context),
+                builder: (context) => showEndRoomDialog(context),
               );
             } else {
               var seatService = context.read<ZegoSpeakerSeatService>();
@@ -84,7 +84,7 @@ class RoomTitleBar extends StatelessWidget {
     );
   }
 
-  getEndRoomDialog(BuildContext context) {
+  showEndRoomDialog(BuildContext context) {
     var title = Text(AppLocalizations.of(context)!.roomPageDestroyRoom);
     var content = Text(AppLocalizations.of(context)!.dialogSureToDestroyRoom);
 
