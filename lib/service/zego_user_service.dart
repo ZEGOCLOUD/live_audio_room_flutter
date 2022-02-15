@@ -72,7 +72,7 @@ class ZegoUserService extends ChangeNotifier {
   }
 
   unregisterMemberLeaveCallback(MemberChangeCallback callback) {
-    _memberJoinedCallbackSet.remove(callback);
+    _memberLeaveCallbackSet.remove(callback);
   }
 
   onRoomLeave() {
@@ -172,7 +172,7 @@ class ZegoUserService extends ChangeNotifier {
       userList.add(member);
       userDic[member.userID] = member;
 
-      if (member.userID.isNotEmpty && localUserInfo.userID != member.userID) {
+      if (member.userID.isNotEmpty) {
         userInfoList.add(member.clone());
       }
     }
