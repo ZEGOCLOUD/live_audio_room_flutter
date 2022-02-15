@@ -103,6 +103,9 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   /// @param seatIndex refers to the seat index of the user you want to remove.
   Future<int> removeUserFromSeat(int seatIndex) async {
     var speakerSeat = seatList[seatIndex];
+    if (speakerSeat.status != ZegoSpeakerSeatStatus.occupied) {
+      return -1; // seat isn't occupied, nobody on, can't remove
+    }
 
     var preUserID = speakerSeat.userID;
     var preMic = speakerSeat.mic;
@@ -168,6 +171,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   /// @param isClose   can be used to close specified untaken speaker seats.
   /// @param seatIndex refers to the seat index of the seat that you want to close/open.
   Future<int> closeSeat(bool isClose, int seatIndex) async {
+    if (isSeatOccupied(seatIndex)) {
+      return -1; //  seat is occupied, can't lock
+    }
+
     var speakerSeat = seatList[seatIndex];
     var preStatus = speakerSeat.status;
     speakerSeat.status =
@@ -212,6 +219,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   ///
   /// @param seatIndex seatIndex to take
   Future<int> takeSeat(int seatIndex) async {
+    if (isSeatOccupied(seatIndex)) {
+      return -1; //  seat is occupied, can't take
+    }
+
     var speakerSeat = seatList[seatIndex];
     var preUserID = speakerSeat.userID;
     var preStatus = speakerSeat.status;
@@ -288,6 +299,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       return -1;
     }
 
+    if (isSeatOccupied(toSeatIndex)) {
+      return -1; //  seat is occupied, can't switch
+    }
+
     var toSeat = seatList[toSeatIndex];
     toSeat.userID = fromSeat.userID;
     toSeat.status = ZegoSpeakerSeatStatus.occupied;
@@ -351,6 +366,16 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       }
     }
     return false;
+  }
+
+  bool isLocalInSeat() {
+    var speakerSeat = _localSpeakerSeat();
+    return speakerSeat != null;
+  }
+
+  bool isSeatOccupied(int seatIndex) {
+    var speakerSeat = seatList[seatIndex];
+    return ZegoSpeakerSeatStatus.occupied == speakerSeat.status;
   }
 
   void _onCapturedSoundLevelUpdate(double soundLevel) {

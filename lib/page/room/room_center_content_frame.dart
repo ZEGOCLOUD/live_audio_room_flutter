@@ -161,6 +161,11 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
       // Remove user from seat
       _showBottomModalButton(
           context, AppLocalizations.of(context)!.roomPageLeaveSeat, () {
+        var seats = context.read<ZegoSpeakerSeatService>();
+        if (!seats.isSeatOccupied(index)) {
+          return;
+        }
+
         _showDialog(
             context,
             AppLocalizations.of(context)!.roomPageLeaveSeat,
@@ -199,6 +204,11 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
     } else if (users.localUserInfo.userID == userID) {
       _showBottomModalButton(
           context, AppLocalizations.of(context)!.roomPageLeaveSeat, () {
+        var seats = context.read<ZegoSpeakerSeatService>();
+        if (!seats.isLocalInSeat()) {
+          return;
+        }
+
         _showDialog(context, AppLocalizations.of(context)!.roomPageLeaveSeat,
             AppLocalizations.of(context)!.dialogSureToLeaveSeat, callback: () {
           var seats = context.read<ZegoSpeakerSeatService>();
