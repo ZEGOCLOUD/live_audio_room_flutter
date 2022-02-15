@@ -317,8 +317,17 @@ class RoomMainPage extends HookWidget {
           onPressed: () {
             hasDialog.value = false;
 
-            Navigator.of(context).pop(true);
-            Navigator.pushReplacementNamed(context, PageRouteNames.login);
+            var userService = context.read<ZegoUserService>();
+            userService.logout().then((errorCode) {
+              if (0 != errorCode) {
+                Fluttertoast.showToast(
+                    msg: AppLocalizations.of(context)!.toastLogoutFail(errorCode),
+                    backgroundColor: Colors.grey);
+              }
+
+              Navigator.of(context).pop(true);
+              Navigator.pushReplacementNamed(context, PageRouteNames.login);
+            });
           },
         ),
       ],
