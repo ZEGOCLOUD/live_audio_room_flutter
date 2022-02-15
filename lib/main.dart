@@ -110,7 +110,7 @@ class ZegoApp extends StatelessWidget {
   roomMainLoadingPage() {
     return Consumer<ZegoLoadingService>(
       builder: (context, loadingService, child) => LoaderOverlay(
-        child: const RoomMainPage(),
+        child: RoomMainPage(),
         useDefaultLoading: false,
         overlayColor: Colors.grey,
         overlayOpacity: 0.8,

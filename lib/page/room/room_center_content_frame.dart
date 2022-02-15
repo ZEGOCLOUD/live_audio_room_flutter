@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +16,7 @@ import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/common/user_avatar.dart';
 
 import 'package:live_audio_room_flutter/page/room/message/room_message_page.dart';
+import 'package:live_audio_room_flutter/common/room_info_content.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
 import 'package:live_audio_room_flutter/page/room/gift/room_gift_tips.dart';
@@ -28,6 +31,8 @@ class RoomCenterContentFrame extends StatefulWidget {
 }
 
 class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
+  ValueNotifier<bool> hasDialog = ValueNotifier<bool>(false);
+
   _createSeats(List<ZegoSpeakerSeat> seatList, List<ZegoUserInfo> userInfoList,
       SeatItemClickCallback callback) {
     var userService = context.read<ZegoUserService>();
@@ -54,6 +59,8 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
 
   _showBottomModalButton(
       BuildContext context, String buttonText, VoidCallback callback) {
+    hasDialog.value = true;
+
     showModalBottomSheet(
         context: context,
         isDismissible: true,
@@ -82,13 +89,17 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
                   ),
                 ],
               ));
-        });
+        }).then((value) {
+      hasDialog.value = false;
+    });
   }
 
   _showDialog(BuildContext context, String title, String description,
       {String? cancelButtonText,
       String? confirmButtonText,
       VoidCallback? callback}) {
+    hasDialog.value = true;
+
     showDialog<String>(
       context: context,
       barrierDismissible: false,
@@ -97,13 +108,20 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
         content: Text(description),
         actions: <Widget>[
           TextButton(
-            onPressed: () => Navigator.pop(context,
-                cancelButtonText ?? AppLocalizations.of(context)!.dialogCancel),
+            onPressed: () {
+              hasDialog.value = false;
+              Navigator.pop(
+                  context,
+                  cancelButtonText ??
+                      AppLocalizations.of(context)!.dialogCancel);
+            },
             child: Text(confirmButtonText ??
                 AppLocalizations.of(context)!.dialogCancel),
           ),
           TextButton(
             onPressed: () {
+              hasDialog.value = false;
+
               Navigator.pop(
                   context, AppLocalizations.of(context)!.dialogConfirm);
 
@@ -286,7 +304,29 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
                 minHeight: 1.h,
                 maxHeight: 570.h, //  630.h change by gift tips
               ),
-              child: ChatMessagePage())
+              child: ChatMessagePage()),
+          Consumer<ZegoUserService>(builder: (_, userService, child) {
+            if (userService.notifyInfo.isEmpty) {
+              return const Offstage(offstage: true, child: Text(''));
+            }
+            Future.delayed(Duration.zero, () async {
+              var infoContent =
+                  RoomInfoContent.fromJson(jsonDecode(userService.notifyInfo));
+
+              switch (infoContent.toastType) {
+                case RoomInfoType.roomNetworkTempBroken:
+                  if (hasDialog.value) {
+                    hasDialog.value = false;
+                    Navigator.pop(context);
+                  }
+                  break;
+                default:
+                  break;
+              }
+            });
+
+            return const Offstage(offstage: true, child: Text(''));
+          }),
         ],
       ),
     );

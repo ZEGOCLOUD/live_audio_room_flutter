@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -14,6 +16,7 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
+import 'package:live_audio_room_flutter/common/room_info_content.dart';
 import 'package:live_audio_room_flutter/page/room/room_setting_page.dart';
 import 'package:live_audio_room_flutter/page/room/member/room_member_page.dart';
 import 'package:live_audio_room_flutter/page/room/gift/room_gift_page.dart';
@@ -50,6 +53,8 @@ class ControllerButton extends StatelessWidget {
 class RoomControlButtonsBar extends HookWidget {
   RoomControlButtonsBar({Key? key}) : super(key: key);
 
+  ValueNotifier<bool> hasDialog = ValueNotifier<bool>(false);
+
   TextEditingController msgInputEditingController = TextEditingController();
 
   @override
@@ -85,6 +90,7 @@ class RoomControlButtonsBar extends HookWidget {
                       _showMessageInput(context);
                     },
                   )),
+          const Expanded(child: Text('')),
           Consumer2<ZegoUserService, ZegoSpeakerSeatService>(
               builder: (_, users, seats, child) => Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -100,6 +106,7 @@ class RoomControlButtonsBar extends HookWidget {
                         }
                       });
                     }, memberCallback: () {
+                      hasDialog.value = true;
                       showModalBottomSheet(
                           context: context,
                           shape: RoundedRectangleBorder(
@@ -108,8 +115,11 @@ class RoomControlButtonsBar extends HookWidget {
                           isDismissible: true,
                           builder: (BuildContext context) {
                             return const RoomMemberPage();
-                          });
+                          }).then((value) {
+                        hasDialog.value = false;
+                      });
                     }, giftCallback: () {
+                      hasDialog.value = true;
                       showModalBottomSheet(
                           context: context,
                           shape: RoundedRectangleBorder(
@@ -118,8 +128,11 @@ class RoomControlButtonsBar extends HookWidget {
                           isDismissible: true,
                           builder: (BuildContext context) {
                             return const RoomGiftPage();
-                          });
+                          }).then((value) {
+                        hasDialog.value = false;
+                      });
                     }, moreCallback: () {
+                      hasDialog.value = true;
                       showModalBottomSheet(
                           context: context,
                           isDismissible: true,
@@ -132,8 +145,11 @@ class RoomControlButtonsBar extends HookWidget {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: _getMoreMenu(context),
                                 ));
-                          });
+                          }).then((value) {
+                        hasDialog.value = false;
+                      });
                     }, settingsCallback: () {
+                      hasDialog.value = true;
                       showModalBottomSheet(
                           context: context,
                           shape: RoundedRectangleBorder(
@@ -142,9 +158,33 @@ class RoomControlButtonsBar extends HookWidget {
                           isDismissible: true,
                           builder: (BuildContext context) {
                             return const RoomSettingPage();
-                          });
+                          }).then((value) {
+                        hasDialog.value = false;
+                      });
                     }),
-                  ))
+                  )),
+          Consumer<ZegoUserService>(builder: (_, userService, child) {
+            if (userService.notifyInfo.isEmpty) {
+              return const Offstage(offstage: true, child: Text(''));
+            }
+            Future.delayed(Duration.zero, () async {
+              var infoContent =
+                  RoomInfoContent.fromJson(jsonDecode(userService.notifyInfo));
+
+              switch (infoContent.toastType) {
+                case RoomInfoType.roomNetworkTempBroken:
+                  if (hasDialog.value) {
+                    hasDialog.value = false;
+                    Navigator.pop(context);
+                  }
+                  break;
+                default:
+                  break;
+              }
+            });
+
+            return const Offstage(offstage: true, child: Text(''));
+          }),
         ],
       ),
     );
@@ -202,6 +242,8 @@ class RoomControlButtonsBar extends HookWidget {
       {String? cancelButtonText,
       String? confirmButtonText,
       VoidCallback? confirmCallback}) {
+    hasDialog.value = true;
+
     showDialog<String>(
       context: context,
       barrierDismissible: false,
@@ -210,13 +252,21 @@ class RoomControlButtonsBar extends HookWidget {
         content: Text(description),
         actions: <Widget>[
           TextButton(
-            onPressed: () => Navigator.pop(context,
-                cancelButtonText ?? AppLocalizations.of(context)!.dialogCancel),
+            onPressed: () {
+              hasDialog.value = false;
+
+              Navigator.pop(
+                  context,
+                  cancelButtonText ??
+                      AppLocalizations.of(context)!.dialogCancel);
+            },
             child: Text(
                 cancelButtonText ?? AppLocalizations.of(context)!.dialogCancel),
           ),
           TextButton(
             onPressed: () {
+              hasDialog.value = false;
+
               Navigator.pop(
                   context,
                   confirmButtonText ??
@@ -235,7 +285,11 @@ class RoomControlButtonsBar extends HookWidget {
   }
 
   _showMessageInput(BuildContext context) {
+    hasDialog.value = true;
+
     InputDialog.show(context, msgInputEditingController).then((value) {
+      hasDialog.value = false;
+
       if (value?.isEmpty ?? true) {
         return;
       }

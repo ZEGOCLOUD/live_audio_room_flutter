@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
@@ -23,7 +22,9 @@ import 'package:live_audio_room_flutter/page/room/room_title_bar.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class RoomMainPage extends HookWidget {
-  const RoomMainPage({Key? key}) : super(key: key);
+  RoomMainPage({Key? key}) : super(key: key);
+
+  ValueNotifier<bool> hasDialog = ValueNotifier<bool>(false);
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +50,7 @@ class RoomMainPage extends HookWidget {
               SizedBox(
                 height: 16.h,
               ),
-              const RoomTitleBar(),
+              RoomTitleBar(),
               const Expanded(child: RoomCenterContentFrame()),
               RoomControlButtonsBar(),
               //  room toast tips notify in room service
@@ -91,6 +92,10 @@ class RoomMainPage extends HookWidget {
                       _showNetworkTempBrokenTips(context, infoContent);
                       break;
                     case RoomInfoType.roomNetworkReconnected:
+                      if (hasDialog.value) {
+                        hasDialog.value = false;
+                        Navigator.pop(context);
+                      }
                       _hideNetworkTempBrokenTips(context, infoContent);
                       break;
                     case RoomInfoType.roomNetworkReconnectedTimeout:
@@ -136,6 +141,8 @@ class RoomMainPage extends HookWidget {
       {String? cancelButtonText,
       String? confirmButtonText,
       VoidCallback? confirmCallback}) {
+    hasDialog.value = true;
+
     showDialog<String>(
       context: context,
       barrierDismissible: false,
@@ -144,13 +151,21 @@ class RoomMainPage extends HookWidget {
         content: Text(description),
         actions: <Widget>[
           TextButton(
-            onPressed: () => Navigator.pop(context,
-                cancelButtonText ?? AppLocalizations.of(context)!.dialogCancel),
+            onPressed: () {
+              hasDialog.value = false;
+
+              Navigator.pop(
+                  context,
+                  cancelButtonText ??
+                      AppLocalizations.of(context)!.dialogCancel);
+            },
             child: Text(
                 cancelButtonText ?? AppLocalizations.of(context)!.dialogCancel),
           ),
           TextButton(
             onPressed: () {
+              hasDialog.value = false;
+
               Navigator.pop(
                   context,
                   confirmButtonText ??
@@ -212,6 +227,8 @@ class RoomMainPage extends HookWidget {
       return;
     }
 
+    hasDialog.value = true;
+
     var title = Text(AppLocalizations.of(context)!.dialogTipsTitle,
         textAlign: TextAlign.center);
     var content = Text(AppLocalizations.of(context)!.toastRoomHasDestroyed,
@@ -225,6 +242,8 @@ class RoomMainPage extends HookWidget {
           child: Text(AppLocalizations.of(context)!.dialogConfirm,
               textAlign: TextAlign.center),
           onPressed: () {
+            hasDialog.value = false;
+
             Navigator.of(context).pop(true);
             Navigator.pushReplacementNamed(
                 context, PageRouteNames.roomEntrance);
@@ -269,6 +288,8 @@ class RoomMainPage extends HookWidget {
       return;
     }
 
+    hasDialog.value = true;
+
     var title = Text(AppLocalizations.of(context)!.networkConnectFailedTitle,
         textAlign: TextAlign.center);
     var content = Text(AppLocalizations.of(context)!.networkConnectFailed,
@@ -282,6 +303,8 @@ class RoomMainPage extends HookWidget {
           child: Text(AppLocalizations.of(context)!.dialogConfirm,
               textAlign: TextAlign.center),
           onPressed: () {
+            hasDialog.value = false;
+
             Navigator.of(context).pop(true);
             Navigator.pushReplacementNamed(context, PageRouteNames.login);
           },
