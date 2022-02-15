@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:zego_express_engine/zego_express_engine.dart';
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
@@ -135,10 +136,17 @@ class SettingsPage extends HookWidget {
     var expressSDKVersion = useState('1.0');
     ZegoExpressEngine.getVersion()
         .then((value) => expressSDKVersion.value = value);
+
     final zimSDKVersion = useState('1.0');
     ZegoRoomManager.shared
         .getZimVersion()
         .then((version) => zimSDKVersion.value = version);
+
+    final appVersion = useState('1.0');
+    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
+      appVersion.value =  packageInfo.version + "." + packageInfo.buildNumber;
+    });
+
     return Scaffold(
         appBar: AppBar(
           elevation: 0,
@@ -170,7 +178,11 @@ class SettingsPage extends HookWidget {
                         SettingSDKVersionWidget(
                             title: AppLocalizations.of(context)!
                                 .settingPageZimSdkVersion,
-                            content: zimSDKVersion.value)
+                            content: zimSDKVersion.value),
+                        SettingSDKVersionWidget(
+                            title: AppLocalizations.of(context)!
+                                .settingPageVersion,
+                            content: appVersion.value)
                       ]
                           .map((e) => Padding(
                                 child: e,
