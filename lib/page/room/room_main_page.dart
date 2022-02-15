@@ -141,6 +141,11 @@ class RoomMainPage extends HookWidget {
       {String? cancelButtonText,
       String? confirmButtonText,
       VoidCallback? confirmCallback}) {
+    if(hasDialog.value) {
+      hasDialog.value = false;
+      Navigator.pop(context);
+    }
+
     hasDialog.value = true;
 
     showDialog<String>(
