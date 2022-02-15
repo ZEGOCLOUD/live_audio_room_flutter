@@ -215,7 +215,7 @@ class RoomControlButtonsBar extends HookWidget {
       child: CupertinoButton(
           color: Colors.white,
           child: Text(
-            AppLocalizations.of(context)!.roomPageLeaveSeat,
+            AppLocalizations.of(context)!.roomPageLeaveSpeakerSeat,
             style: TextStyle(color: const Color(0xFF1B1B1B), fontSize: 28.sp),
           ),
           onPressed: () {
@@ -230,7 +230,7 @@ class RoomControlButtonsBar extends HookWidget {
 
   _onLeaveSeatClicked(BuildContext context) {
     var seats = context.read<ZegoSpeakerSeatService>();
-    _showDialog(context, AppLocalizations.of(context)!.roomPageLeaveSeat,
+    _showDialog(context, AppLocalizations.of(context)!.roomPageLeaveSpeakerSeat,
         AppLocalizations.of(context)!.dialogSureToLeaveSeat,
         confirmCallback: () {
       seats.leaveSeat().then((code) {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -126,6 +127,12 @@ class RoomMainPage extends HookWidget {
       return;
     }
 
+    var userService = context.read<ZegoUserService>();
+    if (ZegoRoomUserRole.roomUserRoleHost ==
+        userService.localUserInfo.userRole) {
+      return; //  display only not host
+    }
+
     var isTextMessageDisable = infoContent.message.toLowerCase() == 'true';
     String message;
     if (isTextMessageDisable) {
@@ -141,7 +148,7 @@ class RoomMainPage extends HookWidget {
       {String? cancelButtonText,
       String? confirmButtonText,
       VoidCallback? confirmCallback}) {
-    if(hasDialog.value) {
+    if (hasDialog.value) {
       hasDialog.value = false;
       Navigator.pop(context);
     }
