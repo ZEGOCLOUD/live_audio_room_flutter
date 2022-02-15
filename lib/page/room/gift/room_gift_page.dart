@@ -23,7 +23,7 @@ class RoomGiftPage extends HookWidget {
       decoration:
           const BoxDecoration(color: StyleColors.roomPopUpPageBackgroundColor),
       padding:
-          EdgeInsets.only(left: 36.w, top: 20.h, right: 36.w, bottom: 22.h),
+          EdgeInsets.only(left: 36.w, top: 20.h, right: 36.w, bottom: 20.h),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [

@@ -38,6 +38,7 @@ class ZegoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     Wakelock.enable(); //  always bright
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []); //  hide status bar and bottom navigation bar
 
     return MultiProvider(
         providers: [
