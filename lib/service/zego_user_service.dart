@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 
@@ -151,7 +152,11 @@ class ZegoUserService extends ChangeNotifier {
   ///
   /// @param userID   refers to the ID of the user that you want to invite
   Future<int> sendInvitation(String userID) async {
-    var result = await ZIMPlugin.sendPeerMessage(userID, "", 1);
+    var content = "";
+    if (Platform.isAndroid) {
+      content = "{}";
+    }
+    var result = await ZIMPlugin.sendPeerMessage(userID, content, 1);
     return result['errorCode'];
   }
 
