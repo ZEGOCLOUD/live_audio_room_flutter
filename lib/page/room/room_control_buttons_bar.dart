@@ -64,7 +64,7 @@ class RoomControlButtonsBar extends HookWidget {
     useEffect(() {
       bool openPermissionDialog = true;
       if (Platform.isIOS) {
-        openPermissionDialog = false;
+        openPermissionDialog = false; //  ios has system popup instead
       }
       _checkMicPermission(context, openPermissionDialog).then((hasPermission) {
         //  sync microphone default status after check permission
@@ -331,7 +331,7 @@ class RoomControlButtonsBar extends HookWidget {
 
   Future<bool> _checkMicPermission(
       BuildContext context, bool showDialog) async {
-    var status = await Permission.microphone.status;
+    var status = await Permission.microphone.request();
     if (!status.isGranted) {
       if (showDialog) {
         _showDialog(context, AppLocalizations.of(context)!.roomPageMicCantOpen,
