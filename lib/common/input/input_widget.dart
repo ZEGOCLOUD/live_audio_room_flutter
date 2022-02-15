@@ -6,8 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class InputWidget extends StatefulWidget {
-  InputWidget({required this.editingController, Key? key}) :
-        super(key: key);
+  InputWidget({required this.editingController, Key? key}) : super(key: key);
   TextEditingController editingController;
 
   @override
@@ -47,6 +46,9 @@ class _InputWidgetState extends State<InputWidget> {
                           borderRadius: BorderRadius.all(Radius.circular(12))),
                       alignment: Alignment.center,
                       child: TextField(
+                        keyboardType: TextInputType.multiline,
+                        minLines: 1,
+                        maxLines: null,
                         autofocus: true,
                         inputFormatters: <TextInputFormatter>[
                           LengthLimitingTextInputFormatter(100)
