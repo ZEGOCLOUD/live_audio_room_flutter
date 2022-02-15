@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -61,7 +62,11 @@ class RoomControlButtonsBar extends HookWidget {
   Widget build(BuildContext context) {
     // Check microphone permission
     useEffect(() {
-      _checkMicPermission(context, false).then((hasPermission) {
+      bool openPermissionDialog = true;
+      if (Platform.isIOS) {
+        openPermissionDialog = false;
+      }
+      _checkMicPermission(context, openPermissionDialog).then((hasPermission) {
         //  sync microphone default status after check permission
         var seatService = context.read<ZegoSpeakerSeatService>();
         seatService.setMicrophoneDefaultMute(!hasPermission);
