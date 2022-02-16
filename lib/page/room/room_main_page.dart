@@ -300,6 +300,11 @@ class RoomMainPage extends HookWidget {
       return;
     }
 
+    var roomService = context.read<ZegoRoomService>();
+    roomService.leaveRoom();
+    var userService = context.read<ZegoUserService>();
+    userService.logout();
+
     hasDialog.value = true;
 
     var title = Text(AppLocalizations.of(context)!.networkConnectFailedTitle,
@@ -317,17 +322,8 @@ class RoomMainPage extends HookWidget {
           onPressed: () {
             hasDialog.value = false;
 
-            var userService = context.read<ZegoUserService>();
-            userService.logout().then((errorCode) {
-              if (0 != errorCode) {
-                Fluttertoast.showToast(
-                    msg: AppLocalizations.of(context)!.toastLogoutFail(errorCode),
-                    backgroundColor: Colors.grey);
-              }
-
-              Navigator.of(context).pop(true);
-              Navigator.pushReplacementNamed(context, PageRouteNames.login);
-            });
+            Navigator.of(context).pop(true);
+            Navigator.pushReplacementNamed(context, PageRouteNames.login);
           },
         ),
       ],
