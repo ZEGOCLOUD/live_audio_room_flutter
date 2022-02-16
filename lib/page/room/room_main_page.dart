@@ -310,9 +310,10 @@ class RoomMainPage extends HookWidget {
 
     var roomService = context.read<ZegoRoomService>();
     roomService.leaveRoom();
+
     var userService = context.read<ZegoUserService>();
     userService.logout();
-
+    
     hasDialog.value = true;
 
     var title = Text(AppLocalizations.of(context)!.networkConnectFailedTitle,
@@ -329,6 +330,12 @@ class RoomMainPage extends HookWidget {
               textAlign: TextAlign.center),
           onPressed: () {
             hasDialog.value = false;
+
+            var roomService = context.read<ZegoRoomService>();
+            roomService.leaveRoom();
+
+            var userService = context.read<ZegoUserService>();
+            userService.logout();
 
             Navigator.of(context).pop(true);
             Navigator.pushReplacementNamed(context, PageRouteNames.login);

@@ -115,6 +115,7 @@ class ZegoRoomService extends ChangeNotifier {
   /// leaves, and all users in the room will be forced to leave the room.</>
   /// <p>Call this method at: After joining a room</>
   Future<int> leaveRoom() async {
+    _stopPublish();
     _logoutRtcRoom();
 
     var result = await ZIMPlugin.leaveRoom(roomInfo.roomID);
@@ -211,6 +212,10 @@ class ZegoRoomService extends ChangeNotifier {
     ZegoExpressEngine.instance.loginRoom(roomInfo.roomID, user, config: config);
     var soundConfig = ZegoSoundLevelConfig(1000, false);
     ZegoExpressEngine.instance.startSoundLevelMonitor(config: soundConfig);
+  }
+
+  void _stopPublish() {
+    ZegoExpressEngine.instance.stopPublishingStream();
   }
 
   void _logoutRtcRoom() {
