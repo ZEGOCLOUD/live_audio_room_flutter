@@ -1,13 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'dart:io';
 
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:wakelock/wakelock.dart';
+import 'package:flutter_background/flutter_background.dart';
 
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
@@ -38,7 +40,12 @@ class ZegoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     Wakelock.enable(); //  always bright
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []); //  hide status bar and bottom navigation bar
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: []); //  hide status bar and bottom navigation bar
+
+    if (Platform.isAndroid) {
+      supportAndroidRunBackground();
+    }
 
     return MultiProvider(
         providers: [
@@ -150,5 +157,23 @@ class ZegoApp extends StatelessWidget {
     if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
       FocusManager.instance.primaryFocus?.unfocus();
     }
+  }
+
+  Future<void> supportAndroidRunBackground() async {
+    PackageInfo.fromPlatform().then((PackageInfo packageInfo) async {
+      var androidConfig = FlutterBackgroundAndroidConfig(
+        notificationTitle: packageInfo.appName,
+        notificationText: "Background notification for keeping " +
+            packageInfo.appName +
+            " running in the background",
+        notificationImportance: AndroidNotificationImportance.Default,
+        // notificationIcon: , // Default is ic_launcher from folder mipmap
+      );
+
+      await FlutterBackground.initialize(androidConfig: androidConfig)
+          .then((value) {
+        FlutterBackground.enableBackgroundExecution();
+      });
+    });
   }
 }
