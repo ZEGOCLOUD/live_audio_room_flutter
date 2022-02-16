@@ -331,7 +331,12 @@ class RoomControlButtonsBar extends HookWidget {
 
   Future<bool> _checkMicPermission(
       BuildContext context, bool showDialog) async {
-    var status = await Permission.microphone.request();
+    var userService = context.read<ZegoUserService>();
+    var status =
+        ZegoRoomUserRole.roomUserRoleHost == userService.localUserInfo.userRole
+            ? await Permission.microphone.request()
+            : await Permission.microphone.status;
+
     if (!status.isGranted) {
       if (showDialog) {
         _showDialog(context, AppLocalizations.of(context)!.roomPageMicCantOpen,

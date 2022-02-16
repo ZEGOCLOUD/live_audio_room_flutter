@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -243,17 +244,20 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
       return;
     }
     _showBottomModalButton(
-        context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
-      var seats = context.read<ZegoSpeakerSeatService>();
+        context, AppLocalizations.of(context)!.roomPageTakeSeat, () async {
+      var seatService = context.read<ZegoSpeakerSeatService>();
 
-      if (ZegoSpeakerSeatStatus.closed == seats.seatList[index].status) {
+      if (ZegoSpeakerSeatStatus.closed == seatService.seatList[index].status) {
         Fluttertoast.showToast(
             msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed,
             backgroundColor: Colors.grey);
         return;
       }
 
-      seats.takeSeat(index).then((code) {
+      var status = await Permission.microphone.request();
+      seatService.setMicrophoneDefaultMute(! status.isGranted);
+
+      seatService.takeSeat(index).then((code) {
         if (code != 0) {
           Fluttertoast.showToast(
               msg: AppLocalizations.of(context)!.toastTakeSpeakerSeatFail(code),

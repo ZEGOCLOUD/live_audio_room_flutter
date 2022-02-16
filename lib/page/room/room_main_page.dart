@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -200,7 +201,7 @@ class RoomMainPage extends HookWidget {
         AppLocalizations.of(context)!.dialogInvitionDescrip,
         cancelButtonText: AppLocalizations.of(context)!.dialogRefuse,
         confirmButtonText: AppLocalizations.of(context)!.dialogAccept,
-        confirmCallback: () {
+        confirmCallback: () async {
       var seatService = context.read<ZegoSpeakerSeatService>();
 
       var userService = context.read<ZegoUserService>();
@@ -222,6 +223,10 @@ class RoomMainPage extends HookWidget {
             backgroundColor: Colors.grey);
         return;
       }
+
+      var status = await Permission.microphone.request();
+      seatService.setMicrophoneDefaultMute(!status.isGranted);
+
       seatService.takeSeat(validSpeakerIndex).then((errorCode) {
         if (errorCode != 0) {
           Fluttertoast.showToast(
