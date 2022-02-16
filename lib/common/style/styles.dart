@@ -32,6 +32,7 @@ class StyleColors {
   static const Color roomChatMessageColor = dark;
 
   static const Color roomMessageSendButtonBgColor = blue;
+  static Color roomMessageSendButtonBgDisableColor = blue.withOpacity(0.3);
   static Color roomMessageSendButtonDisableBgColor =
       roomMessageSendButtonBgColor.withOpacity(0.3);
   static const Color roomMessageInputBgColor = Color(0xffF7F7F8);
@@ -179,7 +180,5 @@ class StyleConstant {
   );
 
   static const loadingText = TextStyle(
-      color: Colors.white,
-      fontSize: 10.0,
-      decoration: TextDecoration.none);
+      color: Colors.white, fontSize: 10.0, decoration: TextDecoration.none);
 }

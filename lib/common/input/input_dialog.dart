@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'input_widget.dart';
 
 class InputDialog {
-  static Future<String?> show(BuildContext context, TextEditingController editingController) async {
+  static Future<String?> show(
+      BuildContext context, TextEditingController editingController) async {
     return Navigator.of(context).push(InputOverlay(editingController));
   }
 }
@@ -38,7 +39,7 @@ class InputOverlay extends ModalRoute<String> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    return InputWidget(editingController: editingController);
+    return InputWidget(tempEditController: editingController);
   }
 
   @override
