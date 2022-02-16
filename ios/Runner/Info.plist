@@ -32,12 +32,15 @@
 	<string>We need to use your mic to help you join the voice interaction.</string>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string></string>
 		<string>audio</string>
 		<string>external-accessory</string>
 		<string>fetch</string>
 		<string>processing</string>
 		<string>voip</string>
+	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+    	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
