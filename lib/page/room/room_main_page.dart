@@ -206,6 +206,9 @@ class RoomMainPage extends HookWidget {
 
       var userService = context.read<ZegoUserService>();
       if (seatService.isUserInSeat(userService.localUserInfo.userID)) {
+        Fluttertoast.showToast(
+            msg: AppLocalizations.of(context)!.toastTakeSpeakerSeatFail(-1),
+            backgroundColor: Colors.grey);
         return;
       }
 
