@@ -90,7 +90,7 @@ class ZegoRoomService extends ChangeNotifier {
       if (roomDic == null) {
         // room has end
         RoomInfoContent toastContent = RoomInfoContent.empty();
-        toastContent.toastType = RoomInfoType.roomEndByHost;
+        toastContent.toastType = RoomInfoType.roomEndByHost;//  clear in receiver
         notifyInfo = json.encode(toastContent.toJson());
       } else {
         var roomInfoJson = Map<String, dynamic>.from(jsonDecode(roomDic));
@@ -163,7 +163,7 @@ class ZegoRoomService extends ChangeNotifier {
       if (roomEvent == zimRoomEvent.zimRoomEventEnterFailed) {
         // network error leave room
         RoomInfoContent toastContent = RoomInfoContent.empty();
-        toastContent.toastType = RoomInfoType.roomNetworkLeave;
+        toastContent.toastType = RoomInfoType.roomNetworkLeave;//  clear in receiver
         notifyInfo = json.encode(toastContent.toJson());
       }
     } else if (roomState == ZimRoomState.zimRoomStateConnected &&
@@ -190,7 +190,7 @@ class ZegoRoomService extends ChangeNotifier {
       }
 
       RoomInfoContent toastContent = RoomInfoContent.empty();
-      toastContent.toastType = RoomInfoType.roomEndByHost;
+      toastContent.toastType = RoomInfoType.roomEndByHost;//  clear in receiver
       notifyInfo = json.encode(toastContent.toJson());
     } else {
       _updateRoomInfo(RoomInfo.fromJson(roomInfoJson));
@@ -219,7 +219,7 @@ class ZegoRoomService extends ChangeNotifier {
 
     RoomInfoContent toastContent = RoomInfoContent.empty();
     if (oldRoomInfo.isTextMessageDisable != roomInfo.isTextMessageDisable) {
-      toastContent.toastType = RoomInfoType.textMessageDisable;
+      toastContent.toastType = RoomInfoType.textMessageDisable;//  clear in receiver
       toastContent.message = roomInfo.isTextMessageDisable.toString();
 
       notifyInfo = json.encode(toastContent.toJson());

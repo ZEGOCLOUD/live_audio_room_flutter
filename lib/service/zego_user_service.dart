@@ -207,7 +207,8 @@ class ZegoUserService extends ChangeNotifier {
           ZegoCustomCommandTypeExtension.mapValue[actionType]) {
         // receive invitation
         RoomInfoContent toastContent = RoomInfoContent.empty();
-        toastContent.toastType = RoomInfoType.roomHostInviteToSpeak;
+        toastContent.toastType =
+            RoomInfoType.roomHostInviteToSpeak; //  clear in receiver
         notifyInfo = json.encode(toastContent.toJson());
       }
     }
@@ -220,6 +221,7 @@ class ZegoUserService extends ChangeNotifier {
     zimConnectionEvent? connectionEvent =
         ZIMConnectionEventExtension.mapValue[event];
 
+    var autoClearNotifyInfo = true;
     if (connectionState == zimConnectionState.zimConnectionStateReconnecting &&
         connectionEvent ==
             zimConnectionEvent.zimConnectionEventLoginInterrupted) {
@@ -251,12 +253,19 @@ class ZegoUserService extends ChangeNotifier {
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.roomNetworkReconnectedTimeout;
       notifyInfo = json.encode(toastContent.toJson());
+      autoClearNotifyInfo = false; //  clear in receiver
       if (userOfflineCallback != null) {
         userOfflineCallback!();
       }
     }
 
     notifyListeners();
+
+    if (autoClearNotifyInfo) {
+      Future.delayed(const Duration(milliseconds: 500), () async {
+        notifyInfo = '';
+      });
+    }
   }
 
   void updateSpeakerSet(Set<String> speakerSet) {
