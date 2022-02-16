@@ -62,11 +62,7 @@ class RoomControlButtonsBar extends HookWidget {
   Widget build(BuildContext context) {
     // Check microphone permission
     useEffect(() {
-      bool openPermissionDialog = true;
-      if (Platform.isIOS) {
-        openPermissionDialog = false; //  ios has system popup instead
-      }
-      _checkMicPermission(context, openPermissionDialog).then((hasPermission) {
+      _checkMicPermission(context, false).then((hasPermission) {
         //  sync microphone default status after check permission
         var seatService = context.read<ZegoSpeakerSeatService>();
         seatService.setMicrophoneDefaultMute(!hasPermission);
