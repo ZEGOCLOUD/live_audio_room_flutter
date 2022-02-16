@@ -27,10 +27,8 @@ class ZegoRoomService extends ChangeNotifier {
 
   String notifyInfo = '';
 
-  void _clearNotifyInfo() {
-    Future.delayed(const Duration(milliseconds: 500), () async {
-      notifyInfo = '';
-    });
+  void clearNotifyInfo() {
+    notifyInfo = '';
   }
 
   ZegoRoomService() {
@@ -182,7 +180,6 @@ class ZegoRoomService extends ChangeNotifier {
     }
 
     notifyListeners();
-    _clearNotifyInfo();
   }
 
   void _onRoomInfoUpdate(String roomID, Map<String, dynamic> roomInfoJson) {
@@ -203,7 +200,6 @@ class ZegoRoomService extends ChangeNotifier {
     }
 
     notifyListeners();
-    _clearNotifyInfo();
   }
 
   Future<void> _loginRtcRoom() async {
@@ -228,7 +224,6 @@ class ZegoRoomService extends ChangeNotifier {
 
       notifyInfo = json.encode(toastContent.toJson());
       notifyListeners();
-      _clearNotifyInfo();
     }
   }
 }

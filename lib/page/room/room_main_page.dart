@@ -57,6 +57,9 @@ class RoomMainPage extends HookWidget {
               RoomControlButtonsBar(),
               //  room toast tips notify in room service
               Consumer<ZegoRoomService>(builder: (_, roomService, child) {
+                if (roomService.roomInfo.roomID.isEmpty) {
+                  return const Offstage(offstage: true, child: Text(''));
+                }
                 if (roomService.notifyInfo.isEmpty) {
                   return const Offstage(offstage: true, child: Text(''));
                 }
@@ -66,13 +69,13 @@ class RoomMainPage extends HookWidget {
 
                   switch (infoContent.toastType) {
                     case RoomInfoType.textMessageDisable:
+                      roomService.clearNotifyInfo();
                       _showTextMessageTips(context, infoContent);
                       break;
                     case RoomInfoType.roomEndByHost:
                     case RoomInfoType.roomNetworkLeave:
+                      roomService.clearNotifyInfo();
                       _showRoomEndTips(context, infoContent);
-                      break;
-                    case RoomInfoType.roomLeave:
                       break;
                     default:
                       break;
@@ -91,6 +94,10 @@ class RoomMainPage extends HookWidget {
 
                   switch (infoContent.toastType) {
                     case RoomInfoType.roomNetworkTempBroken:
+                      if (hasDialog.value) {
+                        hasDialog.value = false;
+                        Navigator.pop(context);
+                      }
                       _showNetworkTempBrokenTips(context, infoContent);
                       break;
                     case RoomInfoType.roomNetworkReconnected:
@@ -101,12 +108,14 @@ class RoomMainPage extends HookWidget {
                       _hideNetworkTempBrokenTips(context, infoContent);
                       break;
                     case RoomInfoType.roomNetworkReconnectedTimeout:
+                      userService.clearNotifyInfo();
                       _showNetworkDisconnectTimeoutDialog(context, infoContent);
                       break;
                     case RoomInfoType.loginUserKickOut:
                       _showLoginUserKickOutTips(context, infoContent);
                       break;
                     case RoomInfoType.roomHostInviteToSpeak:
+                      userService.clearNotifyInfo();
                       _showHostInviteToSpeak(context);
                       break;
                     default:
@@ -313,7 +322,7 @@ class RoomMainPage extends HookWidget {
 
     var userService = context.read<ZegoUserService>();
     userService.logout();
-    
+
     hasDialog.value = true;
 
     var title = Text(AppLocalizations.of(context)!.networkConnectFailedTitle,

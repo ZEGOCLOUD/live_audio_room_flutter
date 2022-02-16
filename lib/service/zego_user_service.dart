@@ -45,10 +45,8 @@ class ZegoUserService extends ChangeNotifier {
 
   String notifyInfo = '';
 
-  void _clearNotifyInfo() {
-    Future.delayed(const Duration(milliseconds: 500), () async {
-      notifyInfo = '';
-    });
+  void clearNotifyInfo() {
+    notifyInfo = '';
   }
 
   ZegoUserService() {
@@ -214,7 +212,6 @@ class ZegoUserService extends ChangeNotifier {
       }
     }
     notifyListeners();
-    _clearNotifyInfo();
   }
 
   void _onConnectionStateChanged(int state, int event) {
@@ -260,7 +257,6 @@ class ZegoUserService extends ChangeNotifier {
     }
 
     notifyListeners();
-    _clearNotifyInfo();
   }
 
   void updateSpeakerSet(Set<String> speakerSet) {
