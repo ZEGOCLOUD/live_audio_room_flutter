@@ -38,10 +38,7 @@ class ZegoRoomService extends ChangeNotifier {
     ZIMPlugin.onRoomStateChanged = _onRoomStateChanged;
   }
 
-  onRoomLeave() {
-    roomInfo = RoomInfo('', '', '');
-    notifyListeners();
-  }
+  onRoomLeave() {}
 
   onRoomEnter() {}
 
@@ -115,10 +112,16 @@ class ZegoRoomService extends ChangeNotifier {
   /// leaves, and all users in the room will be forced to leave the room.</>
   /// <p>Call this method at: After joining a room</>
   Future<int> leaveRoom() async {
-    _stopPublish();
-    _logoutRtcRoom();
+    var roomId = roomInfo.roomID;
 
-    var result = await ZIMPlugin.leaveRoom(roomInfo.roomID);
+    await ZegoExpressEngine.instance.stopSoundLevelMonitor();
+    await ZegoExpressEngine.instance.stopPublishingStream();
+    await ZegoExpressEngine.instance.logoutRoom(roomId);
+
+    var result = await ZIMPlugin.leaveRoom(roomId);
+
+    roomInfo = RoomInfo('', '', '');
+
     var code = result['errorCode'];
     return code;
   }
@@ -212,14 +215,6 @@ class ZegoRoomService extends ChangeNotifier {
     ZegoExpressEngine.instance.loginRoom(roomInfo.roomID, user, config: config);
     var soundConfig = ZegoSoundLevelConfig(1000, false);
     ZegoExpressEngine.instance.startSoundLevelMonitor(config: soundConfig);
-  }
-
-  void _stopPublish() {
-    ZegoExpressEngine.instance.stopPublishingStream();
-  }
-
-  void _logoutRtcRoom() {
-    ZegoExpressEngine.instance.logoutRoom(roomInfo.roomID);
   }
 
   void _updateRoomInfo(RoomInfo updatedRoomInfo) {
