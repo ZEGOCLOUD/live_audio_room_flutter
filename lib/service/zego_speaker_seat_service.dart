@@ -303,6 +303,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       return -1; //  seat is occupied, can't switch
     }
 
+    if (isSeatClosed(toSeatIndex)) {
+      return -1; //  seat is closed, can't switch
+    }
+
     var toSeat = seatList[toSeatIndex];
     toSeat.userID = fromSeat.userID;
     toSeat.status = ZegoSpeakerSeatStatus.occupied;
@@ -376,6 +380,11 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   bool isSeatOccupied(int seatIndex) {
     var speakerSeat = seatList[seatIndex];
     return ZegoSpeakerSeatStatus.occupied == speakerSeat.status;
+  }
+
+  bool isSeatClosed(int seatIndex) {
+    var speakerSeat = seatList[seatIndex];
+    return ZegoSpeakerSeatStatus.closed == speakerSeat.status;
   }
 
   void _onCapturedSoundLevelUpdate(double soundLevel) {

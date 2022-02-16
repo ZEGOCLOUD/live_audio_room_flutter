@@ -153,7 +153,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
         seats.closeSeat(setToClose, index).then((code) {
           if (code != 0) {
             Fluttertoast.showToast(
-                msg: AppLocalizations.of(context)!.toastLockSeatError(code),
+                msg: AppLocalizations.of(context)!.toastLockSeatAlreadyTakeSeat,
                 backgroundColor: Colors.grey);
           }
         });
@@ -200,17 +200,36 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
       }
       _showBottomModalButton(
           context, AppLocalizations.of(context)!.roomPageTakeSeat, () {
-        seats.switchSeat(index);
+        if (ZegoSpeakerSeatStatus.closed == seats.seatList[index].status) {
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!.thisSeatHasBeenClosed,
+              backgroundColor: Colors.grey);
+          return;
+        }
+
+        seats.switchSeat(index).then((errorCode) {
+          if (0 != errorCode) {
+            Fluttertoast.showToast(
+                msg: AppLocalizations.of(context)!
+                    .toastTakeSpeakerSeatFail(errorCode),
+                backgroundColor: Colors.grey);
+          }
+        });
       });
     } else if (users.localUserInfo.userID == userID) {
       _showBottomModalButton(
           context, AppLocalizations.of(context)!.roomPageLeaveSpeakerSeat, () {
         var seats = context.read<ZegoSpeakerSeatService>();
         if (!seats.isLocalInSeat()) {
+          Fluttertoast.showToast(
+              msg: AppLocalizations.of(context)!.toastLeaveSeatFail(-1),
+              backgroundColor: Colors.grey);
           return;
         }
 
-        _showDialog(context, AppLocalizations.of(context)!.roomPageLeaveSpeakerSeat,
+        _showDialog(
+            context,
+            AppLocalizations.of(context)!.roomPageLeaveSpeakerSeat,
             AppLocalizations.of(context)!.dialogSureToLeaveSeat, callback: () {
           var seats = context.read<ZegoSpeakerSeatService>();
           seats.leaveSeat().then((code) {
@@ -255,7 +274,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
       }
 
       var status = await Permission.microphone.request();
-      seatService.setMicrophoneDefaultMute(! status.isGranted);
+      seatService.setMicrophoneDefaultMute(!status.isGranted);
 
       seatService.takeSeat(index).then((code) {
         if (code != 0) {
