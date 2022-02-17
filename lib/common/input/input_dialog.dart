@@ -39,7 +39,9 @@ class InputOverlay extends ModalRoute<String> {
     Animation<double> animation,
     Animation<double> secondaryAnimation,
   ) {
-    return InputWidget(tempEditController: editingController);
+    return GestureDetector(
+        onTapDown: (_) => Navigator.of(context).pop(),
+        child: InputWidget(tempEditController: editingController));
   }
 
   @override

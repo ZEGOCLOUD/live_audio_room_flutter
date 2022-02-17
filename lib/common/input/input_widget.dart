@@ -30,11 +30,9 @@ class InputWidget extends HookWidget {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Expanded(
-            child: GestureDetector(
-                onTapDown: (_) => Navigator.of(context).pop(),
-                child: Container(
-                  color: Colors.transparent,
-                )),
+            child: Container(
+              color: Colors.transparent,
+            ),
           ),
           SafeArea(
             child: Container(
