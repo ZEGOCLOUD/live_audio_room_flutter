@@ -37,7 +37,7 @@ class RoomGiftBottomBar extends HookWidget {
               alignment: Alignment.bottomLeft,
               child: Container(
                 padding: EdgeInsets.only(
-                    left: 36.w, top: 812.h, right: 246.w, bottom: 102.h),
+                    left: 36.w, top: 812.h, right: 246.w, bottom: 150.h),
                 child: RoomGiftMemberList(memberSelectNotify: (userInfo) {
                   selectedUser = userInfo;
                   if (userIDOfNoSpeakerUser != selectedUser.userID) {

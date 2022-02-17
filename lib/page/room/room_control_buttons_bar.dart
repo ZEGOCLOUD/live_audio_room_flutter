@@ -112,23 +112,28 @@ class RoomControlButtonsBar extends HookWidget {
                           context: context,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
-                          elevation: 800.h,
                           isDismissible: true,
                           builder: (BuildContext context) {
-                            return const RoomMemberPage();
+                            return AnimatedPadding(
+                                padding: MediaQuery.of(context).viewInsets,
+                                duration: const Duration(milliseconds: 100),
+                                child: SizedBox(height:800.h, child: const RoomMemberPage()));
                           }).then((value) {
                         hasDialog.value = false;
                       });
                     }, giftCallback: () {
                       hasDialog.value = true;
                       showModalBottomSheet(
+                          isScrollControlled: true,
                           context: context,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
-                          elevation: 800.h,
                           isDismissible: true,
                           builder: (BuildContext context) {
-                            return const RoomGiftPage();
+                            return AnimatedPadding(
+                                padding: MediaQuery.of(context).viewInsets,
+                                duration: const Duration(milliseconds: 100),
+                                child: SizedBox(height:800.h, child: const RoomGiftPage()));
                           }).then((value) {
                         hasDialog.value = false;
                       });
@@ -155,10 +160,12 @@ class RoomControlButtonsBar extends HookWidget {
                           context: context,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
-                          elevation: 800.h,
                           isDismissible: true,
                           builder: (BuildContext context) {
-                            return const RoomSettingPage();
+                            return AnimatedPadding(
+                                padding: MediaQuery.of(context).viewInsets,
+                                duration: const Duration(milliseconds: 100),
+                                child: SizedBox(height:800.h, child: const RoomSettingPage()));
                           }).then((value) {
                         hasDialog.value = false;
                       });
