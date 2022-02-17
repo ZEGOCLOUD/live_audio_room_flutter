@@ -307,7 +307,7 @@ class _RoomCenterContentFrameState extends State<RoomCenterContentFrame> {
         children: [
           SizedBox(
             //height: 212.h * 2,
-            height: 300.h,
+            height: 330.h,
             width: 622.w, //(152.w + 22.w) * 3,
             child: Consumer2<ZegoSpeakerSeatService, ZegoUserService>(
               builder: (context, seats, users, child) => GridView.count(

@@ -114,6 +114,20 @@ class RoomGiftBottomBar extends HookWidget {
   Widget build(BuildContext context) {
     final selectedUserNameCtrl = useTextEditingController();
 
+    final _areFieldsEmpty = useState<bool>(true);
+    useEffect(() {
+      selectedUserNameCtrl.addListener(() {
+        _areFieldsEmpty.value = selectedUserNameCtrl.text.toString().isEmpty;
+        /*
+        selectedUserNameCtrl.text.toString() ==
+            AppLocalizations.of(context)!.roomPageSelectAllSpeakers
+        * */
+        //selectedUserNameCtrl.text.toString().isEmpty;
+        //AppLocalizations.of(context)!
+        //                                     .roomPageSelectDefault
+      });
+    }, [selectedUserNameCtrl]);
+
     return SizedBox(
       height: 80.w,
       width: double.infinity,
@@ -129,7 +143,7 @@ class RoomGiftBottomBar extends HookWidget {
                 color: StyleColors.giftMemberListBackgroundColor,
                 borderRadius: BorderRadius.circular(24.0),
               ),
-              width: 468.w,
+              width: 475.w,
               height: 80.h,
               padding: EdgeInsets.only(
                   left: 36.w, top: 0, right: 0, bottom: 3 /*magic num.*/),
@@ -138,19 +152,26 @@ class RoomGiftBottomBar extends HookWidget {
                   SizedBox(
                       width: 318.w,
                       height: 80.h,
-                      child: Center(
-                          child: TextFormField(
-                        readOnly: true,
-                        textAlign: TextAlign.left,
-                        maxLines: 1,
-                        style: StyleConstant.roomGiftInputText,
-                        decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintStyle: StyleConstant.roomGiftInputText,
-                            hintText: AppLocalizations.of(context)!
-                                .roomPageSelectDefault),
-                        controller: selectedUserNameCtrl,
-                      ))),
+                      child: GestureDetector(
+                          onTap: () {
+                            showMemberList(context, selectedUserNameCtrl);
+                          },
+                          child: AbsorbPointer(
+                              child: Center(
+                                  child: TextFormField(
+                            readOnly: true,
+                            textAlign: TextAlign.left,
+                            maxLines: 1,
+                            style: StyleConstant.roomGiftInputText,
+                            decoration: InputDecoration(
+                                isDense: true,
+                                contentPadding: EdgeInsets.zero,
+                                border: InputBorder.none,
+                                hintStyle: StyleConstant.roomGiftInputText,
+                                hintText: AppLocalizations.of(context)!
+                                    .roomPageSelectDefault),
+                            controller: selectedUserNameCtrl,
+                          ))))),
                   const Expanded(child: Text('')),
                   IconButton(
                       onPressed: () =>
@@ -158,23 +179,28 @@ class RoomGiftBottomBar extends HookWidget {
                       icon: Image.asset(StyleIconUrls.roomMemberDropDownArrow))
                 ],
               )),
+          const Expanded(child: Text('')),
           SizedBox(
-              width: 188.w,
+              width: 180.w,
               height: 80.h,
-              child: OutlinedButton(
-                  onPressed: () =>
-                      selectedUser.isEmpty() ? null : sendGift(context),
-                  child: Text(AppLocalizations.of(context)!.roomPageSendGift,
-                      style: StyleConstant.roomGiftSendButtonText),
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.resolveWith((states) {
-                      // If the button is pressed, return green, otherwise blue
-                      return StyleColors.blueButtonEnabledColor;
-                    }),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24.0))),
-                  )))
+              child: GestureDetector(
+                onTap: () => selectedUser.isEmpty() ? null : sendGift(context),
+                child: Container(
+                  decoration: BoxDecoration(
+                      color: _areFieldsEmpty.value
+                          ? StyleColors.blueButtonDisableColor
+                          : StyleColors.blueButtonEnabledColor,
+                      borderRadius:
+                          const BorderRadius.all(Radius.circular(12))),
+                  padding: const EdgeInsets.only(
+                      left: 10, right: 10, top: 10, bottom: 10),
+                  alignment: Alignment.center,
+                  child: Text(
+                    AppLocalizations.of(context)!.roomPageSendGift,
+                    style: StyleConstant.roomGiftSendButtonText,
+                  ),
+                ),
+              ))
         ],
       ),
     );

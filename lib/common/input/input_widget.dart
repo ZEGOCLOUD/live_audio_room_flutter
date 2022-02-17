@@ -82,7 +82,7 @@ class InputWidget extends HookWidget {
                           color: _areFieldsEmpty.value
                               ? StyleColors.roomMessageSendButtonBgDisableColor
                               : StyleColors.roomMessageSendButtonBgColor,
-                          borderRadius: BorderRadius.all(Radius.circular(12))),
+                          borderRadius: const BorderRadius.all(Radius.circular(12))),
                       padding: const EdgeInsets.only(
                           left: 10, right: 10, top: 10, bottom: 10),
                       alignment: Alignment.center,
