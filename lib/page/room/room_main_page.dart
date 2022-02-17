@@ -38,7 +38,7 @@ class RoomMainPage extends HookWidget with WidgetsBindingObserver {
         if (tempContext != null) {
           //  check if room end when app in background
           var roomService = tempContext?.read<ZegoRoomService>();
-          if (roomService != null && roomService!.roomInfo.roomID.isEmpty) {
+          if (roomService != null && roomService.roomInfo.roomID.isEmpty) {
             RoomInfoContent infoContent = RoomInfoContent.empty();
             infoContent.toastType = RoomInfoType.roomEndByHost;
             _showRoomEndTips(tempContext!, infoContent);
