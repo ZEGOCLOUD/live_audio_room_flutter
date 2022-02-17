@@ -48,7 +48,7 @@ class ZegoApp extends StatelessWidget {
     Wakelock.enable(); //  always bright
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-        overlays: []); //  hide status bar and bottom navigation bar
+        overlays: [SystemUiOverlay.top]); //  hide status bar and bottom navigation bar
 
     if (Platform.isAndroid) {
       supportAndroidRunBackground();
