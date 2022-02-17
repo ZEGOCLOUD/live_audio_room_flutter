@@ -79,7 +79,6 @@ class ZegoUserService extends ChangeNotifier {
     // We need to reuse local user id after leave room
     localUserInfo.userRole = ZegoRoomUserRole.roomUserRoleListener;
     totalUsersNum = 0;
-    loginState = LoginState.loginStateLoggedOut;
   }
 
   onRoomEnter() {
@@ -221,23 +220,24 @@ class ZegoUserService extends ChangeNotifier {
     zimConnectionEvent? connectionEvent =
         ZIMConnectionEventExtension.mapValue[event];
 
+    var inRoom = ZegoRoomManager.shared.roomService.roomInfo.roomID.isNotEmpty;
     var autoClearNotifyInfo = true;
-    if (connectionState == zimConnectionState.zimConnectionStateReconnecting &&
+    if (inRoom &&
+        connectionState == zimConnectionState.zimConnectionStateReconnecting &&
         connectionEvent ==
             zimConnectionEvent.zimConnectionEventLoginInterrupted) {
       //  temp network broken
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.roomNetworkTempBroken;
       notifyInfo = json.encode(toastContent.toJson());
-    } else if (connectionState ==
-            zimConnectionState.zimConnectionStateConnected &&
+    } else if (connectionState == zimConnectionState.zimConnectionStateConnected &&
         connectionEvent == zimConnectionEvent.zimConnectionEventSuccess) {
       //  reconnected after temp network broken
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.roomNetworkReconnected;
       notifyInfo = json.encode(toastContent.toJson());
-    } else if (connectionState ==
-            zimConnectionState.zimConnectionStateDisconnected &&
+    } else if (inRoom &&
+        connectionState == zimConnectionState.zimConnectionStateDisconnected &&
         connectionEvent == zimConnectionEvent.zimConnectionEventKickedOut) {
       //  kick out
       RoomInfoContent toastContent = RoomInfoContent.empty();
@@ -246,8 +246,8 @@ class ZegoUserService extends ChangeNotifier {
       if (userOfflineCallback != null) {
         userOfflineCallback!();
       }
-    } else if (connectionState ==
-            zimConnectionState.zimConnectionStateDisconnected &&
+    } else if (inRoom &&
+        connectionState == zimConnectionState.zimConnectionStateDisconnected &&
         connectionEvent == zimConnectionEvent.zimConnectionEventLoginTimeout) {
       //  connect timeout
       RoomInfoContent toastContent = RoomInfoContent.empty();

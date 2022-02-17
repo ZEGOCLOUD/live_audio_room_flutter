@@ -90,7 +90,8 @@ class ZegoRoomService extends ChangeNotifier {
       if (roomDic == null) {
         // room has end
         RoomInfoContent toastContent = RoomInfoContent.empty();
-        toastContent.toastType = RoomInfoType.roomEndByHost;//  clear in receiver
+        toastContent.toastType =
+            RoomInfoType.roomEndByHost; //  clear in receiver
         notifyInfo = json.encode(toastContent.toJson());
       } else {
         var roomInfoJson = Map<String, dynamic>.from(jsonDecode(roomDic));
@@ -153,21 +154,27 @@ class ZegoRoomService extends ChangeNotifier {
   }
 
   Future<void> _onRoomStateChanged(int state, int event) async {
+    var autoClearNotifyInfo = true;
+
     ZimRoomState? roomState = ZimRoomStateExtension.mapValue[state];
     zimRoomEvent? roomEvent = ZIMRoomEventExtension.mapValue[event];
 
-    if (roomState == ZimRoomState.zimRoomStateDisconnected) {
+    if (roomState == ZimRoomState.zimRoomStateDisconnected &&
+        roomInfo.roomID.isNotEmpty) {
       if (roomLeaveCallback != null) {
         roomLeaveCallback!();
       }
+
       if (roomEvent == zimRoomEvent.zimRoomEventEnterFailed) {
         // network error leave room
         RoomInfoContent toastContent = RoomInfoContent.empty();
-        toastContent.toastType = RoomInfoType.roomNetworkLeave;//  clear in receiver
+        toastContent.toastType = RoomInfoType.roomNetworkLeave;
         notifyInfo = json.encode(toastContent.toJson());
+        autoClearNotifyInfo = false; //  clear in receiver
       }
     } else if (roomState == ZimRoomState.zimRoomStateConnected &&
         roomEvent == zimRoomEvent.zimRoomEventSuccess) {
+      //  sync room
       var result = await ZIMPlugin.queryRoomAllAttributes(roomInfo.roomID);
       var attributesResult = result['roomAttributes'];
       var roomDic = attributesResult['room_info'];
@@ -177,21 +184,33 @@ class ZegoRoomService extends ChangeNotifier {
           roomEnterCallback!();
         }
       }
+
+      // for hide loading if network temp broke before
+      RoomInfoContent toastContent = RoomInfoContent.empty();
+      toastContent.toastType = RoomInfoType.roomNetworkReconnected;
+      notifyInfo = json.encode(toastContent.toJson());
+      autoClearNotifyInfo = false; //  clear in receiver
     }
 
     notifyListeners();
+
+    if (autoClearNotifyInfo) {
+      Future.delayed(const Duration(milliseconds: 500), () async {
+        notifyInfo = '';
+      });
+    }
   }
 
   void _onRoomInfoUpdate(String roomID, Map<String, dynamic> roomInfoJson) {
     // room has end by host
     if (roomInfoJson.keys.isEmpty) {
+      RoomInfoContent toastContent = RoomInfoContent.empty();
+      toastContent.toastType = RoomInfoType.roomEndByHost; //  clear in receiver
+      notifyInfo = json.encode(toastContent.toJson());
+
       if (_localUserID != roomInfo.hostID) {
         leaveRoom();
       }
-
-      RoomInfoContent toastContent = RoomInfoContent.empty();
-      toastContent.toastType = RoomInfoType.roomEndByHost;//  clear in receiver
-      notifyInfo = json.encode(toastContent.toJson());
     } else {
       _updateRoomInfo(RoomInfo.fromJson(roomInfoJson));
       if (roomEnterCallback != null) {
@@ -219,7 +238,8 @@ class ZegoRoomService extends ChangeNotifier {
 
     RoomInfoContent toastContent = RoomInfoContent.empty();
     if (oldRoomInfo.isTextMessageDisable != roomInfo.isTextMessageDisable) {
-      toastContent.toastType = RoomInfoType.textMessageDisable;//  clear in receiver
+      toastContent.toastType =
+          RoomInfoType.textMessageDisable; //  clear in receiver
       toastContent.message = roomInfo.isTextMessageDisable.toString();
 
       notifyInfo = json.encode(toastContent.toJson());

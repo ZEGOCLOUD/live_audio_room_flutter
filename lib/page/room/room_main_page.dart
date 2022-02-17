@@ -23,13 +23,44 @@ import 'package:live_audio_room_flutter/page/room/room_control_buttons_bar.dart'
 import 'package:live_audio_room_flutter/page/room/room_title_bar.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
-class RoomMainPage extends HookWidget {
+class RoomMainPage extends HookWidget with WidgetsBindingObserver {
   RoomMainPage({Key? key}) : super(key: key);
 
+  BuildContext? tempContext;
   ValueNotifier<bool> hasDialog = ValueNotifier<bool>(false);
 
   @override
+  Future didChangeAppLifecycleState(AppLifecycleState state) async {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.resumed:
+        //  to foreground
+        if (tempContext != null) {
+          //  check if room end when app in background
+          var roomService = tempContext?.read<ZegoRoomService>();
+          if (roomService != null && roomService!.roomInfo.roomID.isEmpty) {
+            RoomInfoContent infoContent = RoomInfoContent.empty();
+            infoContent.toastType = RoomInfoType.roomEndByHost;
+            _showRoomEndTips(tempContext!, infoContent);
+          }
+        }
+        break;
+      case AppLifecycleState.paused:
+        //  to background
+        break;
+      default:
+        break;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    tempContext = context;
+    useEffect(() {
+      WidgetsBinding.instance?.addObserver(this);
+      return () => WidgetsBinding.instance?.removeObserver(this);
+    }, const []);
+
     return WillPopScope(
       onWillPop: () async {
         return false;
@@ -57,16 +88,23 @@ class RoomMainPage extends HookWidget {
               RoomControlButtonsBar(),
               //  room toast tips notify in room service
               Consumer<ZegoRoomService>(builder: (_, roomService, child) {
-                if (roomService.roomInfo.roomID.isEmpty) {
-                  return const Offstage(offstage: true, child: Text(''));
-                }
                 if (roomService.notifyInfo.isEmpty) {
                   return const Offstage(offstage: true, child: Text(''));
                 }
-                Future.delayed(Duration.zero, () async {
-                  var infoContent = RoomInfoContent.fromJson(
-                      jsonDecode(roomService.notifyInfo));
 
+                var infoContent = RoomInfoContent.fromJson(
+                    jsonDecode(roomService.notifyInfo));
+
+                // if mobile lock screen, page will receive after active
+                // but room info had clear if room end after lock, so should
+                // execute case statement
+                var roomEndType =
+                    infoContent.toastType == RoomInfoType.roomEndByHost ||
+                        infoContent.toastType == RoomInfoType.roomNetworkLeave;
+                if (roomService.roomInfo.roomID.isEmpty && !roomEndType) {
+                  return const Offstage(offstage: true, child: Text(''));
+                }
+                Future.delayed(Duration.zero, () async {
                   switch (infoContent.toastType) {
                     case RoomInfoType.textMessageDisable:
                       roomService.clearNotifyInfo();
@@ -76,6 +114,21 @@ class RoomMainPage extends HookWidget {
                     case RoomInfoType.roomNetworkLeave:
                       roomService.clearNotifyInfo();
                       _showRoomEndTips(context, infoContent);
+                      break;
+                    case RoomInfoType.roomNetworkTempBroken:
+                      if (hasDialog.value) {
+                        hasDialog.value = false;
+                        Navigator.pop(context);
+                      }
+                      _showNetworkTempBrokenTips(context, infoContent);
+                      break;
+                    case RoomInfoType.roomNetworkReconnected:
+                      if (hasDialog.value) {
+                        hasDialog.value = false;
+                        Navigator.pop(context);
+                      }
+                      roomService.clearNotifyInfo();
+                      _hideNetworkTempBrokenTips(context, infoContent);
                       break;
                     default:
                       break;
