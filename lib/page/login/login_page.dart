@@ -122,6 +122,7 @@ class LoginPage extends HookWidget {
               SizedBox(height: 49.h),
               TextFormField(
                 inputFormatters: [
+                  LengthLimitingTextInputFormatter(16),
                   Utf8LengthLimitingTextInputFormatter(32),
                 ],
                 style: StyleConstant.loginTextInput,
