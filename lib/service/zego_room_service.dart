@@ -31,6 +31,8 @@ class ZegoRoomService extends ChangeNotifier {
     notifyInfo = '';
   }
 
+  bool roomDisconnectSuccess = false;
+
   ZegoRoomService() {
     ZIMPlugin.onRoomInfoUpdate = _onRoomInfoUpdate;
     ZIMPlugin.onRoomStateChanged = _onRoomStateChanged;
@@ -38,7 +40,9 @@ class ZegoRoomService extends ChangeNotifier {
 
   onRoomLeave() {}
 
-  onRoomEnter() {}
+  onRoomEnter() {
+    roomDisconnectSuccess = false;
+  }
 
   String get _localUserID {
     return ZegoRoomManager.shared.userService.localUserInfo.userID;
@@ -59,6 +63,8 @@ class ZegoRoomService extends ChangeNotifier {
   /// @param token    token refers to the authentication token. To get this, see the documentation:
   ///                 https://doc-en.zego.im/article/11648
   Future<int> createRoom(String roomID, String roomName, String token) async {
+    roomDisconnectSuccess = false;
+
     var result = await ZIMPlugin.createRoom(roomID, roomName, _localUserID, 8);
     var code = result['errorCode'];
     if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] == code) {
@@ -80,6 +86,8 @@ class ZegoRoomService extends ChangeNotifier {
   /// @param token    token refers to the authentication token. To get this, see the documentation:
   ///                 https://doc-en.zego.im/article/11648
   Future<int> joinRoom(String roomID, String token) async {
+    roomDisconnectSuccess = false;
+
     var joinResult = await ZIMPlugin.joinRoom(roomID);
     var code = joinResult['errorCode'];
     if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] == code) {
@@ -171,6 +179,8 @@ class ZegoRoomService extends ChangeNotifier {
         toastContent.toastType = RoomInfoType.roomNetworkLeave;
         notifyInfo = json.encode(toastContent.toJson());
         autoClearNotifyInfo = false; //  clear in receiver
+      } else if (roomEvent == zimRoomEvent.zimRoomEventSuccess) {
+        roomDisconnectSuccess = true;
       }
     } else if (roomState == ZimRoomState.zimRoomStateConnected &&
         roomEvent == zimRoomEvent.zimRoomEventSuccess) {
