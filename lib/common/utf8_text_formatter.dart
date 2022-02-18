@@ -5,24 +5,22 @@ import 'package:characters/src/extensions.dart';
 import 'package:flutter/services.dart';
 
 class Utf8LengthLimitingTextInputFormatter extends TextInputFormatter {
-  Utf8LengthLimitingTextInputFormatter(this.maxLength)
-      : assert(maxLength == null || maxLength == -1 || maxLength > 0);
+  Utf8LengthLimitingTextInputFormatter(this.maxByteLength)
+      : assert(maxByteLength == -1 || maxByteLength > 0);
 
-  final int maxLength;
+  final int maxByteLength;
 
   @override
   TextEditingValue formatEditUpdate(
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    if (maxLength != null &&
-        maxLength > 0 &&
-        bytesLength(newValue.text) > maxLength) {
+    if (maxByteLength > 0 && bytesLength(newValue.text) > maxByteLength) {
       // If already at the maximum and tried to enter even more, keep the old value.
-      if (bytesLength(oldValue.text) == maxLength) {
+      if (bytesLength(oldValue.text) == maxByteLength) {
         return oldValue;
       }
-      return truncate(newValue, maxLength);
+      return truncate(newValue, maxByteLength);
     }
     return newValue;
   }
@@ -53,7 +51,6 @@ class Utf8LengthLimitingTextInputFormatter extends TextInputFormatter {
   }
 
   static int bytesLength(String value) {
-    var l = utf8.encode(value).length;
-    return l;
+    return utf8.encode(value).length;
   }
 }
