@@ -154,7 +154,11 @@ class RoomMainPage extends HookWidget with WidgetsBindingObserver {
                       _showNetworkTempBrokenTips(context, infoContent);
                       break;
                     case RoomInfoType.roomNetworkReconnected:
-                      if (hasDialog.value) {
+                      //  do not popup, if page showing timeout dialog
+                      var canHideIfHaveDialog =
+                          !userService.hadRoomReconnectedTimeout;
+
+                      if (canHideIfHaveDialog && hasDialog.value) {
                         hasDialog.value = false;
                         Navigator.pop(context);
                       }
@@ -311,7 +315,7 @@ class RoomMainPage extends HookWidget with WidgetsBindingObserver {
 
     var userService = context.read<ZegoUserService>();
     if (userService.hadRoomReconnectedTimeout) {
-      return; //  do not popup, page showing timeout dialog
+      return; //  do not popup, if page showing timeout dialog
     }
 
     hasDialog.value = true;
@@ -357,7 +361,7 @@ class RoomMainPage extends HookWidget with WidgetsBindingObserver {
 
     var userService = context.read<ZegoUserService>();
     if (userService.hadRoomReconnectedTimeout) {
-      return; //  do not popup, page showing timeout dialog
+      return; //  do not popup, if page showing timeout dialog
     }
 
     context
