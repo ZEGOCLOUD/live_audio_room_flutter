@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/util/secret_reader.dart';
@@ -104,8 +105,11 @@ class LoginPage extends HookWidget {
           child: Column(
             children: [
               TextFormField(
-                maxLength: 20 - 1,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(20),
+                ],
                 style: StyleConstant.loginTextInput,
+                keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                     counterText: '',
                     focusedBorder: textFormFieldBorder,
@@ -116,7 +120,9 @@ class LoginPage extends HookWidget {
               ),
               SizedBox(height: 49.h),
               TextFormField(
-                maxLength: 16 - 1,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(16),
+                ],
                 style: StyleConstant.loginTextInput,
                 decoration: InputDecoration(
                     counterText: '',
@@ -157,10 +163,6 @@ class LoginPage extends HookWidget {
                   info.userName = userNameInputController.text;
                   if (info.userName.isEmpty) {
                     info.userName = info.userID;
-                  }
-                  if (info.userName.codeUnits.length >= 32) {
-                    info.userName =
-                        info.userName.substring(0, info.userName.length - 1);
                   }
                   var userModel = context.read<ZegoUserService>();
                   userModel.login(info, "").then((errorCode) {
