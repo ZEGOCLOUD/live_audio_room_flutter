@@ -193,8 +193,10 @@ class ZIMPlugin: NSObject {
          let userID = params!["userID"] as? String ?? ""
          let content = params!["content"] as? String ?? ""
          let actionType = params!["actionType"] as? Int ?? 0
-        
-         let messageDic = ["target": [userID], "content": content, "actionType":actionType] as [String : Any]
+
+         let contentDic = convertJSONStringToDictionary(json:content) ?? Dictionary<String, String>()
+
+         let messageDic = ["target": [userID], "content": contentDic, "actionType":actionType] as [String : Any]
          let data = convertDictionaryToData(dict: messageDic as NSDictionary)
          let customMessage = ZIMCustomMessage(message: data)
          zim?.sendPeerMessage(customMessage, toUserID: userID, callback: { message, error in

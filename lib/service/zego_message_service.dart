@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 
 import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
 
+import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
+
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/model/zego_text_message.dart';
 import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
@@ -26,6 +28,10 @@ class ZegoMessageService extends ChangeNotifier {
   }
 
   onRoomEnter() {}
+
+  String get _localUserID {
+    return ZegoRoomManager.shared.userService.localUserInfo.userID;
+  }
 
   /// Send IM text message.
   /// <p>Description: This method can be used to send IM text message, and all users in the room will receive the
@@ -65,6 +71,14 @@ class ZegoMessageService extends ChangeNotifier {
   }
 
   void onRoomMemberJoined(List<ZegoUserInfo> members) {
+    if (members.isEmpty) {
+      return;
+    }
+
+    if (members.first.userID == _localUserID) {
+      return; //  users before is current user join
+    }
+
     if (memberJoinedText.isEmpty) {
       return;
     }

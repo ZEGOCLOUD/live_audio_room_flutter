@@ -4,11 +4,13 @@ import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:zego_express_engine/zego_express_engine.dart';
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
+import 'package:live_audio_room_flutter/constants/zego_page_constant.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
@@ -22,6 +24,15 @@ class SettingSDKVersionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: _mainWidget(context),
+    );
+  }
+
+  Widget _mainWidget(BuildContext context) {
     return Container(
         decoration: const BoxDecoration(
           color: StyleColors.settingsCellBackgroundColor,
@@ -111,7 +122,7 @@ class SettingsLogoutWidget extends StatelessWidget {
                 backgroundColor: Colors.grey);
           }
         });
-        Navigator.pushReplacementNamed(context, "/login");
+        Navigator.pushReplacementNamed(context, PageRouteNames.login);
       },
     );
   }
@@ -125,17 +136,24 @@ class SettingsPage extends HookWidget {
     var expressSDKVersion = useState('1.0');
     ZegoExpressEngine.getVersion()
         .then((value) => expressSDKVersion.value = value);
+
     final zimSDKVersion = useState('1.0');
     ZegoRoomManager.shared
         .getZimVersion()
         .then((version) => zimSDKVersion.value = version);
+
+    final appVersion = useState('1.0');
+    PackageInfo.fromPlatform().then((PackageInfo packageInfo) {
+      appVersion.value =  packageInfo.version + "." + packageInfo.buildNumber;
+    });
+
     return Scaffold(
         appBar: AppBar(
           elevation: 0,
           leading: IconButton(
               icon: Image.asset(StyleIconUrls.navigatorBack),
               onPressed: () =>
-                  Navigator.pushReplacementNamed(context, "/room_entrance")),
+                  Navigator.pushReplacementNamed(context, PageRouteNames.roomEntrance)),
           title: Text(AppLocalizations.of(context)!.settingPageSettings,
               style: StyleConstant.settingAppBar,
               textDirection: TextDirection.ltr),
@@ -160,7 +178,11 @@ class SettingsPage extends HookWidget {
                         SettingSDKVersionWidget(
                             title: AppLocalizations.of(context)!
                                 .settingPageZimSdkVersion,
-                            content: zimSDKVersion.value)
+                            content: zimSDKVersion.value),
+                        SettingSDKVersionWidget(
+                            title: AppLocalizations.of(context)!
+                                .settingPageVersion,
+                            content: appVersion.value)
                       ]
                           .map((e) => Padding(
                                 child: e,

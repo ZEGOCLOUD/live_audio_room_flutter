@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -7,12 +10,16 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 
+import 'package:live_audio_room_flutter/common/room_info_content.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:live_audio_room_flutter/constants/zego_page_constant.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
-class RoomTitleBar extends StatelessWidget {
-  const RoomTitleBar({Key? key}) : super(key: key);
+class RoomTitleBar extends HookWidget {
+  RoomTitleBar({Key? key}) : super(key: key);
+
+  ValueNotifier<bool> hasDialog = ValueNotifier<bool>(false);
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +55,7 @@ class RoomTitleBar extends StatelessWidget {
             ],
           ),
         ),
+        const Expanded(child: Text('')),
         IconButton(
           icon: Image.asset(StyleIconUrls.roomTopQuit),
           iconSize: 68.w,
@@ -59,7 +67,7 @@ class RoomTitleBar extends StatelessWidget {
               showDialog<bool>(
                 context: context,
                 barrierDismissible: false,
-                builder: (context) => getEndRoomDialog(context),
+                builder: (context) => showEndRoomDialog(context),
               );
             } else {
               var seatService = context.read<ZegoSpeakerSeatService>();
@@ -72,18 +80,43 @@ class RoomTitleBar extends StatelessWidget {
                             .toastRoomLeaveFailTip(errorCode),
                         backgroundColor: Colors.grey);
                   } else {
-                    Navigator.pushReplacementNamed(context, "/room_entrance");
+                    Navigator.pushReplacementNamed(
+                        context, PageRouteNames.roomEntrance);
                   }
                 });
               });
             }
           },
-        )
+        ),
+        Consumer<ZegoUserService>(builder: (_, userService, child) {
+          if (userService.notifyInfo.isEmpty) {
+            return const Offstage(offstage: true, child: Text(''));
+          }
+          Future.delayed(Duration.zero, () async {
+            var infoContent =
+                RoomInfoContent.fromJson(jsonDecode(userService.notifyInfo));
+
+            switch (infoContent.toastType) {
+              case RoomInfoType.roomNetworkTempBroken:
+                if (hasDialog.value) {
+                  hasDialog.value = false;
+                  Navigator.pop(context);
+                }
+                break;
+              default:
+                break;
+            }
+          });
+
+          return const Offstage(offstage: true, child: Text(''));
+        }),
       ],
     );
   }
 
-  getEndRoomDialog(BuildContext context) {
+  showEndRoomDialog(BuildContext context) {
+    hasDialog.value = true;
+
     var title = Text(AppLocalizations.of(context)!.roomPageDestroyRoom);
     var content = Text(AppLocalizations.of(context)!.dialogSureToDestroyRoom);
 
@@ -93,11 +126,17 @@ class RoomTitleBar extends StatelessWidget {
       actions: <Widget>[
         TextButton(
           child: Text(AppLocalizations.of(context)!.dialogCancel),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () {
+            hasDialog.value = false;
+
+            Navigator.of(context).pop();
+          },
         ),
         TextButton(
           child: Text(AppLocalizations.of(context)!.dialogConfirm),
           onPressed: () {
+            hasDialog.value = false;
+
             context.read<ZegoSpeakerSeatService>().leaveSeat().then((value) {
               var roomService = context.read<ZegoRoomService>();
               roomService.leaveRoom().then((errorCode) {
@@ -110,7 +149,8 @@ class RoomTitleBar extends StatelessWidget {
               });
 
               Navigator.of(context).pop(true);
-              Navigator.pushReplacementNamed(context, "/room_entrance");
+              Navigator.pushReplacementNamed(
+                  context, PageRouteNames.roomEntrance);
             });
           },
         ),

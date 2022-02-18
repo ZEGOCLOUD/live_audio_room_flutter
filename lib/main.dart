@@ -1,11 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
-
 import 'package:flutter/services.dart';
+import 'dart:io';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:wakelock/wakelock.dart';
+import 'package:flutter_background/flutter_background.dart';
+import 'package:flutter_bugly/flutter_bugly.dart';
 
 import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
@@ -13,6 +18,7 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 import 'package:live_audio_room_flutter/service/zego_loading_service.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
+import 'package:live_audio_room_flutter/constants/zego_page_constant.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 import 'package:live_audio_room_flutter/page/room/room_main_page.dart';
@@ -21,7 +27,17 @@ import 'package:live_audio_room_flutter/page/room/room_entrance_page.dart';
 import 'package:live_audio_room_flutter/page/settings/settings_page.dart';
 
 void main() {
-  runApp(const ZegoApp());
+  FlutterBugly.postCatchedException(() {
+    WidgetsFlutterBinding.ensureInitialized();
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+        .then((_) {
+      runApp(const ZegoApp());
+      FlutterBugly.init(
+        androidAppId: "6c4f086570",
+        iOSAppId: "086cd4eca3",
+      );
+    });
+  });
 }
 
 class ZegoApp extends StatelessWidget {
@@ -29,7 +45,15 @@ class ZegoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Wakelock.enable(); //  always bright
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.top]); //  hide status bar and bottom navigation bar
+
+    if (Platform.isAndroid) {
+      supportAndroidRunBackground();
+    }
+
     return MultiProvider(
         providers: [
           ChangeNotifierProvider(
@@ -85,12 +109,13 @@ class ZegoApp extends StatelessWidget {
                     Locale('en', ''), // English, no country code
                     Locale('zh', ''),
                   ],
-                  initialRoute: "/login",
+                  initialRoute: PageRouteNames.login,
                   routes: {
-                    "/login": (context) => const LoginPage(),
-                    "/settings": (context) => const SettingsPage(),
-                    "/room_entrance": (context) => const RoomEntrancePage(),
-                    "/room_main": (context) => roomMainLoadingPage(),
+                    PageRouteNames.login: (context) => const LoginPage(),
+                    PageRouteNames.settings: (context) => const SettingsPage(),
+                    PageRouteNames.roomEntrance: (context) =>
+                        const RoomEntrancePage(),
+                    PageRouteNames.roomMain: (context) => roomMainLoadingPage(),
                   },
                 ),
               )),
@@ -100,7 +125,7 @@ class ZegoApp extends StatelessWidget {
   roomMainLoadingPage() {
     return Consumer<ZegoLoadingService>(
       builder: (context, loadingService, child) => LoaderOverlay(
-        child: const RoomMainPage(),
+        child: RoomMainPage(),
         useDefaultLoading: false,
         overlayColor: Colors.grey,
         overlayOpacity: 0.8,
@@ -139,5 +164,23 @@ class ZegoApp extends StatelessWidget {
     if (!currentFocus.hasPrimaryFocus && currentFocus.focusedChild != null) {
       FocusManager.instance.primaryFocus?.unfocus();
     }
+  }
+
+  Future<void> supportAndroidRunBackground() async {
+    PackageInfo.fromPlatform().then((PackageInfo packageInfo) async {
+      var androidConfig = FlutterBackgroundAndroidConfig(
+        notificationTitle: packageInfo.appName,
+        notificationText: "Background notification for keeping " +
+            packageInfo.appName +
+            " running in the background",
+        notificationImportance: AndroidNotificationImportance.Default,
+        // notificationIcon: , // Default is ic_launcher from folder mipmap
+      );
+
+      await FlutterBackground.initialize(androidConfig: androidConfig)
+          .then((value) {
+        FlutterBackground.enableBackgroundExecution();
+      });
+    });
   }
 }

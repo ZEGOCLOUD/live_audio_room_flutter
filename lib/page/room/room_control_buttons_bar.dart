@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -14,6 +17,7 @@ import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
 import 'package:live_audio_room_flutter/common/style/styles.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
+import 'package:live_audio_room_flutter/common/room_info_content.dart';
 import 'package:live_audio_room_flutter/page/room/room_setting_page.dart';
 import 'package:live_audio_room_flutter/page/room/member/room_member_page.dart';
 import 'package:live_audio_room_flutter/page/room/gift/room_gift_page.dart';
@@ -24,7 +28,8 @@ class ControllerButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String iconSrc;
 
-  const ControllerButton({Key? key, required this.onPressed, required this.iconSrc})
+  const ControllerButton(
+      {Key? key, required this.onPressed, required this.iconSrc})
       : super(key: key);
 
   @override
@@ -47,18 +52,20 @@ class ControllerButton extends StatelessWidget {
 }
 
 class RoomControlButtonsBar extends HookWidget {
-  const RoomControlButtonsBar({Key? key}) : super(key: key);
+  RoomControlButtonsBar({Key? key}) : super(key: key);
+
+  ValueNotifier<bool> hasDialog = ValueNotifier<bool>(false);
+
+  TextEditingController msgInputEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     // Check microphone permission
     useEffect(() {
-      _checkMicPermission(context).then((isEnable) {
-        if (!isEnable) {
-          // Mic flag always reset to enable after log int room. So toggle to disable it.
-          var seatService = context.read<ZegoSpeakerSeatService>();
-          seatService.toggleMic();
-        }
+      _checkMicPermission(context, false).then((hasPermission) {
+        //  sync microphone default status after check permission
+        var seatService = context.read<ZegoSpeakerSeatService>();
+        seatService.setMicrophoneDefaultMute(!hasPermission);
       });
     }, const []);
 
@@ -69,7 +76,7 @@ class RoomControlButtonsBar extends HookWidget {
         children: [
           Consumer<ZegoRoomService>(
               builder: (_, roomService, child) => ControllerButton(
-                    iconSrc: StyleIconUrls.roomBottomIm,
+                    iconSrc: _getImIcon(context, roomService),
                     onPressed: () {
                       var userService = context.read<ZegoUserService>();
                       if (ZegoRoomUserRole.roomUserRoleHost !=
@@ -84,6 +91,7 @@ class RoomControlButtonsBar extends HookWidget {
                       _showMessageInput(context);
                     },
                   )),
+          const Expanded(child: Text('')),
           Consumer2<ZegoUserService, ZegoSpeakerSeatService>(
               builder: (_, users, seats, child) => Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -91,34 +99,46 @@ class RoomControlButtonsBar extends HookWidget {
                     children: _createControllerButtons(
                         users.localUserInfo.userRole, seats.isMute,
                         micCallback: () {
-                      _checkMicPermission(context).then((isEnable) {
-                        if (isEnable) {
+                      _checkMicPermission(context, true).then((hasPermission) {
+                        if (hasPermission) {
                           var seatService =
                               context.read<ZegoSpeakerSeatService>();
                           seatService.toggleMic();
                         }
                       });
                     }, memberCallback: () {
+                      hasDialog.value = true;
                       showModalBottomSheet(
                           context: context,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
-                          elevation: 800.h,
                           isDismissible: true,
                           builder: (BuildContext context) {
-                            return const RoomMemberPage();
-                          });
+                            return AnimatedPadding(
+                                padding: MediaQuery.of(context).viewInsets,
+                                duration: const Duration(milliseconds: 100),
+                                child: SizedBox(height:800.h, child: const RoomMemberPage()));
+                          }).then((value) {
+                        hasDialog.value = false;
+                      });
                     }, giftCallback: () {
+                      hasDialog.value = true;
                       showModalBottomSheet(
+                          isScrollControlled: true,
                           context: context,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
-                          elevation: 800.h,
                           isDismissible: true,
                           builder: (BuildContext context) {
-                            return const RoomGiftPage();
-                          });
+                            return AnimatedPadding(
+                                padding: MediaQuery.of(context).viewInsets,
+                                duration: const Duration(milliseconds: 100),
+                                child: SizedBox(height:800.h, child: const RoomGiftPage()));
+                          }).then((value) {
+                        hasDialog.value = false;
+                      });
                     }, moreCallback: () {
+                      hasDialog.value = true;
                       showModalBottomSheet(
                           context: context,
                           isDismissible: true,
@@ -131,22 +151,62 @@ class RoomControlButtonsBar extends HookWidget {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: _getMoreMenu(context),
                                 ));
-                          });
+                          }).then((value) {
+                        hasDialog.value = false;
+                      });
                     }, settingsCallback: () {
+                      hasDialog.value = true;
                       showModalBottomSheet(
                           context: context,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
-                          elevation: 800.h,
                           isDismissible: true,
                           builder: (BuildContext context) {
-                            return const RoomSettingPage();
-                          });
+                            return AnimatedPadding(
+                                padding: MediaQuery.of(context).viewInsets,
+                                duration: const Duration(milliseconds: 100),
+                                child: SizedBox(height:800.h, child: const RoomSettingPage()));
+                          }).then((value) {
+                        hasDialog.value = false;
+                      });
                     }),
-                  ))
+                  )),
+          Consumer<ZegoUserService>(builder: (_, userService, child) {
+            if (userService.notifyInfo.isEmpty) {
+              return const Offstage(offstage: true, child: Text(''));
+            }
+            Future.delayed(Duration.zero, () async {
+              var infoContent =
+                  RoomInfoContent.fromJson(jsonDecode(userService.notifyInfo));
+
+              switch (infoContent.toastType) {
+                case RoomInfoType.roomNetworkTempBroken:
+                  if (hasDialog.value) {
+                    hasDialog.value = false;
+                    Navigator.pop(context);
+                  }
+                  break;
+                default:
+                  break;
+              }
+            });
+
+            return const Offstage(offstage: true, child: Text(''));
+          }),
         ],
       ),
     );
+  }
+
+  _getImIcon(BuildContext context, ZegoRoomService roomService) {
+    var userService = context.read<ZegoUserService>();
+    if (ZegoRoomUserRole.roomUserRoleHost ==
+        userService.localUserInfo.userRole) {
+      return StyleIconUrls.roomBottomIm;
+    }
+    return roomService.roomInfo.isTextMessageDisable
+        ? StyleIconUrls.roomBottomImDisable
+        : StyleIconUrls.roomBottomIm;
   }
 
   _getMoreMenu(BuildContext context) {
@@ -158,7 +218,7 @@ class RoomControlButtonsBar extends HookWidget {
       child: CupertinoButton(
           color: Colors.white,
           child: Text(
-            AppLocalizations.of(context)!.roomPageLeaveSeat,
+            AppLocalizations.of(context)!.roomPageLeaveSpeakerSeat,
             style: TextStyle(color: const Color(0xFF1B1B1B), fontSize: 28.sp),
           ),
           onPressed: () {
@@ -173,7 +233,7 @@ class RoomControlButtonsBar extends HookWidget {
 
   _onLeaveSeatClicked(BuildContext context) {
     var seats = context.read<ZegoSpeakerSeatService>();
-    _showDialog(context, AppLocalizations.of(context)!.roomPageLeaveSeat,
+    _showDialog(context, AppLocalizations.of(context)!.roomPageLeaveSpeakerSeat,
         AppLocalizations.of(context)!.dialogSureToLeaveSeat,
         confirmCallback: () {
       seats.leaveSeat().then((code) {
@@ -190,6 +250,8 @@ class RoomControlButtonsBar extends HookWidget {
       {String? cancelButtonText,
       String? confirmButtonText,
       VoidCallback? confirmCallback}) {
+    hasDialog.value = true;
+
     showDialog<String>(
       context: context,
       barrierDismissible: false,
@@ -198,21 +260,32 @@ class RoomControlButtonsBar extends HookWidget {
         content: Text(description),
         actions: <Widget>[
           TextButton(
-            onPressed: () => Navigator.pop(context,
+            onPressed: () {
+              hasDialog.value = false;
+
+              Navigator.pop(
+                  context,
+                  cancelButtonText ??
+                      AppLocalizations.of(context)!.dialogCancel);
+            },
+            child: Text(
                 cancelButtonText ?? AppLocalizations.of(context)!.dialogCancel),
-            child: Text(confirmButtonText ??
-                AppLocalizations.of(context)!.dialogCancel),
           ),
           TextButton(
             onPressed: () {
+              hasDialog.value = false;
+
               Navigator.pop(
-                  context, AppLocalizations.of(context)!.dialogConfirm);
+                  context,
+                  confirmButtonText ??
+                      AppLocalizations.of(context)!.dialogConfirm);
 
               if (confirmCallback != null) {
                 confirmCallback();
               }
             },
-            child: Text(AppLocalizations.of(context)!.dialogConfirm),
+            child: Text(confirmButtonText ??
+                AppLocalizations.of(context)!.dialogConfirm),
           ),
         ],
       ),
@@ -220,7 +293,11 @@ class RoomControlButtonsBar extends HookWidget {
   }
 
   _showMessageInput(BuildContext context) {
-    InputDialog.show(context).then((value) {
+    hasDialog.value = true;
+
+    InputDialog.show(context, msgInputEditingController).then((value) {
+      hasDialog.value = false;
+
       if (value?.isEmpty ?? true) {
         return;
       }
@@ -248,17 +325,30 @@ class RoomControlButtonsBar extends HookWidget {
               msg: AppLocalizations.of(context)!
                   .toastSendMessageError(errorCode),
               backgroundColor: Colors.grey);
+        } else {
+          msgInputEditingController.text = ''; // clear if send
         }
       });
     });
   }
 
-  Future<bool> _checkMicPermission(BuildContext context) async {
-    var status = await Permission.microphone.status;
+  Future<bool> _checkMicPermission(
+      BuildContext context, bool showDialog) async {
+    var userService = context.read<ZegoUserService>();
+    var status =
+        ZegoRoomUserRole.roomUserRoleHost == userService.localUserInfo.userRole
+            ? await Permission.microphone.request()
+            : await Permission.microphone.status;
+
     if (!status.isGranted) {
-      _showDialog(context, AppLocalizations.of(context)!.roomPageMicCantOpen,
-          AppLocalizations.of(context)!.roomPageGrantMicPermission,
-          confirmCallback: () => openAppSettings());
+      if (showDialog) {
+        _showDialog(context, AppLocalizations.of(context)!.roomPageMicCantOpen,
+            AppLocalizations.of(context)!.roomPageGrantMicPermission,
+            cancelButtonText: AppLocalizations.of(context)!.dialogCancel,
+            confirmButtonText:
+                AppLocalizations.of(context)!.roomPageGoToSettings,
+            confirmCallback: () => openAppSettings());
+      }
       return false;
     } else {
       return true;

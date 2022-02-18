@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/services.dart';
+import 'package:live_audio_room_flutter/common/utf8_text_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/util/secret_reader.dart';
@@ -24,6 +26,15 @@ class LoginPage extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        return false;
+      },
+      child: _mainWidget(context),
+    );
+  }
+
+  Widget _mainWidget(BuildContext context) {
     // Init SDK
     useEffect(() {
       SecretReader.instance.loadKeyCenterData().then((_) {
@@ -95,8 +106,11 @@ class LoginPage extends HookWidget {
           child: Column(
             children: [
               TextFormField(
-                maxLength: 20,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(20),
+                ],
                 style: StyleConstant.loginTextInput,
+                keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                     counterText: '',
                     focusedBorder: textFormFieldBorder,
@@ -107,7 +121,10 @@ class LoginPage extends HookWidget {
               ),
               SizedBox(height: 49.h),
               TextFormField(
-                maxLength: 16,
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(16),
+                  Utf8LengthLimitingTextInputFormatter(32),
+                ],
                 style: StyleConstant.loginTextInput,
                 decoration: InputDecoration(
                     counterText: '',

@@ -1,7 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
 import 'package:provider/provider.dart';
 
@@ -9,6 +10,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'package:live_audio_room_flutter/service/zego_user_service.dart';
 
+import 'package:live_audio_room_flutter/common/room_info_content.dart';
+import 'package:live_audio_room_flutter/constants/zego_room_constant.dart';
 import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:live_audio_room_flutter/model/zego_user_info.dart';
 import 'package:live_audio_room_flutter/common/style/styles.dart';
@@ -16,9 +19,11 @@ import 'package:live_audio_room_flutter/common/user_avatar.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class RoomMemberListItem extends StatelessWidget {
-  const RoomMemberListItem({Key? key, required this.userInfo})
+  RoomMemberListItem({Key? key, required this.userInfo})
       : super(key: key);
+
   final ZegoUserInfo userInfo;
+  ValueNotifier<bool> hasDialog = ValueNotifier<bool>(false);
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +38,40 @@ class RoomMemberListItem extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 24),
-        Text(userInfo.userName, style: StyleConstant.roomMemberListNameText),
+        SizedBox(
+          width: 347.w,
+          child: Text(
+            userInfo.userName,
+            textAlign: TextAlign.left,
+            softWrap: true,
+            overflow: TextOverflow.ellipsis,
+            style: StyleConstant.roomMemberListNameText,
+          ),
+        ),
         const Expanded(child: Text('')),
-        getRightWidgetByUserRole(context)
+        getRightWidgetByUserRole(context),
+        Consumer<ZegoUserService>(builder: (_, userService, child) {
+          if (userService.notifyInfo.isEmpty) {
+            return const Offstage(offstage: true, child: Text(''));
+          }
+          Future.delayed(Duration.zero, () async {
+            var infoContent =
+            RoomInfoContent.fromJson(jsonDecode(userService.notifyInfo));
+
+            switch (infoContent.toastType) {
+              case RoomInfoType.roomNetworkTempBroken:
+                if (hasDialog.value) {
+                  hasDialog.value = false;
+                  Navigator.pop(context);
+                }
+                break;
+              default:
+                break;
+            }
+          });
+
+          return const Offstage(offstage: true, child: Text(''));
+        }),
       ],
     );
   }
@@ -43,7 +79,7 @@ class RoomMemberListItem extends StatelessWidget {
   Widget getRightWidgetByUserRole(BuildContext context) {
     switch (userInfo.userRole) {
       case ZegoRoomUserRole.roomUserRoleHost:
-        return Text(AppLocalizations.of(context)!.roomPageRoleOwner,
+        return Text(AppLocalizations.of(context)!.roomPageHost,
             textDirection: TextDirection.rtl,
             style: StyleConstant.roomMemberListRoleText);
       case ZegoRoomUserRole.roomUserRoleSpeaker:
@@ -62,6 +98,7 @@ class RoomMemberListItem extends StatelessWidget {
         child: IconButton(
           icon: Image.asset(StyleIconUrls.roomMemberMore),
           onPressed: () {
+            hasDialog.value = true;
             showModalBottomSheet(
                 context: context,
                 isDismissible: true,
@@ -74,7 +111,9 @@ class RoomMemberListItem extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: _getMenuList(context),
                       ));
-                });
+                }).then((value) {
+              hasDialog.value = false;
+            });
           },
         ));
   }
@@ -102,11 +141,7 @@ class RoomMemberListItem extends StatelessWidget {
   }
 
   _onInviteTakeSeatClicked(BuildContext context) {
-    var roomService = context.read<ZegoRoomService>();
-    var seatService = context.read<ZegoSpeakerSeatService>();
-    // Speaker ID Set not include host id
-    if (seatService.speakerIDSet.length >= 7 ||
-        roomService.roomInfo.isSeatClosed) {
+    if (! _hasMoreSeat(context)) {
       Fluttertoast.showToast(
           msg: AppLocalizations.of(context)!.roomPageNoMoreSeatAvailable,
           backgroundColor: Colors.grey);
@@ -115,6 +150,33 @@ class RoomMemberListItem extends StatelessWidget {
 
     // Call SDK to send invitation
     var userService = context.read<ZegoUserService>();
-    userService.sendInvitation(userInfo.userID);
+    userService.sendInvitation(userInfo.userID).then((errorCode) {
+      if(0 == errorCode) {
+        Fluttertoast.showToast(
+            msg: AppLocalizations.of(context)!.roomPageInvitationHasSent,
+            backgroundColor: Colors.grey);
+      }
+    });
+  }
+
+  bool _hasMoreSeat(BuildContext context) {
+    // Speaker ID Set not include host id
+    var seatService = context.read<ZegoSpeakerSeatService>();
+    if(seatService.speakerIDSet.length >= 7) {
+      return false;
+    }
+
+    // var roomService = context.read<ZegoRoomService>();
+    // if(! roomService.roomInfo.isSeatClosed) {
+    //   return true;
+    // }
+
+    for (var speakerSeat in seatService.seatList) {
+      if (ZegoSpeakerSeatStatus.unTaken == speakerSeat.status) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

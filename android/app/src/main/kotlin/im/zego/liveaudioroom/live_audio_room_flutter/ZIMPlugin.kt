@@ -139,7 +139,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         userJsonArray.put(userID)
         val json = JSONObject()
         json.put("target", userJsonArray)
-        json.put("content", content)
+        json.put("content", JSONObject(content))
         json.put("actionType", actionType)
 
         val jsonString = json.toString()
@@ -174,7 +174,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
     fun setRoomAttributes(call: MethodCall, result: MethodChannel.Result) {
         val roomID: String? = call.argument<String>("roomID")
         val attributes: String? = call.argument<String>("attributes")
-        val isDeleteAfterOwnerLeft: Boolean? = call.argument<Boolean>("isDeleteAfterOwnerLeft")
+        val isDeleteAfterOwnerLeft: Boolean? = call.argument<Boolean>("delete")
 
         val json = JSONObject(attributes)
         val map = HashMap<String, String>()

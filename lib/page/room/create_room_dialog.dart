@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:live_audio_room_flutter/service/zego_room_service.dart';
 
 import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
+import 'package:live_audio_room_flutter/constants/zego_page_constant.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class CreateRoomDialog extends HookWidget {
@@ -35,7 +36,7 @@ class CreateRoomDialog extends HookWidget {
         }
         Fluttertoast.showToast(msg: message, backgroundColor: Colors.grey);
       } else {
-        Navigator.pushReplacementNamed(context, "/room_main");
+        Navigator.pushReplacementNamed(context, PageRouteNames.roomMain);
       }
     });
   }

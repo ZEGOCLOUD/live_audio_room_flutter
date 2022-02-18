@@ -9,7 +9,7 @@ class ZegoLoadingService extends ChangeNotifier {
 
   onRoomEnter() {}
 
-  void uploadLoadingText(String text) {
+  void updateLoadingText(String text) {
     _loadingText = text;
     notifyListeners();
   }
