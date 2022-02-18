@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/services.dart';
+import 'package:live_audio_room_flutter/common/utf8_text_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:live_audio_room_flutter/util/secret_reader.dart';
@@ -121,7 +122,7 @@ class LoginPage extends HookWidget {
               SizedBox(height: 49.h),
               TextFormField(
                 inputFormatters: [
-                  LengthLimitingTextInputFormatter(16),
+                  Utf8LengthLimitingTextInputFormatter(32),
                 ],
                 style: StyleConstant.loginTextInput,
                 decoration: InputDecoration(
