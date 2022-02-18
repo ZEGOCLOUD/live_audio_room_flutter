@@ -309,6 +309,11 @@ class RoomMainPage extends HookWidget with WidgetsBindingObserver {
       return;
     }
 
+    var userService = context.read<ZegoUserService>();
+    if (userService.hadRoomReconnectedTimeout) {
+      return; //  do not popup, page showing timeout dialog
+    }
+
     hasDialog.value = true;
 
     var title = Text(AppLocalizations.of(context)!.dialogTipsTitle,
@@ -350,6 +355,11 @@ class RoomMainPage extends HookWidget with WidgetsBindingObserver {
       return;
     }
 
+    var userService = context.read<ZegoUserService>();
+    if (userService.hadRoomReconnectedTimeout) {
+      return; //  do not popup, page showing timeout dialog
+    }
+
     context
         .read<ZegoLoadingService>()
         .updateLoadingText(AppLocalizations.of(context)!.networkReconnect);
@@ -369,6 +379,8 @@ class RoomMainPage extends HookWidget with WidgetsBindingObserver {
     if (infoContent.toastType != RoomInfoType.roomNetworkReconnectedTimeout) {
       return;
     }
+
+    context.loaderOverlay.hide(); //  hide if loading
 
     var roomService = context.read<ZegoRoomService>();
     roomService.leaveRoom();

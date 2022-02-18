@@ -45,6 +45,8 @@ class ZegoUserService extends ChangeNotifier {
 
   String notifyInfo = '';
 
+  bool hadRoomReconnectedTimeout = false;
+
   void clearNotifyInfo() {
     notifyInfo = '';
   }
@@ -82,6 +84,8 @@ class ZegoUserService extends ChangeNotifier {
   }
 
   onRoomEnter() {
+    hadRoomReconnectedTimeout = false;
+
     _updateUserRole(_preSpeakerSet);
   }
 
@@ -230,7 +234,8 @@ class ZegoUserService extends ChangeNotifier {
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.roomNetworkTempBroken;
       notifyInfo = json.encode(toastContent.toJson());
-    } else if (connectionState == zimConnectionState.zimConnectionStateConnected &&
+    } else if (connectionState ==
+            zimConnectionState.zimConnectionStateConnected &&
         connectionEvent == zimConnectionEvent.zimConnectionEventSuccess) {
       //  reconnected after temp network broken
       RoomInfoContent toastContent = RoomInfoContent.empty();
@@ -249,6 +254,8 @@ class ZegoUserService extends ChangeNotifier {
     } else if (inRoom &&
         connectionState == zimConnectionState.zimConnectionStateDisconnected &&
         connectionEvent == zimConnectionEvent.zimConnectionEventLoginTimeout) {
+      hadRoomReconnectedTimeout = true;
+
       //  connect timeout
       RoomInfoContent toastContent = RoomInfoContent.empty();
       toastContent.toastType = RoomInfoType.roomNetworkReconnectedTimeout;
