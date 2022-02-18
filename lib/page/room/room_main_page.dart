@@ -145,23 +145,22 @@ class RoomMainPage extends HookWidget with WidgetsBindingObserver {
                   var infoContent = RoomInfoContent.fromJson(
                       jsonDecode(userService.notifyInfo));
 
+                  //  do not popup, if page showing timeout/room end dialog
+                  //  when this two conditions happen one
+                  var roomService = context.read<ZegoRoomService>();
+                  var canHideIfHaveDialog =
+                      !userService.hadRoomReconnectedTimeout &&
+                          !roomService.roomDisconnectSuccess;
+
                   switch (infoContent.toastType) {
                     case RoomInfoType.roomNetworkTempBroken:
-                      if (hasDialog.value) {
+                      if (canHideIfHaveDialog && hasDialog.value) {
                         hasDialog.value = false;
                         Navigator.pop(context);
                       }
                       _showNetworkTempBrokenTips(context, infoContent);
                       break;
                     case RoomInfoType.roomNetworkReconnected:
-                      //  do not popup, if page showing timeout dialog
-                      //  when this two conditions happen one
-                      var roomService = context.read<ZegoRoomService>();
-                      var canHideIfHaveDialog =
-                          !userService.hadRoomReconnectedTimeout &&
-                              !roomService.roomDisconnectSuccess;
-
-
                       if (canHideIfHaveDialog && hasDialog.value) {
                         hasDialog.value = false;
                         Navigator.pop(context);

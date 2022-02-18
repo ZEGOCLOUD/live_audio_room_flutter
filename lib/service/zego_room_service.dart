@@ -173,14 +173,14 @@ class ZegoRoomService extends ChangeNotifier {
         roomLeaveCallback!();
       }
 
+      roomDisconnectSuccess = true;
+
       if (roomEvent == zimRoomEvent.zimRoomEventEnterFailed) {
         // network error leave room
         RoomInfoContent toastContent = RoomInfoContent.empty();
         toastContent.toastType = RoomInfoType.roomNetworkLeave;
         notifyInfo = json.encode(toastContent.toJson());
         autoClearNotifyInfo = false; //  clear in receiver
-      } else if (roomEvent == zimRoomEvent.zimRoomEventSuccess) {
-        roomDisconnectSuccess = true;
       }
     } else if (roomState == ZimRoomState.zimRoomStateConnected &&
         roomEvent == zimRoomEvent.zimRoomEventSuccess) {
