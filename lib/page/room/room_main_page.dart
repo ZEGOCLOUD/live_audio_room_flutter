@@ -145,19 +145,22 @@ class RoomMainPage extends HookWidget with WidgetsBindingObserver {
                   var infoContent = RoomInfoContent.fromJson(
                       jsonDecode(userService.notifyInfo));
 
+                  //  do not popup, if page showing timeout/room end dialog
+                  //  when this two conditions happen one
+                  var roomService = context.read<ZegoRoomService>();
+                  var canHideIfHaveDialog =
+                      !userService.hadRoomReconnectedTimeout &&
+                          !roomService.roomDisconnectSuccess;
+
                   switch (infoContent.toastType) {
                     case RoomInfoType.roomNetworkTempBroken:
-                      if (hasDialog.value) {
+                      if (canHideIfHaveDialog && hasDialog.value) {
                         hasDialog.value = false;
                         Navigator.pop(context);
                       }
                       _showNetworkTempBrokenTips(context, infoContent);
                       break;
                     case RoomInfoType.roomNetworkReconnected:
-                      //  do not popup, if page showing timeout dialog
-                      var canHideIfHaveDialog =
-                          !userService.hadRoomReconnectedTimeout;
-
                       if (canHideIfHaveDialog && hasDialog.value) {
                         hasDialog.value = false;
                         Navigator.pop(context);
@@ -313,6 +316,9 @@ class RoomMainPage extends HookWidget with WidgetsBindingObserver {
       return;
     }
 
+    var roomService = context.read<ZegoRoomService>();
+    roomService.leaveRoom();
+
     var userService = context.read<ZegoUserService>();
     if (userService.hadRoomReconnectedTimeout) {
       return; //  do not popup, if page showing timeout dialog
@@ -333,6 +339,9 @@ class RoomMainPage extends HookWidget with WidgetsBindingObserver {
           child: Text(AppLocalizations.of(context)!.dialogConfirm,
               textAlign: TextAlign.center),
           onPressed: () {
+            var roomService = context.read<ZegoRoomService>();
+            roomService.leaveRoom();
+
             hasDialog.value = false;
 
             Navigator.of(context).pop(true);
