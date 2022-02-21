@@ -316,6 +316,9 @@ class RoomMainPage extends HookWidget with WidgetsBindingObserver {
       return;
     }
 
+    var roomService = context.read<ZegoRoomService>();
+    roomService.leaveRoom();
+
     var userService = context.read<ZegoUserService>();
     if (userService.hadRoomReconnectedTimeout) {
       return; //  do not popup, if page showing timeout dialog
@@ -336,6 +339,9 @@ class RoomMainPage extends HookWidget with WidgetsBindingObserver {
           child: Text(AppLocalizations.of(context)!.dialogConfirm,
               textAlign: TextAlign.center),
           onPressed: () {
+            var roomService = context.read<ZegoRoomService>();
+            roomService.leaveRoom();
+
             hasDialog.value = false;
 
             Navigator.of(context).pop(true);
