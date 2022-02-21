@@ -40,6 +40,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     return ZegoRoomManager.shared.userService.localUserInfo.userID;
   }
 
+  bool _microphoneDefaultMute = false; //  microphone default status
   bool get isMute {
     if (_localSpeakerSeat() == null) {
       return true;
@@ -70,12 +71,29 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     _roomID = roomInfo.roomID;
     _hostID = roomInfo.hostID;
     if (_hostID == _localUserID) {
-      takeSeat(0);
+      if (seatList[0].userID.isEmpty) {
+        // take if first room enter
+        takeSeat(0);
+      }
     } else {
       var hostSeat = seatList[0];
       hostSeat.userID = _hostID;
       hostSeat.status = ZegoSpeakerSeatStatus.occupied;
       notifyListeners();
+    }
+
+    updateSpeakerSeat();
+  }
+
+  void updateSpeakerSeat() async {
+    var roomInfo = ZegoRoomManager.shared.roomService.roomInfo;
+
+    var result = await ZIMPlugin.queryRoomAllAttributes(roomInfo.roomID);
+    var attributesResult = Map<String, dynamic>.from(result['roomAttributes']);
+    attributesResult.removeWhere((key, value) => key == "room_info");
+    if (attributesResult.keys.isNotEmpty) {
+      //  update seat's info proactively
+      _onRoomSpeakerSeatUpdate(roomInfo.roomID, attributesResult);
     }
   }
 
@@ -85,6 +103,9 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   /// @param seatIndex refers to the seat index of the user you want to remove.
   Future<int> removeUserFromSeat(int seatIndex) async {
     var speakerSeat = seatList[seatIndex];
+    if (speakerSeat.status != ZegoSpeakerSeatStatus.occupied) {
+      return -1; // seat isn't occupied, nobody on, can't remove
+    }
 
     var preUserID = speakerSeat.userID;
     var preMic = speakerSeat.mic;
@@ -138,7 +159,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
     var json = jsonEncode(roomInfo);
     map['room_info'] = json;
     String attributes = jsonEncode(map);
-    var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, false);
+    var result = await ZIMPlugin.setRoomAttributes(_roomID, attributes, true);
     return result['errorCode'];
   }
 
@@ -150,6 +171,10 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   /// @param isClose   can be used to close specified untaken speaker seats.
   /// @param seatIndex refers to the seat index of the seat that you want to close/open.
   Future<int> closeSeat(bool isClose, int seatIndex) async {
+    if (isSeatOccupied(seatIndex)) {
+      return -1; //  seat is occupied, can't lock
+    }
+
     var speakerSeat = seatList[seatIndex];
     var preStatus = speakerSeat.status;
     speakerSeat.status =
@@ -194,10 +219,15 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
   ///
   /// @param seatIndex seatIndex to take
   Future<int> takeSeat(int seatIndex) async {
+    if (isSeatOccupied(seatIndex)) {
+      return -1; //  seat is occupied, can't take
+    }
+
     var speakerSeat = seatList[seatIndex];
     var preUserID = speakerSeat.userID;
     var preStatus = speakerSeat.status;
     speakerSeat.userID = _localUserID;
+    speakerSeat.mic = !_microphoneDefaultMute;
     speakerSeat.status = ZegoSpeakerSeatStatus.occupied;
     String speakerSeatJson = jsonEncode(speakerSeat);
     Map speakerSeatMap = {"${speakerSeat.seatIndex}": speakerSeatJson};
@@ -269,6 +299,14 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       return -1;
     }
 
+    if (isSeatOccupied(toSeatIndex)) {
+      return -1; //  seat is occupied, can't switch
+    }
+
+    if (isSeatClosed(toSeatIndex)) {
+      return -1; //  seat is closed, can't switch
+    }
+
     var toSeat = seatList[toSeatIndex];
     toSeat.userID = fromSeat.userID;
     toSeat.status = ZegoSpeakerSeatStatus.occupied;
@@ -277,7 +315,7 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
 
     fromSeat.userID = "";
     fromSeat.status = ZegoSpeakerSeatStatus.unTaken;
-    fromSeat.mic = true;  // restore to default value
+    fromSeat.mic = true; // restore to default value
     String fromSeatJson = jsonEncode(fromSeat);
 
     Map speakerSeatMap = {
@@ -300,16 +338,53 @@ class ZegoSpeakerSeatService extends ChangeNotifier {
       var preSpeakerSeat = seatList[speakerSeat.seatIndex];
       seatList[speakerSeat.seatIndex] = speakerSeat;
       if (speakerSeat.userID == _localUserID) {
-        ZegoExpressEngine.instance.muteMicrophone(! speakerSeat.mic);
+        ZegoExpressEngine.instance.muteMicrophone(!speakerSeat.mic);
         var userStreamID = _roomID + "_" + _localUserID + "_main";
         ZegoExpressEngine.instance.startPublishingStream(userStreamID);
-      } else if (preSpeakerSeat.userID == _localUserID){
+      } else if (preSpeakerSeat.userID == _localUserID) {
         ZegoExpressEngine.instance.muteMicrophone(true);
         ZegoExpressEngine.instance.stopPublishingStream();
       }
     }
     updateSpeakerIDList();
     notifyListeners();
+  }
+
+  void setMicrophoneDefaultMute(bool value) {
+    _microphoneDefaultMute = value;
+
+    if (_hostID == _localUserID &&
+        seatList[0].userID.isNotEmpty &&
+        seatList[0].mic == _microphoneDefaultMute) {
+      //  takeSeat(0) is call, _microphoneDefaultMute assign after
+      //  sync host's mic status
+      toggleMic();
+    }
+  }
+
+  bool isUserInSeat(String useID) {
+    for (final seat in seatList) {
+      if (ZegoSpeakerSeatStatus.occupied == seat.status &&
+          seat.userID == useID) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool isLocalInSeat() {
+    var speakerSeat = _localSpeakerSeat();
+    return speakerSeat != null;
+  }
+
+  bool isSeatOccupied(int seatIndex) {
+    var speakerSeat = seatList[seatIndex];
+    return ZegoSpeakerSeatStatus.occupied == speakerSeat.status;
+  }
+
+  bool isSeatClosed(int seatIndex) {
+    var speakerSeat = seatList[seatIndex];
+    return ZegoSpeakerSeatStatus.closed == speakerSeat.status;
   }
 
   void _onCapturedSoundLevelUpdate(double soundLevel) {

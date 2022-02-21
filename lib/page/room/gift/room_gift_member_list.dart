@@ -24,75 +24,85 @@ class RoomGiftMemberList extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: StyleColors.giftMemberListBackgroundColor,
-        borderRadius: BorderRadius.circular(17.0),
-      ),
-      child: Consumer<ZegoSpeakerSeatService>(builder: (_, seatService, child) {
-        var roomService = context.read<ZegoRoomService>();
-        var userService = context.read<ZegoUserService>();
-        List<String> speakerIDList = [...seatService.speakerIDSet];
-        if (ZegoRoomUserRole.roomUserRoleHost !=
-            userService.localUserInfo.userRole) {
-          speakerIDList.add(roomService.roomInfo.hostID); //  add host
-        }
-        List<ZegoUserInfo> speakerList = [];
-        for (var speakerID in speakerIDList) {
-          if (!userService.userDic.containsKey(speakerID)) {
-            continue;
+    return SizedBox(
+      height: 400.h,
+      width: 468.w,
+      child: Container(
+        decoration: BoxDecoration(
+          color: StyleColors.giftMemberListBackgroundColor,
+          borderRadius: BorderRadius.circular(17.0),
+        ),
+        child:
+            Consumer<ZegoSpeakerSeatService>(builder: (_, seatService, child) {
+          var roomService = context.read<ZegoRoomService>();
+          var userService = context.read<ZegoUserService>();
+          List<String> speakerIDList = [...seatService.speakerIDSet];
+          if (ZegoRoomUserRole.roomUserRoleHost !=
+              userService.localUserInfo.userRole) {
+            speakerIDList.insert(0, roomService.roomInfo.hostID); //  add host
           }
-          speakerList
-              .add(userService.userDic[speakerID] ?? ZegoUserInfo.empty());
-        }
-        if (speakerList.isEmpty) {
-          //  display if empty
-          speakerList.add(ZegoUserInfo(
-              userIDOfNoSpeakerUser,
-              AppLocalizations.of(context)!.roomPageGiftNoSpeaker,
-              ZegoRoomUserRole.roomUserRoleListener));
-        } else {
-          //  notify all user on the list
-          speakerList.insert(
-              0,
-              ZegoUserInfo(
-                  userIDOfAllSpeaker,
-                  AppLocalizations.of(context)!.roomPageSelectAllSpeakers,
-                  ZegoRoomUserRole.roomUserRoleListener));
-          //  remove self if you are on the list
-          speakerList.removeWhere((userInfo) =>
-              userService.localUserInfo.userID == userInfo.userID);
-        }
-        return ListView.builder(
-          itemExtent: 84.h,
-          padding: const EdgeInsets.only(left: 0),
-          itemCount: speakerList.length,
-          itemBuilder: (_, index) {
-            ZegoUserInfo user = speakerList[index];
-            return GestureDetector(
-                child: Container(
-                    padding: EdgeInsets.only(left: 30.w),
-                    child: Center(
-                      child: Row(
-                        children: [
-                          Text(
-                            user.userName,
-                            textAlign: TextAlign.left,
-                            style: StyleConstant.roomGiftMemberListText,
-                          ),
-                          const Expanded(child: Text(''))
-                        ],
-                      ),
-                    )),
-                onTap: () {
-                  if (userIDOfNoSpeakerUser == user.userID) {
-                    return;
-                  }
-                  memberSelectNotify(user);
-                });
-          },
-        );
-      }),
+          List<ZegoUserInfo> speakerList = [];
+          for (var speakerID in speakerIDList) {
+            if (!userService.userDic.containsKey(speakerID)) {
+              continue;
+            }
+            speakerList
+                .add(userService.userDic[speakerID] ?? ZegoUserInfo.empty());
+          }
+          if (speakerList.isEmpty) {
+            //  display if empty
+            speakerList.add(ZegoUserInfo(
+                userIDOfNoSpeakerUser,
+                AppLocalizations.of(context)!.roomPageGiftNoSpeaker,
+                ZegoRoomUserRole.roomUserRoleListener));
+          } else {
+            //  notify all user on the list
+            speakerList.insert(
+                0,
+                ZegoUserInfo(
+                    userIDOfAllSpeaker,
+                    AppLocalizations.of(context)!.roomPageSelectAllSpeakers,
+                    ZegoRoomUserRole.roomUserRoleListener));
+            //  remove self if you are on the list
+            speakerList.removeWhere((userInfo) =>
+                userService.localUserInfo.userID == userInfo.userID);
+          }
+          return ListView.builder(
+            itemExtent: 84.h,
+            padding: const EdgeInsets.only(left: 0),
+            itemCount: speakerList.length,
+            itemBuilder: (_, index) {
+              ZegoUserInfo user = speakerList[index];
+              return GestureDetector(
+                  child: Container(
+                      padding: EdgeInsets.only(left: 30.w),
+                      child: Center(
+                        child: Row(
+                          children: [
+                            SizedBox(
+                              width: 322.w,
+                              child: Text(
+                                user.userName,
+                                textAlign: TextAlign.left,
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                                style: StyleConstant.roomGiftMemberListText,
+                              ),
+                            ),
+                            const Expanded(child: Text(''))
+                          ],
+                        ),
+                      )),
+                  onTap: () {
+                    if (userIDOfNoSpeakerUser == user.userID) {
+                      return;
+                    }
+                    memberSelectNotify(user);
+                  });
+            },
+          );
+        }),
+      ),
     );
   }
 }
