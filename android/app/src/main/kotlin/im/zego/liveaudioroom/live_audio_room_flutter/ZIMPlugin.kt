@@ -240,7 +240,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
 
         override fun onError(zim: ZIM?, errorInfo: ZIMError?) {
             super.onError(zim, errorInfo)
-            eventSink.success(mapOf("method" to "onError", "code" to (errorInfo?.code ?: 0), "message" to errorInfo?.message))
+            eventSink.success(mapOf("method" to "onError", "code" to (errorInfo?.code?.value() ?: 0), "message" to errorInfo?.message))
         }
 
         override fun onReceivePeerMessage(
