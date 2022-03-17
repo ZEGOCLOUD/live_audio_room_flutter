@@ -24,8 +24,8 @@ class ZIMPlugin {
   /// Used to receive the native event stream
   static StreamSubscription<dynamic>? streamSubscription;
 
-  static Future<void> createZIM(int appID, String appSign, String serverSecret) async {
-    return await channel.invokeMethod("createZIM", {"appID": appID, "appSign": appSign, "serverSecret": serverSecret});
+  static Future<void> createZIM(int appID, String serverSecret) async {
+    return await channel.invokeMethod("createZIM", {"appID": appID, "serverSecret": serverSecret});
   }
 
   static Future<Map> destroyZIM() async {
@@ -76,8 +76,8 @@ class ZIMPlugin {
     return await channel.invokeMethod("setRoomAttributes", {"roomID": roomID, "attributes": attributes, "delete": delete});
   }
 
-  static Future<Map> getRTCToken(String roomID, String userID) async {
-    return await channel.invokeMethod("getRTCToken", {"roomID": roomID, "userID": userID});
+  static Future<Map> getToken(String userID) async {
+    return await channel.invokeMethod("getToken", {"userID": userID});
   }
 
   static Future<Map> getZIMVersion() async {

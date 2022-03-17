@@ -23,7 +23,6 @@ class ZIMPlugin: EventChannel.StreamHandler {
 
     private var zim: ZIM? = null
     private var appID: Int = 0
-    private var appSign: String = ""
     private var serverSecret: String = ""
 
     fun createZIM(call: MethodCall, result: MethodChannel.Result , application: Application) {
@@ -32,7 +31,6 @@ class ZIMPlugin: EventChannel.StreamHandler {
             return
         }
         appID = call.argument<Int>("appID")!!
-        appSign = call.argument<String>("appSign").toString()
         serverSecret = call.argument<String>("serverSecret").toString()
         zim = ZIM.create(appID?.toLong()!!, application)
         setZIMHandler()
@@ -200,8 +198,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         })
     }
 
-    fun getSDKToken(call: MethodCall, result: MethodChannel.Result) {
-        val roomID: String? = call.argument<String>("roomID")
+    fun getToken(call: MethodCall, result: MethodChannel.Result) {
         val userID: String? = call.argument<String>("userID")
 
         val token = TokenServerAssistant

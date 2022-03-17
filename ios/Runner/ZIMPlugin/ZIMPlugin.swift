@@ -17,7 +17,6 @@ class ZIMPlugin: NSObject {
     
     var events: FlutterEventSink?
     var appID: UInt32 = 0
-    var appSign: String = ""
     var serverSecret: String = ""
     
     var zim: ZIM?
@@ -69,8 +68,8 @@ class ZIMPlugin: NSObject {
              case "setRoomAttributes":
                 self.setRoomAttributes(call, result: result)
                 break
-             case "getRTCToken":
-                self.getRTCToken(call, result: result)
+             case "getToken":
+                self.getToken(call, result: result)
                 break
              case "getZIMVersion":
                 self.getZIMVersion(call, result: result)
@@ -89,7 +88,6 @@ class ZIMPlugin: NSObject {
          let params = call.arguments as? NSDictionary
          if (params == nil) { return }
          appID = params!["appID"] as? UInt32 ?? 0
-         appSign = params!["appSign"] as? String ?? ""
          serverSecret = params!["serverSecret"] as? String ?? ""
          zim = ZIM.create(appID)
          zim?.setEventHandler(self)
@@ -109,7 +107,7 @@ class ZIMPlugin: NSObject {
          let userName = params!["userName"] as? String ?? ""
          var token = params!["token"] as? String ?? ""
          if token.count == 0 {
-             token = AppToken.getZIMToken(withUserID: userID, appID: appID, secret: serverSecret) ?? ""
+             token = AppToken.getToken(withUserID: userID, appID: appID, secret: serverSecret) ?? ""
          }
          
          let user = ZIMUserInfo()
@@ -241,13 +239,12 @@ class ZIMPlugin: NSObject {
          })
      }
     
-    func getRTCToken(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
+    func getToken(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
         let params = call.arguments as? NSDictionary
                 if (params == nil) { return }
-        let roomID = params!["roomID"] as? String ?? ""
         let userID = params!["userID"] as? String ?? ""
         
-        let token = AppToken.getRtcToken(withRoomID: roomID, userID: userID, appID: appID, secret: serverSecret) ?? ""
+        let token = AppToken.getToken(withUserID: userID, appID: appID, secret: serverSecret) ?? ""
         result(["errorCode": 0, "token": token])
     }
     
