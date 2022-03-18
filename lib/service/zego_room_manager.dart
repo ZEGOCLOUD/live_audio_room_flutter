@@ -44,15 +44,14 @@ class ZegoRoomManager extends ChangeNotifier {
     userService.onRoomEnter();
   }
 
-  Future<void> initWithAPPID(int appID, String appSign, String serverSecret,
+  Future<void> initWithAPPID(int appID, String serverSecret,
       ZegoRoomCallback callback) async {
-    await ZIMPlugin.createZIM(appID, appSign, serverSecret);
+    await ZIMPlugin.createZIM(appID, serverSecret);
     ZIMPlugin.registerEventHandler();
 
     ZegoExpressEngine.onRoomStreamUpdate = _onRoomStreamUpdate;
     ZegoExpressEngine.onApiCalledResult = _onApiCalledResult;
-    ZegoEngineProfile profile =
-        ZegoEngineProfile(appID, appSign, ZegoScenario.General);
+    ZegoEngineProfile profile = ZegoEngineProfile(appID, ZegoScenario.General);
     ZegoExpressEngine.createEngineWithProfile(profile).then((value) {
       ZegoExpressEngine.instance.enableCamera(false); // demo is pure audio
     });

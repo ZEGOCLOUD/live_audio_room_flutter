@@ -3,17 +3,12 @@ import 'dart:convert';
 
 class SecretReader {
   int _appID = 0;
-  String _appSign = "";
   String _serverSecret = "";
 
   static SecretReader? _instance;
 
   int get appID {
     return _appID;
-  }
-
-  String get appSign {
-    return _appSign;
   }
 
   String get serverSecret {
@@ -24,7 +19,6 @@ class SecretReader {
     var jsonStr = await rootBundle.loadString("assets/key_center.json");
     var dataObj = jsonDecode(jsonStr);
     _appID = dataObj['appID'];
-    _appSign = dataObj['appSign'];
     _serverSecret = dataObj['serverSecret'];
   }
 

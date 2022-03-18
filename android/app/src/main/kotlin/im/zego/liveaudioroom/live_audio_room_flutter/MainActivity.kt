@@ -29,7 +29,7 @@ class MainActivity: FlutterActivity() {
                 "sendPeerMessage" -> { pluginHandler.sendPeerMessage(call, result) }
                 "sendRoomMessage" -> { pluginHandler.sendRoomMessage(call, result) }
                 "setRoomAttributes" -> { pluginHandler.setRoomAttributes(call, result) }
-                "getRTCToken" -> { pluginHandler.getSDKToken(call, result) }
+                "getToken" -> { pluginHandler.getToken(call, result) }
                 "getZIMVersion" -> { pluginHandler.getZIMVersion(call, result)}
                 else -> { result.error("error_code", "error_message", null) }
             }

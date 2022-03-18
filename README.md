@@ -47,7 +47,7 @@ $ flutter doctor
 
 1. Clone the Live Audio Room Github repository.
 2. Open Terminal, navigate to the cloned project repository.
-3. Run the configuration script with the `./configure.sh` command. And fill in the AppID, AppSign, and ServerSecret, which can be obtained in the [ZEGO Admin Console](https://console.zego.im/).  
+3. Run the configuration script with the `./configure.sh` command. And fill in the AppID, and ServerSecret, which can be obtained in the [ZEGO Admin Console](https://console.zego.im/).  
 **Note**: If you are using Windows system, double-click the `configure.bat` to run the configuration script. 
 <img width="700px" src="docs/images/configure_script.png"/>
 
@@ -88,3 +88,6 @@ ZegoSpeakerSeatService._onRoomSpeakerSeatUpdate(
 
 ## More documentation
 You can find more documentation on our official website: [Live Audio Room (RTC+ IM)](https://doc-en.zego.im/article/13746).
+
+## Tips
+if ```CocsPods could not find compatible versions for pod "ZegoExpressEngine"``` happen in pod install process, Please use ```pod install --repo-update``` to update
