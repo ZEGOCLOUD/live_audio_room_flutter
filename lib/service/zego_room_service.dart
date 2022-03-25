@@ -234,7 +234,7 @@ class ZegoRoomService extends ChangeNotifier {
   Future<void> _loginRtcRoom() async {
     var user = ZegoUser(_localUserID, _localUserName);
     var config = ZegoRoomConfig.defaultConfig();
-    var result = await ZIMPlugin.getRTCToken(roomInfo.roomID, _localUserID);
+    var result = await ZIMPlugin.getToken(_localUserID);
     config.token = result["token"];
     config.maxMemberCount = 0;
     ZegoExpressEngine.instance.loginRoom(roomInfo.roomID, user, config: config);
