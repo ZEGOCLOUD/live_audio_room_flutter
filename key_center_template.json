@@ -1,4 +1,7 @@
 {
+
+  "__appID": "Get your AppID from ZEGOCLOUD Console [My Projects] : https://console.zegocloud.com/project",
   "appID": 11111111,
+  "__serverSecret": "Get your ServerSecret from ZEGOCLOUD Console [My Projects -> project's Edit -> Basic Configurations] : https://console.zegocloud.com/project",
   "serverSecret": "xxxxxx"
 }
