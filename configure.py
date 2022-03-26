@@ -25,21 +25,26 @@ class KeyCenterHelper:
         config_obj = {}
         with open(os.path.join(self._get_current_path(), self._template_file_name), 'r', encoding='utf-8') as file:
             config_obj = json.load(file)
+
+        real_config_obj = {}
         for key, default_value in config_obj.items():
-            try:
-                config_obj[key] = type(default_value)(
-                    input('Please input value for {}:'.format(key, type(default_value).__name__)))
-            except (TypeError, ValueError) as e:
-                print("Invalid value for {} with type[{}]!Please try again!".format(key, type(default_value).__name__))
-                return
+            if key.startswith('__') :
+                print(config_obj[key])
+            else:
+                try:
+                    real_config_obj[key] = type(default_value)(
+                        input('Please input value for {}:'.format(key, type(default_value).__name__)))
+                except (TypeError, ValueError) as e:
+                    print("Invalid value for {} with type[{}]!Please try again!".format(key, type(default_value).__name__))
+                    return
         # write config to real key_center config file
         real_config_file = os.path.join(self._get_current_path(), self._file_name)
         if not os.path.exists(os.path.dirname(real_config_file)):
             os.makedirs(os.path.dirname(real_config_file))
         with open(os.path.join(self._get_current_path(), self._file_name), 'w', encoding='utf-8') as file:
-            json.dump(config_obj, file)
+            json.dump(real_config_obj, file)
         self._add_key_center_file_to_git_ignore()
-        print('Write config to {} succeed!'.format(self._file_name), config_obj)
+        print('Write config to {} succeed!'.format(self._file_name), real_config_obj)
 
 
 if __name__ == "__main__":
