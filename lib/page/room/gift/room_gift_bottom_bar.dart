@@ -4,17 +4,16 @@ import 'package:provider/provider.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
-import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
-import 'package:live_audio_room_flutter/service/zego_room_service.dart';
-
-import 'package:live_audio_room_flutter/common/style/styles.dart';
-import 'package:live_audio_room_flutter/model/zego_user_info.dart';
-import 'package:live_audio_room_flutter/model/zego_room_gift.dart';
-import 'package:live_audio_room_flutter/page/room/gift/room_gift_member_list.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+
+import '../../../service/zego_gift_service.dart';
+import '../../../service/zego_speaker_seat_service.dart';
+import '../../../service/zego_user_service.dart';
+import '../../../service/zego_room_service.dart';
+import '../../../common/style/styles.dart';
+import '../../../model/zego_user_info.dart';
+import '../../../model/zego_room_gift.dart';
+import '../../../page/room/gift/room_gift_member_list.dart';
 
 class RoomGiftBottomBar extends HookWidget {
   RoomGiftBottomBar({Key? key, required this.selectedRoomGift})

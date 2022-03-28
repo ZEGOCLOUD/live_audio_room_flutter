@@ -3,13 +3,12 @@ import 'package:provider/provider.dart';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
-
-import 'package:live_audio_room_flutter/model/zego_user_info.dart';
-import 'package:live_audio_room_flutter/common/style/styles.dart';
-import 'package:live_audio_room_flutter/page/room/member/room_member_list_item.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+
+import '../../../service/zego_user_service.dart';
+import '../../../model/zego_user_info.dart';
+import '../../../common/style/styles.dart';
+import '../../../page/room/member/room_member_list_item.dart';
 
 class RoomMemberPage extends HookWidget {
   const RoomMemberPage({Key? key}) : super(key: key);

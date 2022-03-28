@@ -3,13 +3,13 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
+import '../../plugin/zim_plugin.dart';
 import 'package:zego_express_engine/zego_express_engine.dart';
-import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
-import 'package:live_audio_room_flutter/common/room_info_content.dart';
-import 'package:live_audio_room_flutter/constants/zego_room_constant.dart';
-import 'package:live_audio_room_flutter/model/zego_room_info.dart';
-import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
+import '../../service/zego_room_manager.dart';
+import '../../common/room_info_content.dart';
+import '../../constants/zego_room_constant.dart';
+import '../../model/zego_room_info.dart';
+import '../../constants/zim_error_code.dart';
 
 typedef RoomCallback = Function(int);
 typedef RoomLeaveCallback = VoidCallback;
