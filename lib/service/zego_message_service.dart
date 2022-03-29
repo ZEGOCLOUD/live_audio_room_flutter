@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 
-import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
+import '../../plugin/zim_plugin.dart';
 
-import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
+import '../../service/zego_room_manager.dart';
 
-import 'package:live_audio_room_flutter/model/zego_user_info.dart';
-import 'package:live_audio_room_flutter/model/zego_text_message.dart';
-import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
+import '../../model/zego_user_info.dart';
+import '../../model/zego_text_message.dart';
+import '../../constants/zim_error_code.dart';
 
 typedef ZegoRoomCallback = Function(int);
 

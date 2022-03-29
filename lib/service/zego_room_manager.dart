@@ -4,14 +4,14 @@ import 'dart:async';
 
 import 'package:zego_express_engine/zego_express_engine.dart';
 
-import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
-import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
-import 'package:live_audio_room_flutter/service/zego_loading_service.dart';
-import 'package:live_audio_room_flutter/service/zego_message_service.dart';
-import 'package:live_audio_room_flutter/service/zego_room_service.dart';
-import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
-import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
+import '../../plugin/zim_plugin.dart';
+import '../../service/zego_gift_service.dart';
+import '../../service/zego_loading_service.dart';
+import '../../service/zego_message_service.dart';
+import '../../service/zego_room_service.dart';
+import '../../service/zego_speaker_seat_service.dart';
+import '../../service/zego_user_service.dart';
+import '../../constants/zim_error_code.dart';
 
 typedef ZegoRoomCallback = Function(int);
 

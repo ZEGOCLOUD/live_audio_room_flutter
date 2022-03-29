@@ -7,14 +7,14 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_provider_utilities/flutter_provider_utilities.dart';
 
-import 'package:live_audio_room_flutter/service/zego_room_service.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+import '../../service/zego_room_service.dart';
+import '../../service/zego_user_service.dart';
 
-import 'package:live_audio_room_flutter/constants/zego_page_constant.dart';
-import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
-import 'package:live_audio_room_flutter/common/room_info_content.dart';
-import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
-import 'package:live_audio_room_flutter/page/room/create_room_dialog.dart';
+import '../../constants/zego_page_constant.dart';
+import '../../constants/zim_error_code.dart';
+import '../../common/room_info_content.dart';
+import '../../model/zego_room_user_role.dart';
+import '../../page/room/create_room_dialog.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class RoomEntrancePage extends HookWidget {

@@ -3,15 +3,14 @@ import 'package:provider/provider.dart';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
-import 'package:live_audio_room_flutter/service/zego_room_service.dart';
-
-import 'package:live_audio_room_flutter/common/style/styles.dart';
-import 'package:live_audio_room_flutter/model/zego_user_info.dart';
-import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+
+import '../../../service/zego_speaker_seat_service.dart';
+import '../../../service/zego_user_service.dart';
+import '../../../service/zego_room_service.dart';
+import '../../../common/style/styles.dart';
+import '../../../model/zego_user_info.dart';
+import '../../../model/zego_room_user_role.dart';
 
 const userIDOfNoSpeakerUser = '-1000';
 const userIDOfAllSpeaker = '-1001';

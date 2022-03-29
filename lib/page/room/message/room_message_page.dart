@@ -6,12 +6,11 @@ import 'package:provider/provider.dart';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:live_audio_room_flutter/service/zego_message_service.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
-
-import 'package:live_audio_room_flutter/page/room/message/room_message_list_item.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+
+import '../../../service/zego_message_service.dart';
+import '../../../service/zego_user_service.dart';
+import '../../../page/room/message/room_message_list_item.dart';
 
 class ChatMessagePage extends HookWidget {
   ChatMessagePage({Key? key}) : super(key: key);

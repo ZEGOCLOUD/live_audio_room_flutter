@@ -2,12 +2,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import 'package:live_audio_room_flutter/common/style/styles.dart';
-import 'package:live_audio_room_flutter/model/zego_user_info.dart';
-import 'package:live_audio_room_flutter/model/zego_text_message.dart';
-import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
+
+import '../../../common/style/styles.dart';
+import '../../../model/zego_user_info.dart';
+import '../../../model/zego_text_message.dart';
+import '../../../model/zego_room_user_role.dart';
 
 class ZegoMessageListItemModel {
   ZegoUserInfo sender = ZegoUserInfo.empty();

@@ -12,19 +12,19 @@ import 'package:wakelock/wakelock.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_bugly/flutter_bugly.dart';
 
-import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
-import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
-import 'package:live_audio_room_flutter/service/zego_loading_service.dart';
+import '../../service/zego_room_manager.dart';
+import '../../service/zego_speaker_seat_service.dart';
+import '../../service/zego_user_service.dart';
+import '../../service/zego_loading_service.dart';
 
-import 'package:live_audio_room_flutter/common/style/styles.dart';
-import 'package:live_audio_room_flutter/constants/zego_page_constant.dart';
+import '../../common/style/styles.dart';
+import '../../constants/zego_page_constant.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
-import 'package:live_audio_room_flutter/page/room/room_main_page.dart';
-import 'package:live_audio_room_flutter/page/login/login_page.dart';
-import 'package:live_audio_room_flutter/page/room/room_entrance_page.dart';
-import 'package:live_audio_room_flutter/page/settings/settings_page.dart';
+import '../../page/room/room_main_page.dart';
+import '../../page/login/login_page.dart';
+import '../../page/room/room_entrance_page.dart';
+import '../../page/settings/settings_page.dart';
 
 void main() {
   FlutterBugly.postCatchedException(() {
