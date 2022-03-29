@@ -3,11 +3,11 @@ import 'package:provider/provider.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+import '../../service/zego_user_service.dart';
 
-import 'package:live_audio_room_flutter/common/style/styles.dart';
-import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
-import 'package:live_audio_room_flutter/constants/zego_room_constant.dart';
+import '../../common/style/styles.dart';
+import '../../model/zego_room_user_role.dart';
+import '../../constants/zego_room_constant.dart';
 
 typedef SeatItemClickCallback = Function(
     int index, String userId, String userName, ZegoSpeakerSeatStatus status);

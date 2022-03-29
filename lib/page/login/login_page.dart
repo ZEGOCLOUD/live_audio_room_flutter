@@ -2,22 +2,21 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/services.dart';
-import 'package:live_audio_room_flutter/common/utf8_text_formatter.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'package:live_audio_room_flutter/util/secret_reader.dart';
 
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
-
-import 'package:live_audio_room_flutter/common/style/styles.dart';
-import 'package:live_audio_room_flutter/model/zego_user_info.dart';
-import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
-import 'package:live_audio_room_flutter/common/device_info.dart';
+
+import '../../common/utf8_text_formatter.dart';
+import '../../util/secret_reader.dart';
+import '../../service/zego_user_service.dart';
+import '../../common/device_info.dart';
+import '../../common/style/styles.dart';
+import '../../model/zego_user_info.dart';
+import '../../service/zego_room_manager.dart';
 
 class LoginPage extends HookWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -39,10 +38,8 @@ class LoginPage extends HookWidget {
     useEffect(() {
       SecretReader.instance.loadKeyCenterData().then((_) {
         // WARNING: DO NOT USE APPID AND APPSIGN IN PRODUCTION CODE!!!GET IT FROM SERVER INSTEAD!!!
-        ZegoRoomManager.shared.initWithAPPID(
-            SecretReader.instance.appID,
-            SecretReader.instance.serverSecret,
-            (_) => null);
+        ZegoRoomManager.shared.initWithAPPID(SecretReader.instance.appID,
+            SecretReader.instance.serverSecret, (_) => null);
       });
     }, const []);
 

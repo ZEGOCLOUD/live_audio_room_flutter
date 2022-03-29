@@ -2,15 +2,15 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
-import 'package:live_audio_room_flutter/plugin/zim_plugin.dart';
+import '../../plugin/zim_plugin.dart';
 
-import 'package:live_audio_room_flutter/constants/zego_connection_constant.dart';
-import 'package:live_audio_room_flutter/constants/zego_custom_command_constant.dart';
-import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
-import 'package:live_audio_room_flutter/model/zego_user_info.dart';
-import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
-import 'package:live_audio_room_flutter/common/room_info_content.dart';
-import 'package:live_audio_room_flutter/constants/zim_error_code.dart';
+import '../../constants/zego_connection_constant.dart';
+import '../../constants/zego_custom_command_constant.dart';
+import '../../model/zego_room_user_role.dart';
+import '../../model/zego_user_info.dart';
+import '../../service/zego_room_manager.dart';
+import '../../common/room_info_content.dart';
+import '../../constants/zim_error_code.dart';
 
 enum LoginState {
   loginStateLoggedOut,

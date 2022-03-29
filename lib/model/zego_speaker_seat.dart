@@ -1,4 +1,4 @@
-import 'package:live_audio_room_flutter/constants/zego_room_constant.dart';
+import '../../constants/zego_room_constant.dart';
 
 /// Class speaker seat status information.
 /// <p>Description: This class contains the speaker seat status information.</>

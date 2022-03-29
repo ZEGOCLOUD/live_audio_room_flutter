@@ -8,21 +8,21 @@ import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
-import 'package:live_audio_room_flutter/service/zego_gift_service.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
-import 'package:live_audio_room_flutter/service/zego_speaker_seat_service.dart';
+import '../../service/zego_gift_service.dart';
+import '../../service/zego_user_service.dart';
+import '../../service/zego_speaker_seat_service.dart';
 
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
-import 'package:live_audio_room_flutter/model/zego_user_info.dart';
-import 'package:live_audio_room_flutter/common/user_avatar.dart';
+import '../../model/zego_user_info.dart';
+import '../../common/user_avatar.dart';
 
-import 'package:live_audio_room_flutter/page/room/message/room_message_page.dart';
-import 'package:live_audio_room_flutter/common/room_info_content.dart';
-import 'package:live_audio_room_flutter/model/zego_room_user_role.dart';
-import 'package:live_audio_room_flutter/model/zego_speaker_seat.dart';
-import 'package:live_audio_room_flutter/page/room/gift/room_gift_tips.dart';
-import 'package:live_audio_room_flutter/page/room/room_seat_item.dart';
-import 'package:live_audio_room_flutter/constants/zego_room_constant.dart';
+import '../../page/room/message/room_message_page.dart';
+import '../../common/room_info_content.dart';
+import '../../model/zego_room_user_role.dart';
+import '../../model/zego_speaker_seat.dart';
+import '../../page/room/gift/room_gift_tips.dart';
+import '../../page/room/room_seat_item.dart';
+import '../../constants/zego_room_constant.dart';
 
 class RoomCenterContentFrame extends StatefulWidget {
   const RoomCenterContentFrame({Key? key}) : super(key: key);

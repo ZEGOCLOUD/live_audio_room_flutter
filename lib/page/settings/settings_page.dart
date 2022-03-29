@@ -7,11 +7,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:zego_express_engine/zego_express_engine.dart';
-import 'package:live_audio_room_flutter/service/zego_room_manager.dart';
-import 'package:live_audio_room_flutter/service/zego_user_service.dart';
+import '../../service/zego_room_manager.dart';
+import '../../service/zego_user_service.dart';
 
-import 'package:live_audio_room_flutter/constants/zego_page_constant.dart';
-import 'package:live_audio_room_flutter/common/style/styles.dart';
+import '../../constants/zego_page_constant.dart';
+import '../../common/style/styles.dart';
 import 'package:flutter_gen/gen_l10n/live_audio_room_localizations.dart';
 
 class SettingSDKVersionWidget extends StatelessWidget {
