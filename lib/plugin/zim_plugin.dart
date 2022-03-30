@@ -19,7 +19,8 @@ class ZIMPlugin {
 
   static void Function(String roomID, List<Map<String, dynamic>> textMessageListJson)? onReceiveTextRoomMessage;
   static void Function(String roomID, List<Map<String, dynamic>> customMessageListJson)? onReceiveCustomRoomMessage;
-  static void Function(List<Map<String, dynamic>> customMessageListJson)? onReceiveCustomPeerMessage;
+  static void Function(List<Map<String, dynamic>> customMessageListJson, String fromUserID)? onReceiveTextPeerMessage;
+  static void Function(List<Map<String, dynamic>> customMessageListJson, String fromUserID)? onReceiveCustomPeerMessage;
 
   /// Used to receive the native event stream
   static StreamSubscription<dynamic>? streamSubscription;
@@ -64,12 +65,12 @@ class ZIMPlugin {
     return await channel.invokeMethod("queryRoomOnlineMemberCount", {"roomID": roomID});
   }
 
-  static Future<Map> sendPeerMessage(String userID, String content, int actionType) async {
-    return await channel.invokeMethod("sendPeerMessage", {"userID": userID, "content": content, "actionType": actionType});
+  static Future<Map> sendPeerMessage(String userID, String message, bool isCustomMessage) async {
+    return await channel.invokeMethod("sendPeerMessage", {"userID": userID, "message": message, 'isCustomMessage': isCustomMessage});
   }
 
-  static Future<Map> sendRoomMessage(String roomID, String content, bool isCustomMessage) async {
-    return await channel.invokeMethod("sendRoomMessage", {"roomID": roomID, "content": content, 'isCustomMessage': isCustomMessage});
+  static Future<Map> sendRoomMessage(String roomID, String message, bool isCustomMessage) async {
+    return await channel.invokeMethod("sendRoomMessage", {"roomID": roomID, "message": message, 'isCustomMessage': isCustomMessage});
   }
 
   static Future<Map> setRoomAttributes(String roomID, String attributes, bool delete) async {
@@ -155,10 +156,17 @@ class ZIMPlugin {
         var roomID = map['roomID'];
         onReceiveCustomRoomMessage!(roomID, customMessageJson);
         break;
+      case 'receiveTextPeerMessage':
+        if (onReceiveTextPeerMessage == null) return;
+        var textMessagesJson = List<Map<String, dynamic>>.from(jsonDecode(map['messageList']));
+        var fromUserID = map['fromUserID'];
+        onReceiveTextPeerMessage!(textMessagesJson, fromUserID);
+        break;
       case 'receiveCustomPeerMessage':
         if (onReceiveCustomPeerMessage == null) return;
         var customMessageJson = List<Map<String, dynamic>>.from(jsonDecode(map['messageList']));
-        onReceiveCustomPeerMessage!(customMessageJson);
+        var fromUserID = map['fromUserID'];
+        onReceiveCustomPeerMessage!(customMessageJson, fromUserID);
         break;
       case 'connectionStateChanged':
         if (onConnectionStateChanged == null) return;

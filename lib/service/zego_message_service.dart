@@ -13,12 +13,18 @@ typedef ZegoRoomCallback = Function(int);
 /// Class IM message management.
 /// <p>Description: This class contains the logics of the IM messages management, such as send or receive messages.</>
 class ZegoMessageService extends ChangeNotifier {
+  // Current room message list
   List<ZegoTextMessage> messageList = [];
+  // Data of <fromUserID, MessageList>, which contains the text message you received
+  Map<String, List<ZegoTextMessage>> textPeerMessageReceivedList = {};
+  // Data of <toUserID, MessageList>, which contains the text message you has been sent
+  Map<String, List<ZegoTextMessage>> textPeerMessageSentList = {};
   String memberJoinedText = '';
   String memberLeaveText = '';
 
   ZegoMessageService() {
-    ZIMPlugin.onReceiveTextRoomMessage = _onReceiveTextMessage;
+    ZIMPlugin.onReceiveTextRoomMessage = _onReceiveTextRoomMessage;
+    ZIMPlugin.onReceiveTextPeerMessage = _onReceiveTextPeerMessage;
   }
 
   onRoomLeave() {
@@ -56,16 +62,49 @@ class ZegoMessageService extends ChangeNotifier {
     return code;
   }
 
+  /// Send IM text message to specific user.
+  /// <p>Description: This method can be used to send IM text message to specific user, and the user with "toUserID" will receive the
+  /// message notification.</>
+  /// <p>Call this method at:  After user login</>
+  ///
+  /// @param toUserID the user's ID which you are trying to send message to.
+  /// @param message refers to the text message content, which is limited to 1kb.
+  Future<int> sendTextPeerMessage(String toUserID, String message) async {
+    var result = await ZIMPlugin.sendPeerMessage(toUserID, message, false);
+    int code = result['errorCode'];
+    var timestamp = result['timestamp'];
+    var messageID = result['messageID'];
+    if (ZIMErrorCodeExtension.valueMap[zimErrorCode.success] == code) {
+      var msg = ZegoTextMessage();
+      msg.message = message;
+      msg.userID = toUserID;
+      msg.timestamp = timestamp;
+      msg.messageID = messageID;
+      textPeerMessageSentList[toUserID]?.add(msg);
+      notifyListeners();
+    }
+    return code;
+  }
+
   void setTranslateTexts(String memberJoinedText, String memberLeaveText) {
     this.memberJoinedText = memberJoinedText;
     this.memberLeaveText = memberLeaveText;
   }
 
-  void _onReceiveTextMessage(
+  void _onReceiveTextRoomMessage(
       String roomID, List<Map<String, dynamic>> messageListJson) {
     for (final item in messageListJson) {
       var message = ZegoTextMessage.formJson(item);
       messageList.add(message);
+    }
+    notifyListeners();
+  }
+
+  void _onReceiveTextPeerMessage(
+      List<Map<String, dynamic>> messageListJson, String fromUserID) {
+    for (final item in messageListJson) {
+      var message = ZegoTextMessage.formJson(item);
+      textPeerMessageReceivedList[fromUserID]?.add(message);
     }
     notifyListeners();
   }
