@@ -152,8 +152,14 @@ class ZegoUserService extends ChangeNotifier {
   ///
   /// @param userID   refers to the ID of the user that you want to invite
   Future<int> sendInvitation(String userID) async {
-    var content = "{}";
-    var result = await ZIMPlugin.sendPeerMessage(userID, content, 1);
+    Map message = {
+      'actionType': 1,
+      'target': [userID],
+      'content': {}
+    };
+    String jsonMessage = jsonEncode(message);
+
+    var result = await ZIMPlugin.sendPeerMessage(userID, jsonMessage, true);
     return result['errorCode'];
   }
 
@@ -201,7 +207,7 @@ class ZegoUserService extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _onReceiveCustomPeerMessage(List<Map<String, dynamic>> messageListJson) {
+  void _onReceiveCustomPeerMessage(List<Map<String, dynamic>> messageListJson, String fromUserID) {
     for (final item in messageListJson) {
       var messageJson = item['message'];
       Map<String, dynamic> messageDic = jsonDecode(messageJson);

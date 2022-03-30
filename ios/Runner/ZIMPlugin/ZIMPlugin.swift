@@ -189,16 +189,20 @@ class ZIMPlugin: NSObject {
          let params = call.arguments as? NSDictionary
                  if (params == nil) { return }
          let userID = params!["userID"] as? String ?? ""
-         let content = params!["content"] as? String ?? ""
-         let actionType = params!["actionType"] as? Int ?? 0
-
-         let contentDic = convertJSONStringToDictionary(json:content) ?? Dictionary<String, String>()
-
-         let messageDic = ["target": [userID], "content": contentDic, "actionType":actionType] as [String : Any]
-         let data = convertDictionaryToData(dict: messageDic as NSDictionary)
-         let customMessage = ZIMCustomMessage(message: data)
-         zim?.sendPeerMessage(customMessage, toUserID: userID, callback: { message, error in
-             result(["errorCode": error.code.rawValue, "message": error.message])
+         let content = params!["message"] as? String ?? ""
+         let isCustomMessage = params!["isCustomMessage"] as? Bool ?? false
+         var message: ZIMMessage?
+         if (isCustomMessage) {
+             let contentData = content.data(using: .utf8) ?? Data()
+             message = ZIMCustomMessage(message: contentData)
+         } else {
+             message = ZIMTextMessage(message: content)
+         }
+         guard let message = message else {
+             return
+         }
+         zim?.sendPeerMessage(message, toUserID: userID, callback: { message, error in
+             result(["errorCode": error.code.rawValue, "message": error.message, "timestamp": message.timestamp, "messageID": message.messageID])
          })
      }
 
@@ -206,7 +210,7 @@ class ZIMPlugin: NSObject {
          let params = call.arguments as? NSDictionary
                  if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
-         let content = params!["content"] as? String ?? ""
+         let content = params!["message"] as? String ?? ""
          let isCustomMessage = params!["isCustomMessage"] as? Bool ?? false
          var message: ZIMMessage?
          if (isCustomMessage) {
@@ -296,16 +300,26 @@ extension ZIMPlugin: ZIMEventHandler {
     // MARK: - Message
     func zim(_ zim: ZIM, receivePeerMessage messageList: [ZIMMessage], fromUserID: String) {
         guard let events = self.events else { return }
+        var textMessageJsonList = Array<[String: Any]>();
         var customMessageJsonList = Array<[String: Any]>();
         for item in messageList {
-            guard let message = item as? ZIMCustomMessage else { continue }
-            let content = NSString(data: message.message, encoding: String.Encoding.utf8.rawValue) ?? ""
-            
-            let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": content, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
-            customMessageJsonList.append(messageJson)
+            if item.type == .text {
+                guard let message = item as? ZIMTextMessage else { continue }
+                let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": message.message, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
+                textMessageJsonList.append(messageJson)
+            } else {
+                guard let message = item as? ZIMCustomMessage else { continue }
+                let content = NSString(data: message.message, encoding: String.Encoding.utf8.rawValue) ?? ""
+                
+                let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": content, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
+                customMessageJsonList.append(messageJson)
+            }
+        }
+        if textMessageJsonList.count > 0 {
+            events(["method": "receiveTextPeerMessage", "messageList": convertObjectToJSONString(textMessageJsonList), "fromUserID": fromUserID])
         }
         if customMessageJsonList.count > 0 {
-            events(["method": "receiveCustomPeerMessage", "messageList": convertObjectToJSONString(customMessageJsonList)])
+            events(["method": "receiveCustomPeerMessage", "messageList": convertObjectToJSONString(customMessageJsonList), "fromUserID": fromUserID])
         }
     }
     
@@ -324,12 +338,12 @@ extension ZIMPlugin: ZIMEventHandler {
                 let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": content, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
                 customMessageJsonList.append(messageJson)
             }
-            if textMessageJsonList.count > 0 {
-                events(["method": "receiveTextRoomMessage", "messageList": convertObjectToJSONString(textMessageJsonList), "roomID": fromRoomID])
-            }
-            if customMessageJsonList.count > 0 {
-                events(["method": "receiveCustomRoomMessage", "messageList": convertObjectToJSONString(customMessageJsonList), "roomID": fromRoomID])
-            }
+        }
+        if textMessageJsonList.count > 0 {
+            events(["method": "receiveTextRoomMessage", "messageList": convertObjectToJSONString(textMessageJsonList), "roomID": fromRoomID])
+        }
+        if customMessageJsonList.count > 0 {
+            events(["method": "receiveCustomRoomMessage", "messageList": convertObjectToJSONString(customMessageJsonList), "roomID": fromRoomID])
         }
     }
     
