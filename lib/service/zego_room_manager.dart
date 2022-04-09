@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:live_audio_room_flutter/service/zego_token_manager.dart';
 import 'dart:async';
 
 import 'package:zego_express_engine/zego_express_engine.dart';
@@ -44,13 +47,17 @@ class ZegoRoomManager extends ChangeNotifier {
     userService.onRoomEnter();
   }
 
-  Future<void> initWithAPPID(int appID, String serverSecret,
-      ZegoRoomCallback callback) async {
+  Future<void> initWithAPPID(
+      int appID, String serverSecret, ZegoRoomCallback callback) async {
     await ZIMPlugin.createZIM(appID, serverSecret);
     ZIMPlugin.registerEventHandler();
 
     ZegoExpressEngine.onRoomStreamUpdate = _onRoomStreamUpdate;
     ZegoExpressEngine.onApiCalledResult = _onApiCalledResult;
+
+    ZegoExpressEngine.onRoomTokenWillExpire = onRoomTokenWillExpire;
+    ZIMPlugin.onTokenWillExpire = onTokenWillExpire;
+
     ZegoEngineProfile profile = ZegoEngineProfile(appID, ZegoScenario.General);
     ZegoExpressEngine.createEngineWithProfile(profile).then((value) {
       ZegoExpressEngine.instance.enableCamera(false); // demo is pure audio
@@ -102,5 +109,44 @@ class ZegoRoomManager extends ChangeNotifier {
       print(
           "_onApiCalledResult funcName:$funcName, errorCode:$errorCode, info:$info");
     }
+  }
+
+  /// Callback notification that Token authentication is about to expire.
+  ///
+  /// Description:The callback notification that the Token authentication is about to expire, please use [renewToken] to update the Token authentication.
+  ///
+  /// @param remainTimeInSecond The remaining time before the token expires.
+  /// @param roomID Room ID where the user is logged in, a string of up to 128 bytes in length.
+  void onRoomTokenWillExpire(String roomID, int remainTimeInSecond) async {
+    log('[token] onRoomTokenWillExpire, $roomID, $remainTimeInSecond');
+
+    var result = await ZegoTokenManager.shared
+        .getToken(userService.localUserInfo.userID);
+    if (result.isSuccess) {
+      var token = result.success;
+      renewToken(token, roomService.roomInfo.roomID);
+    }
+  }
+
+  void onTokenWillExpire(int second) async {
+    log('[token] onTokenWillExpire, $second');
+
+    var result = await ZegoTokenManager.shared
+        .getToken(userService.localUserInfo.userID);
+    if (result.isSuccess) {
+      var token = result.success;
+      renewToken(token, roomService.roomInfo.roomID);
+    }
+  }
+
+  /// Renew token.
+  ///
+  /// Description: After the developer receives [onRoomTokenWillExpire], they can use this API to update the token to ensure that the subsequent RTC&ZIM functions are normal.
+  ///
+  /// @param token The token that needs to be renew.
+  /// @param roomID Room ID.
+  void renewToken(String token, String roomID) async {
+    ZegoExpressEngine.instance.renewToken(roomID, token);
+    ZIMPlugin.renewToken(token);
   }
 }

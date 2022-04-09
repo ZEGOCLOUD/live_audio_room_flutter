@@ -19,7 +19,7 @@
     privilege.insert(std::make_pair(ZEGO::SERVER_ASSISTANT03::kPrivilegeLogin, 1));
     privilege.insert(std::make_pair(ZEGO::SERVER_ASSISTANT03::kPrivilegePublish, 1));
     
-    auto RTCTokenResult = ZEGO::SERVER_ASSISTANT03::ZegoRTCServerAssistant::GenerateToken(appID, roomID.UTF8String, userID.UTF8String, privilege, appSercret.UTF8String, 3600 * 24);
+    auto RTCTokenResult = ZEGO::SERVER_ASSISTANT03::ZegoRTCServerAssistant::GenerateToken(appID, roomID.UTF8String, userID.UTF8String, privilege, appSercret.UTF8String, 24 * 60 * 60);
 
     NSString *rtcToken = [NSString stringWithCString:RTCTokenResult.token.c_str() encoding:NSUTF8StringEncoding];
     return rtcToken;
@@ -31,7 +31,7 @@
     auto tokenResult = ZEGO::SERVER_ASSISTANT::ZegoServerAssistant::GenerateToken(appID,
                                                                                   userID.UTF8String,
                                                                                   appSecret.UTF8String,
-                                                                                  3600 * 24);
+                                                                                  24 * 60 * 60);
     NSString *token = [NSString stringWithCString:tokenResult.token.c_str() encoding:NSUTF8StringEncoding];
     return token;
 }

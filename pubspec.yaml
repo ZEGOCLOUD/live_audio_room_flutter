@@ -47,6 +47,7 @@ dependencies:
   package_info_plus: ^1.3.0
   flutter_background: ^1.1.0
   flutter_bugly: ^0.4.3
+  result_type: ^0.1.0
 
 dev_dependencies:
   flutter_test:
