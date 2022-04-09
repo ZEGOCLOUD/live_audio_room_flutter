@@ -29,7 +29,7 @@ class RoomEntrancePage extends HookWidget {
     }
 
     var room = context.read<ZegoRoomService>();
-    room.joinRoom(roomID, "").then((code) {
+    room.joinRoom(roomID).then((code) {
       if (code != 0) {
         String message = AppLocalizations.of(context)!.toastJoinRoomFail(code);
         if (code == ZIMErrorCodeExtension.valueMap[zimErrorCode.roomNotExist]) {

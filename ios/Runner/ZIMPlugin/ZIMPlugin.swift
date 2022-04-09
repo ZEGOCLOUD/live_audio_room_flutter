@@ -53,6 +53,9 @@ class ZIMPlugin: NSObject {
              case "uploadLog":
                 self.uploadLog(call, result: result)
                 break
+             case "renewToken":
+                self.renewToken(call, result: result)
+                break
              case "queryRoomAllAttributes":
                 self.queryRoomAllAttributes(call, result: result)
                 break
@@ -164,6 +167,15 @@ class ZIMPlugin: NSObject {
      func uploadLog(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
          zim?.uploadLog({ error in
              result(["errorCode": error.code.rawValue, "message": error.message])
+         })
+     }
+
+     func renewToken(_ call: FlutterMethodCall, result:@escaping FlutterResult)  {
+         let params = call.arguments as? NSDictionary
+         if (params == nil) { return }
+         let token = params!["token"] as? String ?? ""
+         zim?.renewToken(token, callback: { token, error in
+             result(["errorCode": error.code.rawValue, "message": error.message, "token": token])
          })
      }
 

@@ -112,6 +112,13 @@ class ZIMPlugin: EventChannel.StreamHandler {
         })
     }
 
+    fun renewToken(call: MethodCall, result: MethodChannel.Result) {
+        val token: String? = call.argument<String>("token")
+        zim?.renewToken(token) { token, errorInfo ->
+            result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message, "token" to token))
+        }
+    }
+
     fun queryRoomAllAttributes(call: MethodCall, result: MethodChannel.Result) {
         val roomID: String? = call.argument<String>("roomID")
         zim?.queryRoomAllAttributes(roomID
@@ -199,7 +206,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         val userID: String? = call.argument<String>("userID")
 
         val token = TokenServerAssistant
-            .generateToken(appID.toLong(), userID, serverSecret, 60 * 60 * 24).data
+            .generateToken(appID.toLong(), userID, serverSecret, 24 * 60 * 60).data
         result.success(mapOf("errorCode" to 0, "token" to token))
     }
 

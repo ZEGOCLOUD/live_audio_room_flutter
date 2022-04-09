@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:live_audio_room_flutter/service/zego_token_manager.dart';
 
 import '../../plugin/zim_plugin.dart';
 import 'package:zego_express_engine/zego_express_engine.dart';
@@ -60,9 +62,7 @@ class ZegoRoomService extends ChangeNotifier {
   /// @param roomID   roomID refers to the room ID, the unique identifier of the room. This is required to join a room
   ///                 and cannot be null.
   /// @param roomName roomName refers to the room name. This is used for display in the room and cannot be null.
-  /// @param token    token refers to the authentication token. To get this, see the documentation:
-  ///                 https://doc-en.zego.im/article/11648
-  Future<int> createRoom(String roomID, String roomName, String token) async {
+  Future<int> createRoom(String roomID, String roomName) async {
     roomDisconnectSuccess = false;
 
     var result = await ZIMPlugin.createRoom(roomID, roomName, _localUserID, 8);
@@ -83,9 +83,7 @@ class ZegoRoomService extends ChangeNotifier {
   /// <p>Call this method at: After user logs in</>
   ///
   /// @param roomID   refers to the ID of the room you want to join, and cannot be null.
-  /// @param token    token refers to the authentication token. To get this, see the documentation:
-  ///                 https://doc-en.zego.im/article/11648
-  Future<int> joinRoom(String roomID, String token) async {
+  Future<int> joinRoom(String roomID) async {
     roomDisconnectSuccess = false;
 
     var joinResult = await ZIMPlugin.joinRoom(roomID);
@@ -232,10 +230,15 @@ class ZegoRoomService extends ChangeNotifier {
   }
 
   Future<void> _loginRtcRoom() async {
+    var tokenResult = await ZegoTokenManager.shared.getToken(_localUserID);
+    if (tokenResult.isFailure) {
+      log('[room service] login rtc room, fail to get token, ${tokenResult.failure}');
+      return;
+    }
+
     var user = ZegoUser(_localUserID, _localUserName);
     var config = ZegoRoomConfig.defaultConfig();
-    var result = await ZIMPlugin.getToken(_localUserID);
-    config.token = result["token"];
+    config.token = tokenResult.success;
     config.maxMemberCount = 0;
     ZegoExpressEngine.instance.loginRoom(roomInfo.roomID, user, config: config);
     var soundConfig = ZegoSoundLevelConfig(1000, false);

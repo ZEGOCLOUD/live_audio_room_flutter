@@ -7,6 +7,8 @@ class ZIMPlugin {
   static const MethodChannel channel = MethodChannel('ZIMPlugin');
   static const EventChannel event = EventChannel('ZIMPluginEventChannel');
 
+  static void Function(int second)? onTokenWillExpire;
+
   static void Function(int state, int event)? onConnectionStateChanged;
 
   static void Function(String roomID, List<Map<String, dynamic>> memberList)? onRoomMemberJoined;
@@ -55,6 +57,10 @@ class ZIMPlugin {
 
   static Future<Map> uploadLog() async {
     return await channel.invokeMethod("uploadLog");
+  }
+
+  static Future<Map> renewToken(String token) async {
+    return await channel.invokeMethod("renewToken", {"token": token});
   }
 
   static Future<Map> queryRoomAllAttributes(String roomID) async {
@@ -173,6 +179,11 @@ class ZIMPlugin {
         int state = map['state'];
         int event = map['event'];
         onConnectionStateChanged!(state, event);
+        break;
+      case 'tokenWillExpire':
+        if (onTokenWillExpire == null) return;
+        int second = map['second'];
+        onTokenWillExpire!(second);
         break;
       default:
         break;
