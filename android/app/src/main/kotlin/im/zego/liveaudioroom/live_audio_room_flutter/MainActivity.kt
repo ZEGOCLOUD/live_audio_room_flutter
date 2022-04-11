@@ -24,6 +24,7 @@ class MainActivity: FlutterActivity() {
                 "joinRoom" -> { pluginHandler.joinRoom(call, result) }
                 "leaveRoom" -> { pluginHandler.leaveRoom(call, result) }
                 "uploadLog" -> { pluginHandler.uploadLog(call, result) }
+                "renewToken" -> { pluginHandler.renewToken(call, result) }
                 "queryRoomAllAttributes" -> { pluginHandler.queryRoomAllAttributes(call, result) }
                 "queryRoomOnlineMemberCount" -> { pluginHandler.queryRoomOnlineMemberCount(call, result) }
                 "sendPeerMessage" -> { pluginHandler.sendPeerMessage(call, result) }

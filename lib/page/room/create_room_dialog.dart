@@ -27,7 +27,7 @@ class CreateRoomDialog extends HookWidget {
       return;
     }
     var room = context.read<ZegoRoomService>();
-    room.createRoom(roomID, roomName, "").then((code) {
+    room.createRoom(roomID, roomName).then((code) {
       if (code != 0) {
         String message =
             AppLocalizations.of(context)!.toastCreateRoomFail(code);

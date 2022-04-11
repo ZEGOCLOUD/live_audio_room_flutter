@@ -112,6 +112,13 @@ class ZIMPlugin: EventChannel.StreamHandler {
         })
     }
 
+    fun renewToken(call: MethodCall, result: MethodChannel.Result) {
+        val token: String? = call.argument<String>("token")
+        zim?.renewToken(token) { token, errorInfo ->
+            result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message, "token" to token))
+        }
+    }
+
     fun queryRoomAllAttributes(call: MethodCall, result: MethodChannel.Result) {
         val roomID: String? = call.argument<String>("roomID")
         zim?.queryRoomAllAttributes(roomID
@@ -130,29 +137,26 @@ class ZIMPlugin: EventChannel.StreamHandler {
 
     fun sendPeerMessage(call: MethodCall, result: MethodChannel.Result) {
         val userID: String? = call.argument<String>("userID")
-        val content: String? = call.argument<String>("content")
-        val actionType: Int? = call.argument<Int>("actionType")
+        val content: String? = call.argument<String>("message")
+        val isCustomMessage: Boolean? = call.argument<Boolean>("isCustomMessage")
 
-        var userJsonArray = JSONArray()
-        userJsonArray.put(userID)
-        val json = JSONObject()
-        json.put("target", userJsonArray)
-        json.put("content", JSONObject(content))
-        json.put("actionType", actionType)
-
-        val jsonString = json.toString()
-
-        val customMessage = ZIMCustomMessage()
-        customMessage.message = jsonString.encodeToByteArray()
-        zim?.sendPeerMessage(customMessage, userID
+        var message = ZIMMessage()
+        if (isCustomMessage == true) {
+            message = ZIMCustomMessage()
+            message.message = content?.encodeToByteArray()
+        } else {
+            message = ZIMTextMessage()
+            message.message = content
+        }
+        zim?.sendPeerMessage(message, userID
         ) { message, errorInfo ->
-            result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message))
+            result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message, "timestamp" to message.timestamp, "messageID" to message.messageID))
         }
     }
 
     fun sendRoomMessage(call: MethodCall, result: MethodChannel.Result) {
         val roomID: String? = call.argument<String>("roomID")
-        val content: String? = call.argument<String>("content")
+        val content: String? = call.argument<String>("message")
         val isCustomMessage: Boolean? = call.argument<Boolean>("isCustomMessage")
 
         var message = ZIMMessage()
@@ -202,7 +206,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
         val userID: String? = call.argument<String>("userID")
 
         val token = TokenServerAssistant
-            .generateToken(appID.toLong(), userID, serverSecret, 60 * 60 * 24).data
+            .generateToken(appID.toLong(), userID, serverSecret, 24 * 60 * 60).data
         result.success(mapOf("errorCode" to 0, "token" to token))
     }
 
@@ -256,6 +260,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
                     json.put("userID", customMessage.userID)
                     json.put("message", String(customMessage.message))
                     json.put("type", customMessage.type.value())
+                    json.put("timestamp", customMessage.timestamp)
                     customMessageJson.put(json)
                 } else {
                     var textMessage = it as ZIMTextMessage
@@ -263,13 +268,14 @@ class ZIMPlugin: EventChannel.StreamHandler {
                     json.put("userID", textMessage.userID)
                     json.put("message", textMessage.message)
                     json.put("type", textMessage.type.value())
+                    json.put("timestamp", textMessage.timestamp)
                     textMessageJson.put(json)
                 }
             }
             if (customMessageJson.length() > 0) {
-                eventSink.success(mapOf("method" to "receiveCustomPeerMessage", "messageList" to customMessageJson.toString()))
+                eventSink.success(mapOf("method" to "receiveCustomPeerMessage", "messageList" to customMessageJson.toString(), "fromUserID" to fromUserID))
             } else {
-                eventSink.success(mapOf("method" to "receiveTextPeerMessage", "messageList" to textMessageJson.toString()))
+                eventSink.success(mapOf("method" to "receiveTextPeerMessage", "messageList" to textMessageJson.toString(), "fromUserID" to fromUserID))
             }
         }
 
