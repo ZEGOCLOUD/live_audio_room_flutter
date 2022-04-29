@@ -92,7 +92,7 @@ class ZIMPlugin: NSObject {
          if (params == nil) { return }
          appID = params!["appID"] as? UInt32 ?? 0
          serverSecret = params!["serverSecret"] as? String ?? ""
-         zim = ZIM.create(appID)
+         zim = ZIM.create(withAppID: appID)
          zim?.setEventHandler(self)
          result(nil)
      }
@@ -116,7 +116,7 @@ class ZIMPlugin: NSObject {
          let user = ZIMUserInfo()
          user.userID = userID
          user.userName = userName
-         zim?.login(user, token: token, callback: { error in
+         zim?.login(with: user, token: token, callback: { error in
              result(["errorCode": error.code.rawValue, "message": error.message])
          })
      }
@@ -159,7 +159,7 @@ class ZIMPlugin: NSObject {
          let params = call.arguments as? NSDictionary
          if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
-         zim?.leaveRoom(roomID, callback: { error in
+         zim?.leaveRoom(roomID, callback: { roomID, error in
              result(["errorCode": error.code.rawValue, "message": error.message])
          })
      }
@@ -183,7 +183,7 @@ class ZIMPlugin: NSObject {
          let params = call.arguments as? NSDictionary
          if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
-         zim?.queryRoomAllAttributes(byRoomID: roomID, callback: { roomAttributes, error in
+         zim?.queryRoomAllAttributes(byRoomID: roomID, callback: { roomID, roomAttributes, error in
              result(["errorCode": error.code.rawValue, "message": error.message, "roomAttributes": roomAttributes])
          })
      }
@@ -192,7 +192,7 @@ class ZIMPlugin: NSObject {
          let params = call.arguments as? NSDictionary
                  if (params == nil) { return }
          let roomID = params!["roomID"] as? String ?? ""
-         zim?.queryRoomOnlineMemberCount(roomID, callback: { count, error in
+         zim?.queryRoomOnlineMemberCount(byRoomID: roomID, callback: { roomID, count, error in
              result(["errorCode": error.code.rawValue, "message": error.message, "count": count])
          })
      }
@@ -206,14 +206,16 @@ class ZIMPlugin: NSObject {
          var message: ZIMMessage?
          if (isCustomMessage) {
              let contentData = content.data(using: .utf8) ?? Data()
-             message = ZIMCustomMessage(message: contentData)
+             message = ZIMCommandMessage(message: contentData)
          } else {
              message = ZIMTextMessage(message: content)
          }
          guard let message = message else {
              return
          }
-         zim?.sendPeerMessage(message, toUserID: userID, callback: { message, error in
+         let config = ZIMMessageSendConfig()
+         config.priority = .low
+         zim?.sendPeerMessage(message, toUserID: userID, config: config, callback: { message, error in
              result(["errorCode": error.code.rawValue, "message": error.message, "timestamp": message.timestamp, "messageID": message.messageID])
          })
      }
@@ -227,7 +229,7 @@ class ZIMPlugin: NSObject {
          var message: ZIMMessage?
          if (isCustomMessage) {
              let contentData = content.data(using: .utf8) ?? Data()
-             message = ZIMCustomMessage(message: contentData)
+             message = ZIMCommandMessage(message: contentData)
          } else {
              message = ZIMTextMessage(message: content)
          }
@@ -235,7 +237,9 @@ class ZIMPlugin: NSObject {
              return
          }
 
-         zim?.sendRoomMessage(message, toRoomID: roomID, callback: { message, error in
+         let config = ZIMMessageSendConfig()
+         config.priority = .low
+         zim?.sendRoomMessage(message, toRoomID: roomID, config: config, callback: {message, error in
              result(["errorCode": error.code.rawValue, "message": error.message])
          })
      }
@@ -250,7 +254,7 @@ class ZIMPlugin: NSObject {
          let config = ZIMRoomAttributesSetConfig()
          config.isForce = true
          config.isDeleteAfterOwnerLeft = isDeleteAfterOwnerLeft
-         zim?.setRoomAttributes(dic, roomID: roomID, config: config, callback: { error in
+         zim?.setRoomAttributes(dic, roomID: roomID, config: config, callback: { roomID, errorKeys, error in
              result(["errorCode": error.code.rawValue, "message": error.message])
          })
      }
@@ -317,13 +321,13 @@ extension ZIMPlugin: ZIMEventHandler {
         for item in messageList {
             if item.type == .text {
                 guard let message = item as? ZIMTextMessage else { continue }
-                let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": message.message, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
+                let messageJson = ["messageID": message.messageID, "userID": message.senderUserID, "message": message.message, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
                 textMessageJsonList.append(messageJson)
             } else {
-                guard let message = item as? ZIMCustomMessage else { continue }
+                guard let message = item as? ZIMCommandMessage else { continue }
                 let content = NSString(data: message.message, encoding: String.Encoding.utf8.rawValue) ?? ""
                 
-                let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": content, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
+                let messageJson = ["messageID": message.messageID, "userID": message.senderUserID, "message": content, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
                 customMessageJsonList.append(messageJson)
             }
         }
@@ -342,12 +346,12 @@ extension ZIMPlugin: ZIMEventHandler {
         for item in messageList {
             if item.type == .text {
                 guard let message = item as? ZIMTextMessage else { continue }
-                let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": message.message, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
+                let messageJson = ["messageID": message.messageID, "userID": message.senderUserID, "message": message.message, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
                 textMessageJsonList.append(messageJson)
             } else {
-                guard let message = item as? ZIMCustomMessage else { continue }
+                guard let message = item as? ZIMCommandMessage else { continue }
                 let content = NSString(data: message.message, encoding: String.Encoding.utf8.rawValue) ?? ""
-                let messageJson = ["messageID": message.messageID, "userID": message.userID, "message": content, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
+                let messageJson = ["messageID": message.messageID, "userID": message.senderUserID, "message": content, "timestamp": message.timestamp, "type": message.type.rawValue] as [String : Any];
                 customMessageJsonList.append(messageJson)
             }
         }
