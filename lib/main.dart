@@ -97,7 +97,7 @@ class ZegoApp extends StatelessWidget {
               child: ScreenUtilInit(
                 designSize: const Size(750, 1334),
                 minTextAdapt: true,
-                builder: () => MaterialApp(
+                builder: (context) => MaterialApp(
                   title: "ZegoLiveAudio",
                   localizationsDelegates: const [
                     AppLocalizations.delegate,

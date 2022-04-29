@@ -100,7 +100,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
 
     fun leaveRoom(call: MethodCall, result: MethodChannel.Result) {
         val roomID: String? = call.argument<String>("roomID")
-        zim?.leaveRoom(roomID) { errorInfo ->
+        zim?.leaveRoom(roomID) { roomID, errorInfo ->
             result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message))
         }
 
@@ -122,7 +122,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
     fun queryRoomAllAttributes(call: MethodCall, result: MethodChannel.Result) {
         val roomID: String? = call.argument<String>("roomID")
         zim?.queryRoomAllAttributes(roomID
-        ) { roomAttributes, errorInfo ->
+        ) { roomID, roomAttributes, errorInfo ->
             result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message, "roomAttributes" to roomAttributes))
         }
     }
@@ -130,7 +130,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
     fun queryRoomOnlineMemberCount(call: MethodCall, result: MethodChannel.Result) {
         val roomID: String? = call.argument<String>("roomID")
         zim?.queryRoomOnlineMemberCount(roomID
-        ) { count, errorInfo ->
+        ) { roomID, count, errorInfo ->
             result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message, "count" to count))
         }
     }
@@ -142,13 +142,15 @@ class ZIMPlugin: EventChannel.StreamHandler {
 
         var message = ZIMMessage()
         if (isCustomMessage == true) {
-            message = ZIMCustomMessage()
+            message = ZIMCommandMessage()
             message.message = content?.encodeToByteArray()
         } else {
             message = ZIMTextMessage()
             message.message = content
         }
-        zim?.sendPeerMessage(message, userID
+        var config = ZIMMessageSendConfig()
+        config.priority = ZIMMessagePriority.LOW
+        zim?.sendPeerMessage(message, userID, config
         ) { message, errorInfo ->
             result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message, "timestamp" to message.timestamp, "messageID" to message.messageID))
         }
@@ -161,13 +163,15 @@ class ZIMPlugin: EventChannel.StreamHandler {
 
         var message = ZIMMessage()
         if (isCustomMessage == true) {
-            message = ZIMCustomMessage()
+            message = ZIMCommandMessage()
             message.message = content?.encodeToByteArray()
         } else {
             message = ZIMTextMessage()
             message.message = content
         }
-        zim?.sendRoomMessage(message, roomID
+        var config = ZIMMessageSendConfig()
+        config.priority = ZIMMessagePriority.LOW
+        zim?.sendRoomMessage(message, roomID, config
         ) { message, errorInfo ->
             result.success(mapOf("errorCode" to errorInfo.code.value(), "message" to errorInfo.message))
         }
@@ -189,16 +193,8 @@ class ZIMPlugin: EventChannel.StreamHandler {
         config.isForce = true
         config.isDeleteAfterOwnerLeft = isDeleteAfterOwnerLeft == true
 
-        zim?.setRoomAttributes(map, roomID, config, object : ZIMRoomAttributesBatchOperatedCallback,
-            ZIMRoomAttributesOperatedCallback {
-            override fun onRoomAttributesBatchOperated(errorInfo: ZIMError?) {
-                result.success(mapOf("errorCode" to (errorInfo?.code?.value() ?: 0), "message" to errorInfo?.message))
-            }
-
-            override fun onRoomAttributesOperated(errorInfo: ZIMError?) {
-                result.success(mapOf("errorCode" to (errorInfo?.code?.value() ?: 0), "message" to errorInfo?.message))
-            }
-
+        zim?.setRoomAttributes(map, roomID, config, {roomID, errorKeys, errorInfo ->
+            result.success(mapOf("errorCode" to (errorInfo?.code?.value() ?: 0), "message" to errorInfo?.message))
         })
     }
 
@@ -254,10 +250,10 @@ class ZIMPlugin: EventChannel.StreamHandler {
             var textMessageJson = JSONArray()
             messageList?.forEach {
                 var json = JSONObject()
-                if (it.type == ZIMMessageType.CUSTOM) {
-                    var customMessage = it as ZIMCustomMessage
+                if (it.type == ZIMMessageType.COMMAND) {
+                    var customMessage = it as ZIMCommandMessage
                     json.put("messageID", customMessage.messageID)
-                    json.put("userID", customMessage.userID)
+                    json.put("userID", customMessage.senderUserID)
                     json.put("message", String(customMessage.message))
                     json.put("type", customMessage.type.value())
                     json.put("timestamp", customMessage.timestamp)
@@ -265,7 +261,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
                 } else {
                     var textMessage = it as ZIMTextMessage
                     json.put("messageID", textMessage.messageID)
-                    json.put("userID", textMessage.userID)
+                    json.put("userID", textMessage.senderUserID)
                     json.put("message", textMessage.message)
                     json.put("type", textMessage.type.value())
                     json.put("timestamp", textMessage.timestamp)
@@ -289,10 +285,10 @@ class ZIMPlugin: EventChannel.StreamHandler {
             var textMessageJson = JSONArray()
             messageList?.forEach {
                 var json = JSONObject()
-                if (it.type == ZIMMessageType.CUSTOM) {
-                    var customMessage = it as ZIMCustomMessage
+                if (it.type == ZIMMessageType.COMMAND) {
+                    var customMessage = it as ZIMCommandMessage
                     json.put("messageID", customMessage.messageID)
-                    json.put("userID", customMessage.userID)
+                    json.put("userID", customMessage.senderUserID)
                     json.put("message", String(customMessage.message))
                     json.put("type", customMessage.type.value())
                     json.put("timestamp", customMessage.timestamp)
@@ -300,7 +296,7 @@ class ZIMPlugin: EventChannel.StreamHandler {
                 } else {
                     var textMessage = it as ZIMTextMessage
                     json.put("messageID", textMessage.messageID)
-                    json.put("userID", textMessage.userID)
+                    json.put("userID", textMessage.senderUserID)
                     json.put("message", textMessage.message)
                     json.put("type", textMessage.type.value())
                     json.put("timestamp", textMessage.timestamp)
