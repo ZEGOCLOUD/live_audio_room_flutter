@@ -186,7 +186,7 @@ target 'Runner' do
   use_modular_headers!
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  pod 'ZIM','1.3.7' # Add this line
+  pod 'ZIM','2.1.1' # Add this line
 end
 ```
 
@@ -236,7 +236,7 @@ class MainActivity: FlutterActivity() {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
-    api 'com.github.zegolibrary:zim:1.3.2' // Add this line
+    api 'com.github.zegolibrary:zim:2.1.1' // Add this line
 }
 ```
 
